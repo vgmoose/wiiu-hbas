@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Homebrew App Store</name>
+  <coder>vgmoose</coder>
+  <version>1.0</version>
+  <release_date>20160511210000</release_date>
+  <short_description>Download apps for HBL</short_description> 
+  <long_description>Download apps for Homebrew Launcher over the network.
+
+  </long_description> 
+
+</app>
