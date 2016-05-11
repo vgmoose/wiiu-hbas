@@ -70,6 +70,15 @@ for app in os.listdir("apps"):
     coder = "???"
     desc = "???"
     
+    binary = None
+    
+    for file in os.listdir("apps/%s" % app):
+        if file.endswith(".elf"):
+            binary = file
+    
+    if not binary:
+        continue
+    
     if os.path.isfile(xmlfile):
         tree = ET.parse(xmlfile)
 
@@ -85,6 +94,14 @@ for app in os.listdir("apps"):
         
     html += "<tr><td><img src='%s'></td><td>%s</td><td>%s</td><td>%s</td><td><a href='%s'>Download</a></td></tr>\n" % (icon, name, coder, desc, dl)
     
+    yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary)
+    
 html += "</table>"
 
-print html
+index = open("index.html", "w+")
+index.write(html)
+index.close()
+
+directory = open("directory.yaml", "w+")
+directory.write(yaml)
+directory.close()

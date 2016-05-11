@@ -1,0 +1,30 @@
+app: asturoids
+- Ast-U-Roids
+- brienj
+- Ast-U-Roids
+- asturoids.elf
+app: ddd
+- ddd
+- Dimok
+- WiiU Title Dumper
+- ddd.elf
+app: ftpiiu
+- FTPiiU
+- joedj
+- An FTP server
+- ftpiiu.elf
+app: homebrew_launcher
+- Homebrew Launcher
+- Dimok
+- WiiU Homebrew Launcher
+- homebrew_launcher.elf
+app: loadiine
+- loadiine
+- ???
+- ???
+- loadiine_gx2.elf
+app: space
+- Space Game
+- vgmoose
+- Generic space shooter
+- space.elf
