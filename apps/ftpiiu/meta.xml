@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>FTPiiU</name>
+  <coder>joedj</coder>
+  <version>0.3</version>
+  <release_date>20160331200000</release_date>
+  <short_description>An FTP server</short_description>
+  <long_description>ftpiiU is an FTP server for WiiU.
+
+	Ported to WiiU by Dimok.
+	Based on FTPii from joedj
+  </long_description>
+
+</app>

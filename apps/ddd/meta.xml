@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>ddd</name>
+  <coder>Dimok</coder>
+  <version>0.3</version>
+  <release_date>20160424120000</release_date>
+  <short_description>WiiU Title Dumper</short_description>
+  <long_description>This application dumps available data of any title that is entered over network to a PC application.
+  </long_description>
+</app>

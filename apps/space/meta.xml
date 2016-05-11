@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Space Game</name>
+  <coder>vgmoose</coder>
+  <version>1.0</version>
+  <release_date>20160209200000</release_date>
+  <short_description>Generic space shooter</short_description>
+  <long_description>Space Game!! by vgmoose
+      
+    play online: space.vgmoose.com
+    source code: github.com/vgmoose/space
+    
+    The year is 201X. Hop aboard the H.Y.K.M. interstellar spaceship and defend your precious cargo from the oncoming pirates and naysayers! Use either joystick to move around and dodge enemies, and tap/hold on the screen to fire in the direction of the tap. You are the last hope for the Wii U homebrew scene!
+    
+    I had a lot of fun making this game and I hope you all enjoy my little generic space shooter homebrew! I love how the homebrew scene is starting to take off.
+    
+      With or without an IOSU exploit, let's keep having fun!
+      
+      For more info, see my post on vgmoose.com :)
+  </long_description>
+
+</app>

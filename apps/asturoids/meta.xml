@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Ast-U-Roids</name>
+  <coder>brienj</coder>
+  <version>2.0</version>
+  <release_date>20160503120400</release_date>
+  <short_description>Ast-U-Roids</short_description>
+  <long_description>XHP Creations proudly presents Ast-U-Roids
+Special Thanks to:
+Datalogger - Old school hacker
+vgmoose - Inspiring programmer that's always cool
+pwsincd - For setting up a non-volatile working environment
+Quark The Awesome - Another inspiring programmer that never quits
+Dimok - For setting up the Homebrew Launcher environment
+XHP Creations logo is a trademark of XHP Creations and should not be used in any unofficial build.</long_description>
+</app>
