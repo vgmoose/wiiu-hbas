@@ -142,6 +142,7 @@ void Application::executeThread(void)
     log_printf("Initialize main font system\n");
     FreeTypeGX *fontSystem = new FreeTypeGX(Resources::GetFile("font.ttf"), Resources::GetFileSize("font.ttf"), true);
     GuiText::setPresetFont(fontSystem);
+    GuiText::setPresets(28, glm::vec4(0, 0, 0, 1), 0xFFFF, ALIGN_CENTER | ALIGN_MIDDLE); 
 
     log_printf("Initialize main window\n");
 

@@ -27,6 +27,8 @@ public:
     virtual ~HomebrewWindow();
 
     void draw(CVideo *pVideo);
+    float scrollOffY = 0;
+    float lastScrollOffY = 0;
 
 private:
     void OnOpenEffectFinish(GuiElement *element);

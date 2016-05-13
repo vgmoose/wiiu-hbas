@@ -17,9 +17,16 @@ If you are a developer and would like to add an app to my HBAS site (this repo),
 
 ### Credits
 
+Code
+
 - dimok - lots of code, and the main framework used here is copied from [Homebrew Launcher](https://gbatemp.net/threads/homebrew-launcher-for-wiiu.416905/)
 - brienj - for making high quality standalone HBL apps that can be featured on HBAS!
 - marionumber1 - for begrudgingly being a 5.5 enabler
 - pwsincd - for hopefully agreeing to host a UK HBAS repo 
+
+Resources
+
+- Music by [(T-T)b](http://t-tb.bandcamp.com)
+- Cloud icon by [Lyolya](http://www.flaticon.com/authors/lyolya)
 
 *And everybody else in the developing Wii U homebrew community!*

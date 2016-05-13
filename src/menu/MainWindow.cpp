@@ -29,10 +29,10 @@ MainWindow::MainWindow(int w, int h)
     , bgParticleImg(w, h, 500)
     , homebrewWindow(w, h)
 {
-    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 0);
-    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 1);
-    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 2);
-    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 3);
+    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
+    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
+    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
+    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
     append(&bgImageColor);
     append(&bgParticleImg);
 
@@ -102,6 +102,30 @@ void MainWindow::update(GuiController *controller)
 {
     //! dont read behind the initial elements in case one was added
     //u32 tvSize = tvElements.size();
+    
+        if(controller->chanIdx >= 1 && controller->chanIdx <= 4 && controller->data.validPointer)
+    {
+        int wpadIdx = controller->chanIdx - 1;
+        f32 posX = controller->data.x;
+        f32 posY = controller->data.y;
+        pointerImg[wpadIdx]->setPosition(posX, posY);
+        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
+        pointerValid[wpadIdx] = true;
+    }
+    
+    if (controller->data.touched) {
+        if (lastTouchX2 == -1)
+        {
+            lastTouchX2 = controller->data.y;
+        }
+        else
+        {
+            scrollMenu(controller->data.y - lastTouchX2);
+            lastTouchX2 = controller->data.y;
+        }
+    } else {
+        lastTouchX2 = -1;
+    }
 
     if(controller->chan & GuiTrigger::CHANNEL_1)
     {
@@ -136,28 +160,12 @@ void MainWindow::update(GuiController *controller)
 //            tvElements[i]->update(controller);
 //        }
 //    }
-
-    if(controller->chanIdx >= 1 && controller->chanIdx <= 4 && controller->data.validPointer)
-    {
-        int wpadIdx = controller->chanIdx - 1;
-        f32 posX = controller->data.x;
-        f32 posY = controller->data.y;
-        pointerImg[wpadIdx]->setPosition(posX, posY);
-        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
-        pointerValid[wpadIdx] = true;
-    }
-    
-    if (controller->data.touched) {
-        scrollMenu(controller->data.x - lastTouchX2);
-        lastTouchX2 = controller->data.x;
-    } else {
-        lastTouchX2 = -1;
-    }
 }
 
 void MainWindow::scrollMenu(float scrol)
 {
-    
+    homebrewWindow.lastScrollOffY = homebrewWindow.scrollOffY;
+    homebrewWindow.scrollOffY += scrol;
 }
 
 void MainWindow::drawDrc(CVideo *video)

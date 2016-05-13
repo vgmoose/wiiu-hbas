@@ -106,12 +106,12 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
            cpName += strlen("sd:/wiiu/apps/");
 
-        homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(1.0f));
+        homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         homebrewButtons[idx].nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
         homebrewButtons[idx].nameLabel->setPosition(256 + 80, 20);
 
-        homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(1.0f));
+        homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
         homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
@@ -122,8 +122,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].descriptionLabel, 1);
         homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
-        float fXOffset = (i / MAX_BUTTONS_ON_PAGE) * width;
-        float fYOffset = (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (i % MAX_BUTTONS_ON_PAGE);
+        float fXOffset = 0;
+        float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (i);
         homebrewButtons[idx].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         homebrewButtons[idx].button->setTrigger(&touchTrigger);
         homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
@@ -135,29 +135,29 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     }
 
 
-    if((MAX_BUTTONS_ON_PAGE) < homebrewButtons.size())
-    {
-        arrowLeftButton.setImage(&arrowLeftImage);
-        arrowLeftButton.setEffectGrow();
-        arrowLeftButton.setPosition(40, 0);
-        arrowLeftButton.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        arrowLeftButton.setTrigger(&touchTrigger);
-        arrowLeftButton.setTrigger(&wpadTouchTrigger);
-        arrowLeftButton.setTrigger(&buttonLTrigger);
-        arrowLeftButton.setSoundClick(buttonClickSound);
-        arrowLeftButton.clicked.connect(this, &HomebrewWindow::OnLeftArrowClick);
-
-        arrowRightButton.setImage(&arrowRightImage);
-        arrowRightButton.setEffectGrow();
-        arrowRightButton.setPosition(-40, 0);
-        arrowRightButton.setAlignment(ALIGN_RIGHT | ALIGN_MIDDLE);
-        arrowRightButton.setTrigger(&touchTrigger);
-        arrowRightButton.setTrigger(&wpadTouchTrigger);
-        arrowRightButton.setTrigger(&buttonRTrigger);
-        arrowRightButton.setSoundClick(buttonClickSound);
-        arrowRightButton.clicked.connect(this, &HomebrewWindow::OnRightArrowClick);
-        append(&arrowRightButton);
-    }
+//    if((MAX_BUTTONS_ON_PAGE) < homebrewButtons.size())
+//    {
+//        arrowLeftButton.setImage(&arrowLeftImage);
+//        arrowLeftButton.setEffectGrow();
+//        arrowLeftButton.setPosition(40, 0);
+//        arrowLeftButton.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+//        arrowLeftButton.setTrigger(&touchTrigger);
+//        arrowLeftButton.setTrigger(&wpadTouchTrigger);
+//        arrowLeftButton.setTrigger(&buttonLTrigger);
+//        arrowLeftButton.setSoundClick(buttonClickSound);
+//        arrowLeftButton.clicked.connect(this, &HomebrewWindow::OnLeftArrowClick);
+//
+//        arrowRightButton.setImage(&arrowRightImage);
+//        arrowRightButton.setEffectGrow();
+//        arrowRightButton.setPosition(-40, 0);
+//        arrowRightButton.setAlignment(ALIGN_RIGHT | ALIGN_MIDDLE);
+//        arrowRightButton.setTrigger(&touchTrigger);
+//        arrowRightButton.setTrigger(&wpadTouchTrigger);
+//        arrowRightButton.setTrigger(&buttonRTrigger);
+//        arrowRightButton.setSoundClick(buttonClickSound);
+//        arrowRightButton.clicked.connect(this, &HomebrewWindow::OnRightArrowClick);
+//        append(&arrowRightButton);
+//    }
 
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
     hblVersionText.setPosition(-30, 30);
@@ -268,7 +268,10 @@ void HomebrewWindow::OnRightArrowClick(GuiButton *button, const GuiController *c
 void HomebrewWindow::draw(CVideo *pVideo)
 {
     bool bUpdatePositions = false;
-
+    
+    if (scrollOffY != lastScrollOffY)
+        bUpdatePositions = true;
+        
     if(currentLeftPosition < targetLeftPosition)
     {
         currentLeftPosition += 35;
@@ -294,8 +297,8 @@ void HomebrewWindow::draw(CVideo *pVideo)
 
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
-            float fXOffset = (i / MAX_BUTTONS_ON_PAGE) * getWidth();
-            float fYOffset = (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 20);
+            float fXOffset = 0;
+            float fYOffset = scrollOffY + (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 20) * i;
             homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
     }
