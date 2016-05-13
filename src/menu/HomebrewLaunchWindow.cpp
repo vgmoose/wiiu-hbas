@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "HomebrewLaunchWindow.h"
-#include "HomebrewLoader.h"
 #include "common/common.h"
 #include "fs/DirList.h"
 #include "fs/fs_utils.h"
@@ -184,9 +183,9 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     u32 ApplicationMemoryEnd;
     asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
 
-    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(homebrewLaunchPath, (unsigned char*)ApplicationMemoryEnd);
-    loader->setEffect(EFFECT_FADE, 15, 255);
-    loader->effectFinished.connect(this, &HomebrewLaunchWindow::OnOpenEffectFinish);
-    loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
-    append(loader);
+//    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(homebrewLaunchPath, (unsigned char*)ApplicationMemoryEnd);
+//    loader->setEffect(EFFECT_FADE, 15, 255);
+//    loader->effectFinished.connect(this, &HomebrewLaunchWindow::OnOpenEffectFinish);
+//    loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
+//    append(loader);
 }

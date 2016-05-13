@@ -29,10 +29,10 @@ MainWindow::MainWindow(int w, int h)
     , bgParticleImg(w, h, 500)
     , homebrewWindow(w, h)
 {
-    bgImageColor.setImageColor((GX2Color){  79, 153, 239, 255 }, 0);
-    bgImageColor.setImageColor((GX2Color){  79, 153, 239, 255 }, 1);
-    bgImageColor.setImageColor((GX2Color){  59, 159, 223, 255 }, 2);
-    bgImageColor.setImageColor((GX2Color){  59, 159, 223, 255 }, 3);
+    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 0);
+    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 1);
+    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 2);
+    bgImageColor.setImageColor((GX2Color){ 246, 246, 246, 255 }, 3);
     append(&bgImageColor);
     append(&bgParticleImg);
 
@@ -146,6 +146,18 @@ void MainWindow::update(GuiController *controller)
         pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
         pointerValid[wpadIdx] = true;
     }
+    
+    if (controller->data.touched) {
+        scrollMenu(controller->data.x - lastTouchX2);
+        lastTouchX2 = controller->data.x;
+    } else {
+        lastTouchX2 = -1;
+    }
+}
+
+void MainWindow::scrollMenu(float scrol)
+{
+    
 }
 
 void MainWindow::drawDrc(CVideo *video)

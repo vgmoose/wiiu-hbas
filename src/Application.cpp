@@ -41,7 +41,7 @@ Application::Application()
     controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
 
     //! load resources
-    Resources::LoadFiles("sd:/wiiu/apps/homebrew_launcher/resources");
+    Resources::LoadFiles("sd:/wiiu/apps/hbappstore/resources");
 
     //! create bgMusic
     bgMusic = new GuiSound(Resources::GetFile("slimers.mp3"), Resources::GetFileSize("slimers.mp3"));

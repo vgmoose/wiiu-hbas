@@ -64,6 +64,6 @@ extern "C" int Menu_Main(void)
     memoryRelease();
     log_deinit();
 
-    return returnCode;
+    return 0;
 }
 

@@ -19,7 +19,6 @@
 
 #include "gui/Gui.h"
 #include "gui/GuiFrame.h"
-#include "TcpReceiver.h"
 
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 {
@@ -72,7 +71,6 @@ private:
     int currentLeftPosition;
     int targetLeftPosition;
 
-    TcpReceiver tcpReceiver;
 };
 
 #endif //_HOMEBREW_WINDOW_H_

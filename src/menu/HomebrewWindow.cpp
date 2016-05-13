@@ -42,10 +42,9 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
     , buttonRTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_R | GuiTrigger::BUTTON_RIGHT, true)
-    , tcpReceiver(DEFAULT_WIILOAD_PORT)
 {
-    tcpReceiver.serverReceiveStart.connect(this, &HomebrewWindow::OnTcpReceiveStart);
-    tcpReceiver.serverReceiveFinished.connect(this, &HomebrewWindow::OnTcpReceiveFinish);
+//    tcpReceiver.serverReceiveStart.connect(this, &HomebrewWindow::OnTcpReceiveStart);
+//    tcpReceiver.serverReceiveFinished.connect(this, &HomebrewWindow::OnTcpReceiveFinish);
 
     targetLeftPosition = 0;
     currentLeftPosition = 0;
@@ -296,44 +295,12 @@ void HomebrewWindow::draw(CVideo *pVideo)
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
             float fXOffset = (i / MAX_BUTTONS_ON_PAGE) * getWidth();
-            float fYOffset = (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 20) * (i % MAX_BUTTONS_ON_PAGE);
+            float fYOffset = (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 20);
             homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
     }
 
     GuiFrame::draw(pVideo);
-}
 
-void HomebrewWindow::OnCloseTcpReceiverFinish(GuiElement *element)
-{
-    //! remove element from draw list and push to delete queue
-    remove(element);
-    clearState(STATE_DISABLED);
-}
-
-void HomebrewWindow::OnTcpReceiveStart(GuiElement *element, u32 ip)
-{
-    setState(STATE_DISABLED);
-
-    element->setEffect(EFFECT_FADE, 15, 255);
-    element->effectFinished.connect(this, &HomebrewWindow::OnOpenEffectFinish);
-    append(element);
-}
-
-void HomebrewWindow::OnTcpReceiveFinish(GuiElement *element, u32 ip, int result)
-{
-    element->setState(GuiElement::STATE_DISABLED);
-    element->setEffect(EFFECT_FADE, -10, 0);
-    element->effectFinished.connect(this, &HomebrewWindow::OnCloseTcpReceiverFinish);
-
-    if(result > 0)
-    {
-        u32 ApplicationMemoryEnd;
-        asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
-
-        ELF_DATA_ADDR = ApplicationMemoryEnd;
-        ELF_DATA_SIZE = result;
-        Application::instance()->quit(EXIT_SUCCESS);
-    }
 }
 

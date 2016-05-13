@@ -115,6 +115,8 @@ public:
     void drawTv(CVideo *video);
     void update(GuiController *controller);
     void updateEffects();
+    void scrollMenu(float scrol);
+    float lastTouchX2 = 0;
 private:
     int width, height;
     std::vector<GuiElement *> drcElements;
