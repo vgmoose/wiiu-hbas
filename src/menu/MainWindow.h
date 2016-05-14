@@ -21,7 +21,6 @@
 #include <queue>
 #include "gui/Gui.h"
 #include "HomebrewWindow.h"
-#include "gui/GuiParticleImage.h"
 
 class CVideo;
 
@@ -123,7 +122,6 @@ private:
     std::vector<GuiElement *> tvElements;
 
     GuiImage bgImageColor;
-    GuiParticleImage bgParticleImg;
     HomebrewWindow homebrewWindow;
 
     GuiImageData *pointerImgData[4];

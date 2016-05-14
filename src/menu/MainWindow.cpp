@@ -26,7 +26,6 @@ MainWindow::MainWindow(int w, int h)
     : width(w)
     , height(h)
     , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
-    , bgParticleImg(w, h, 500)
     , homebrewWindow(w, h)
 {
     bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
@@ -34,7 +33,6 @@ MainWindow::MainWindow(int w, int h)
     bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
     bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
     append(&bgImageColor);
-    append(&bgParticleImg);
 
     for(int i = 0; i < 4; i++)
     {
@@ -52,7 +50,6 @@ MainWindow::~MainWindow()
 {
     remove(&homebrewWindow);
     remove(&bgImageColor);
-    remove(&bgParticleImg);
 
     while(!tvElements.empty())
     {
@@ -165,6 +162,8 @@ void MainWindow::update(GuiController *controller)
 void MainWindow::scrollMenu(float scrol)
 {
     homebrewWindow.lastScrollOffY = homebrewWindow.scrollOffY;
+    if (homebrewWindow.scrollOffY + scrol < -140 || homebrewWindow.scrollOffY + scrol > homebrewWindow.homebrewButtons.size()*130)
+        return;
     homebrewWindow.scrollOffY += scrol;
 }
 

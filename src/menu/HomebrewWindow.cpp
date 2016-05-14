@@ -30,14 +30,17 @@
 HomebrewWindow::HomebrewWindow(int w, int h)
     : GuiFrame(w, h)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
-    , homebrewButtonImgData(Resources::GetImageData("homebrewButton.png"))
+    , installedButtonImgData(Resources::GetImageData("INSTALLED.png"))
+    , getButtonImgData(Resources::GetImageData("GET.png"))
+    , updateButtonImgData(Resources::GetImageData("UPDATE.png"))
+    , localButtonImgData(Resources::GetImageData("LOCAL.png"))
     , arrowRightImageData(Resources::GetImageData("rightArrow.png"))
     , arrowLeftImageData(Resources::GetImageData("leftArrow.png"))
     , arrowRightImage(arrowRightImageData)
     , arrowLeftImage(arrowLeftImageData)
     , arrowRightButton(arrowRightImage.getWidth(), arrowRightImage.getHeight())
     , arrowLeftButton(arrowLeftImage.getWidth(), arrowLeftImage.getHeight())
-    , hblVersionText("Homebrew Launcher " HBL_VERSION " by Dimok", 32, glm::vec4(1.0f))
+    , hblVersionText("Homebrew App Store by VGMoose, Music by (T-T)b (google t tb bandcamp)", 32, glm::vec4(1.0f))
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
@@ -68,7 +71,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons.resize(homebrewButtons.size() + 1);
 
         homebrewButtons[idx].execPath = dirList.GetFilepath(i);
-        homebrewButtons[idx].image = new GuiImage(homebrewButtonImgData);
+        homebrewButtons[idx].image = new GuiImage(localButtonImgData);
         homebrewButtons[idx].image->setScale(0.9f);
         homebrewButtons[idx].iconImgData = NULL;
 
@@ -79,6 +82,13 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 
         u8 * iconData = NULL;
         u32 iconDataSize = 0;
+        
+        homebrewButtons[idx].dirPath = homebrewPath;
+        
+        // since we got this app from the sd card, mark it local for now.
+        // if we see it later on the server, update its status appropriately to 
+        // update or installed
+        homebrewButtons[idx].status = "LOCAL";
 
         LoadFileToMem((homebrewPath + "/icon.png").c_str(), &iconData, &iconDataSize);
 
@@ -115,8 +125,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
         homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
-
-        homebrewButtons[idx].button = new GuiButton(homebrewButtonImgData->getWidth(), homebrewButtonImgData->getHeight());
+        
+        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
 
         homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
@@ -160,7 +170,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 //    }
 
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
-    hblVersionText.setPosition(-30, 30);
+    hblVersionText.setPosition(-30, 0);
     append(&hblVersionText);
 }
 
@@ -177,7 +187,10 @@ HomebrewWindow::~HomebrewWindow()
     }
 
     Resources::RemoveSound(buttonClickSound);
-    Resources::RemoveImageData(homebrewButtonImgData);
+    Resources::RemoveImageData(installedButtonImgData);
+    Resources::RemoveImageData(getButtonImgData);
+    Resources::RemoveImageData(updateButtonImgData);
+    Resources::RemoveImageData(localButtonImgData);
     Resources::RemoveImageData(arrowRightImageData);
     Resources::RemoveImageData(arrowLeftImageData);
 }

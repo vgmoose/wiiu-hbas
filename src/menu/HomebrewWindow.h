@@ -29,6 +29,19 @@ public:
     void draw(CVideo *pVideo);
     float scrollOffY = 0;
     float lastScrollOffY = 0;
+        typedef struct
+    {
+        std::string execPath;
+        GuiImage *image;
+        GuiButton *button;
+        GuiText *nameLabel;
+        GuiText *descriptionLabel;
+        GuiImageData *iconImgData;
+        GuiImage *iconImg;
+        std::string status;
+        std::string dirPath;
+    } homebrewButton;
+    std::vector<homebrewButton> homebrewButtons;
 
 private:
     void OnOpenEffectFinish(GuiElement *element);
@@ -43,7 +56,10 @@ private:
     void OnTcpReceiveFinish(GuiElement *element, u32 ip, int result);
 
     GuiSound *buttonClickSound;
-    GuiImageData * homebrewButtonImgData;
+    GuiImageData * installedButtonImgData;
+    GuiImageData * getButtonImgData;
+    GuiImageData * updateButtonImgData;
+    GuiImageData * localButtonImgData;
 
     GuiImageData* arrowRightImageData;
     GuiImageData* arrowLeftImageData;
@@ -53,18 +69,6 @@ private:
     GuiButton arrowLeftButton;
     GuiText hblVersionText;
 
-    typedef struct
-    {
-        std::string execPath;
-        GuiImage *image;
-        GuiButton *button;
-        GuiText *nameLabel;
-        GuiText *descriptionLabel;
-        GuiImageData *iconImgData;
-        GuiImage *iconImg;
-    } homebrewButton;
-
-    std::vector<homebrewButton> homebrewButtons;
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
     GuiTrigger buttonLTrigger;
