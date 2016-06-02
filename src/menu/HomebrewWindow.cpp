@@ -27,6 +27,11 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 
+#define LOCAL 0
+#define UPDATE 1
+#define INSTALLED 2
+#define GET 3
+
 HomebrewWindow::HomebrewWindow(int w, int h)
     : GuiFrame(w, h)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
@@ -52,11 +57,14 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     targetLeftPosition = 0;
     currentLeftPosition = 0;
     listOffset = 0;
+        
+    GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
 
     DirList dirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
 
     dirList.SortList();
 
+    // load up local apps
     for(int i = 0; i < dirList.GetFilecount(); i++)
     {
         //! skip our own application in the listing
@@ -69,10 +77,10 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
+        
+//        homebrewButton homebrewButtons[idx] = homebrewButtons[idx];
 
         homebrewButtons[idx].execPath = dirList.GetFilepath(i);
-        homebrewButtons[idx].image = new GuiImage(localButtonImgData);
-        homebrewButtons[idx].image->setScale(0.9f);
         homebrewButtons[idx].iconImgData = NULL;
 
         std::string homebrewPath = homebrewButtons[idx].execPath;
@@ -88,7 +96,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         // since we got this app from the sd card, mark it local for now.
         // if we see it later on the server, update its status appropriately to 
         // update or installed
-        homebrewButtons[idx].status = "LOCAL";
+        homebrewButtons[idx].status = LOCAL;
 
         LoadFileToMem((homebrewPath + "/icon.png").c_str(), &iconData, &iconDataSize);
 
@@ -127,6 +135,10 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
         
         homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+        
+        // set the right image for the status
+        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
+        homebrewButtons[idx].image->setScale(0.9f);
 
         homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
@@ -138,7 +150,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].button->setTrigger(&touchTrigger);
         homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
         homebrewButtons[idx].button->setEffectGrow();
-        homebrewButtons[idx].button->setSoundClick(buttonClickSound);
+//        homebrewButtons[idx].button->setSoundClick(buttonClickSound);
         homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
 
         append(homebrewButtons[idx].button);

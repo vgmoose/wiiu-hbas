@@ -47,7 +47,8 @@ SOURCES		:=	src \
 				src/system \
 				src/utils \
 				src/video \
-				src/video/shaders
+				src/video/shaders \
+                src/network
 DATA		:=	data \
 				data/images \
 				data/fonts \

@@ -38,7 +38,7 @@ public:
         GuiText *descriptionLabel;
         GuiImageData *iconImgData;
         GuiImage *iconImg;
-        std::string status;
+        int status;
         std::string dirPath;
     } homebrewButton;
     std::vector<homebrewButton> homebrewButtons;
