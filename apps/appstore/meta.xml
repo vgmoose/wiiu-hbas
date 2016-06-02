@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>HB App Store</name>
+  <coder>vgmoose</coder>
+  <version>1.0</version>
+  <release_date>20160209200000</release_date>
+  <short_description>Download homebrew apps</short_description>
+
+</app>
