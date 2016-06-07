@@ -25,6 +25,7 @@ class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 public:
     HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData);
     virtual ~HomebrewLaunchWindow();
+	
 
     sigslot::signal1<GuiElement *> backButtonClicked;
 private:

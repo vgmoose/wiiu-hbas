@@ -14,6 +14,7 @@
 #include "utils/logger.h"
 #include "utils/utils.h"
 #include "common/common.h"
+#include "dynamic_libs/curl_functions.h"
 
 /* Entry point */
 extern "C" int Menu_Main(void)
@@ -34,6 +35,7 @@ extern "C" int Menu_Main(void)
     InitVPadFunctionPointers();
     InitPadScoreFunctionPointers();
     InitAXFunctionPointers();
+    InitCurlFunctionPointers();
 
     log_print("Function exports loaded\n");
 

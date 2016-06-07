@@ -22,6 +22,11 @@
 #include "system/AsyncDeleter.h"
 #include "utils/HomebrewXML.h"
 #include "HomebrewLaunchWindow.h"
+#include "network/FileDownloader.h"
+#include <thread>
+#include <sstream>
+
+
 
 #define DEFAULT_WIILOAD_PORT        4299
 
@@ -74,12 +79,13 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         //! skip hidden linux and mac files
         if(dirList.GetFilename(i)[0] == '.' || dirList.GetFilename(i)[0] == '_')
             continue;
+        
+//        createHomebrewButton(dirList.GetFilepath(i), 
 
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
         
-//        homebrewButton homebrewButtons[idx] = homebrewButtons[idx];
-
+        // file path
         homebrewButtons[idx].execPath = dirList.GetFilepath(i);
         homebrewButtons[idx].iconImgData = NULL;
 
@@ -154,7 +160,127 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
 
         append(homebrewButtons[idx].button);
+        
+//        // try to go through the string
+//        for (int x=0; x<fileContents.size(); x++)
+//        {
+//            
+//        }
+		
     }
+        		
+        // download app list from wiiubru
+        std::string fileContents;
+        std::string targetUrl = std::string("http://wiiubru.com/appstore/directory.yaml");
+        FileDownloader::getFile(targetUrl, fileContents);
+
+        std::istringstream f(fileContents);
+        std::string shortname;
+        std::getline(f, shortname);
+        shortname = shortname.substr(5);
+        std::string name;    
+        std::getline(f, name);
+        name = name.substr(2);
+        std::string author;    
+        std::getline(f, author);
+        author = author.substr(2);
+        std::string desc;    
+        std::getline(f, desc);
+        desc = desc.substr(2);
+        std::string binary;    
+        std::getline(f, binary);
+        binary = binary.substr(2);
+        
+          int idx = homebrewButtons.size();
+        homebrewButtons.resize(homebrewButtons.size() + 1);
+        
+        // file path
+        homebrewButtons[idx].execPath = "n";
+        homebrewButtons[idx].iconImgData = NULL;
+
+        std::string homebrewPath = homebrewButtons[idx].execPath;
+        size_t slashPos = homebrewPath.rfind('/');
+        if(slashPos != std::string::npos)
+            homebrewPath.erase(slashPos);
+
+        u8 * iconData = NULL;
+        u32 iconDataSize = 0;
+        
+        homebrewButtons[idx].dirPath = homebrewPath;
+        
+        // since we got this app from the sd card, mark it local for now.
+        // if we see it later on the server, update its status appropriately to 
+        // update or installed
+        homebrewButtons[idx].status = GET;
+        
+        // download app list from wiiubru
+        std::string targetIcon;
+        std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
+        FileDownloader::getFile(targetIconUrl, targetIcon);
+
+        LoadFileToMem(targetIcon.c_str(), &iconData, &iconDataSize);
+
+        if(iconData != NULL)
+        {
+            homebrewButtons[idx].iconImgData = new GuiImageData(iconData, iconDataSize);
+            free(iconData);
+            iconData = NULL;
+        }
+
+        const float cfImageScale = 1.0f;
+
+        homebrewButtons[idx].iconImg = new GuiImage(homebrewButtons[idx].iconImgData);
+        homebrewButtons[idx].iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+        homebrewButtons[idx].iconImg->setPosition(60, 0);
+        homebrewButtons[idx].iconImg->setScale(cfImageScale);
+
+        HomebrewXML metaXml;
+
+//        bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
+
+        const char *cpName = name.c_str();
+        const char *cpDescription = desc.c_str();
+
+        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
+           cpName += strlen("sd:/wiiu/apps/");
+
+        homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+        homebrewButtons[idx].nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+        homebrewButtons[idx].nameLabel->setPosition(256 + 80, 20);
+
+        homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+        homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+        homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
+        
+        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+        
+        // set the right image for the status
+        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
+        homebrewButtons[idx].image->setScale(0.9f);
+
+        homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
+        homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
+        homebrewButtons[idx].button->setLabel(homebrewButtons[idx].descriptionLabel, 1);
+        homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
+        float fXOffset = 0;
+        float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (idx);
+        homebrewButtons[idx].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
+        homebrewButtons[idx].button->setTrigger(&touchTrigger);
+        homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
+        homebrewButtons[idx].button->setEffectGrow();
+//        homebrewButtons[idx].button->setSoundClick(buttonClickSound);
+        homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
+
+        append(homebrewButtons[idx].button);
+        
+    
+//    while (std::getline(f, line)) {
+//        if (!strncmp(str, substr, strlen("app: "))) {
+//            
+//        }
+//    }
 
 
 //    if((MAX_BUTTONS_ON_PAGE) < homebrewButtons.size())

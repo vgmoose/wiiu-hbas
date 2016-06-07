@@ -32,6 +32,7 @@ TARGET		:=	hbas
 BUILD		:=	build
 BUILD_DBG	:=	$(TARGET)_dbg
 SOURCES		:=	src \
+				src/common \
 				src/dynamic_libs \
 				src/fs \
 				src/game \
@@ -47,8 +48,7 @@ SOURCES		:=	src \
 				src/system \
 				src/utils \
 				src/video \
-				src/video/shaders \
-                src/network
+				src/video/shaders
 DATA		:=	data \
 				data/images \
 				data/fonts \
