@@ -33,8 +33,22 @@ void InitSysFunctionPointers(void);
 extern void(*_SYSLaunchTitleByPathFromLauncher)(const char* path, int len, int zero);
 extern int (* SYSRelaunchTitle)(int argc, char* argv);
 extern int (* SYSLaunchMenu)(void);
+typedef struct SYSBrowserArgsIn SYSBrowserArgsIn;
+typedef struct SYSStandardArgsIn SYSStandardArgsIn;
 
+//struct SYSStandardArgsIn {
+//    const char* anchor;
+//	    u32         anchorSize;
+//		};
 
+//struct SYSBrowserArgsIn {
+//    SYSStandardArgsIn stdIn;
+//	    const char*       url;
+//		    u32               urlSize;
+//			};
+//
+//
+//extern void* (* SYSSwitchToBrowser)(const SYSBrowserArgsIn * args);
 #ifdef __cplusplus
 }
 #endif

@@ -22,10 +22,12 @@
  * distribution.
  ***************************************************************************/
 #include "os_functions.h"
+#include "sys_functions.h"
 
 EXPORT_DECL(void, _SYSLaunchTitleByPathFromLauncher, const char* path, int len, int zero);
 EXPORT_DECL(int, SYSRelaunchTitle, int argc, char* argv);
 EXPORT_DECL(int, SYSLaunchMenu, void);
+//EXPORT_DECL(void*, SYSSwitchToBrowser, const SYSBrowserArgsIn* args);
 
 void InitSysFunctionPointers(void)
 {
@@ -36,5 +38,6 @@ void InitSysFunctionPointers(void)
     OS_FIND_EXPORT(sysapp_handle, _SYSLaunchTitleByPathFromLauncher);
     OS_FIND_EXPORT(sysapp_handle, SYSRelaunchTitle);
     OS_FIND_EXPORT(sysapp_handle, SYSLaunchMenu);
+    //OS_FIND_EXPORT(sysapp_handle, SYSSwitchToBrowser);
 }
 

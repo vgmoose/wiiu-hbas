@@ -20,6 +20,7 @@
 #include "fs/fs_utils.h"
 #include "utils/HomebrewXML.h"
 #include "Application.h"
+#include "dynamic_libs/sys_functions.h"
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData)
     : GuiFrame(0, 0)
@@ -180,8 +181,15 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     backBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
 
-    u32 ApplicationMemoryEnd;
-    asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
+//    struct SYSBrowserArgsIn args = {};
+//    std::string url = "http://vgmoose.com";
+//    args.url = url.c_str();
+//    args.urlSize = url.size();
+//    SYSSwitchToBrowser(&args);
+    
+    
+//    u32 ApplicationMemoryEnd;
+//    asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
 
 //    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(homebrewLaunchPath, (unsigned char*)ApplicationMemoryEnd);
 //    loader->setEffect(EFFECT_FADE, 15, 255);

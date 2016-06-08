@@ -218,14 +218,11 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
         FileDownloader::getFile(targetIconUrl, targetIcon);
 
-        LoadFileToMem(targetIcon.c_str(), &iconData, &iconDataSize);
-
-        if(iconData != NULL)
-        {
-            homebrewButtons[idx].iconImgData = new GuiImageData(iconData, iconDataSize);
-            free(iconData);
-            iconData = NULL;
-        }
+//        if(targetIcon != NULL)
+//        {
+            homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+//            free(iconData);
+//        }
 
         const float cfImageScale = 1.0f;
 
