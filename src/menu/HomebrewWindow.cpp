@@ -113,11 +113,11 @@ HomebrewWindow::HomebrewWindow(int w, int h)
             iconData = NULL;
         }
 
-        const float cfImageScale = 1.0f;
+        const float cfImageScale = 0.8f;
 
         homebrewButtons[idx].iconImg = new GuiImage(homebrewButtons[idx].iconImgData);
         homebrewButtons[idx].iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        homebrewButtons[idx].iconImg->setPosition(60, 0);
+        homebrewButtons[idx].iconImg->setPosition(30, 0);
         homebrewButtons[idx].iconImg->setScale(cfImageScale);
 
         HomebrewXML metaXml;
@@ -130,28 +130,28 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
            cpName += strlen("sd:/wiiu/apps/");
 
-        homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         homebrewButtons[idx].nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-        homebrewButtons[idx].nameLabel->setPosition(256 + 80, 20);
+        homebrewButtons[idx].nameLabel->setPosition(256 + 10, 20);
 
-        homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].descriptionLabel = new GuiText(metaXml.GetCoder(), 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-        homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
+        homebrewButtons[idx].descriptionLabel->setPosition(256 + 10, -20);
         
         homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
         
         // set the right image for the status
         homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
-        homebrewButtons[idx].image->setScale(0.9f);
+        homebrewButtons[idx].image->setScale(0.9);
 
         homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
         homebrewButtons[idx].button->setLabel(homebrewButtons[idx].descriptionLabel, 1);
         homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
-        float fXOffset = 0;
-        float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (i);
+        float fXOffset = (idx % 2)? 270 : -270;
+        float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * ((idx % 2)? (int)(idx/2)-1 : (int)(idx/2));
         homebrewButtons[idx].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         homebrewButtons[idx].button->setTrigger(&touchTrigger);
         homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
@@ -359,6 +359,7 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
     bool disableButtons = false;
+    return;
 
     for(u32 i = 0; i < homebrewButtons.size(); i++)
     {
@@ -445,8 +446,8 @@ void HomebrewWindow::draw(CVideo *pVideo)
 
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
-            float fXOffset = 0;
-            float fYOffset = scrollOffY + (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 20) * i;
+            float fXOffset = (i % 2)? 265 : -265;
+            float fYOffset = scrollOffY + (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));            
             homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
     }
