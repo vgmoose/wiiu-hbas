@@ -26,7 +26,7 @@ public:
     typedef void (*ProgressCallback)(void *arg, u32 done, u32 total);
 
     static bool getFile(const std::string & downloadUrl, std::string & fileBuffer, ProgressCallback callback = 0, void *arg = 0);
-//    static bool getFile(const std::string & downloadUrl, const std::string & outputPath, ProgressCallback callback = 0, void *arg = 0);
+    static bool getFile(const std::string & downloadUrl, const std::string & outputPath, ProgressCallback callback = 0, void *arg = 0);
 private:
     typedef struct
     {

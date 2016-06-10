@@ -173,105 +173,110 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         std::string fileContents;
         std::string targetUrl = std::string("http://wiiubru.com/appstore/directory.yaml");
         FileDownloader::getFile(targetUrl, fileContents);
-
         std::istringstream f(fileContents);
-        std::string shortname;
-        std::getline(f, shortname);
-        shortname = shortname.substr(5);
-        std::string name;    
-        std::getline(f, name);
-        name = name.substr(2);
-        std::string author;    
-        std::getline(f, author);
-        author = author.substr(2);
-        std::string desc;    
-        std::getline(f, desc);
-        desc = desc.substr(2);
-        std::string binary;    
-        std::getline(f, binary);
-        binary = binary.substr(2);
-        
-          int idx = homebrewButtons.size();
-        homebrewButtons.resize(homebrewButtons.size() + 1);
-        
-        // file path
-        homebrewButtons[idx].execPath = "n";
-        homebrewButtons[idx].iconImgData = NULL;
 
-        std::string homebrewPath = homebrewButtons[idx].execPath;
-        size_t slashPos = homebrewPath.rfind('/');
-        if(slashPos != std::string::npos)
-            homebrewPath.erase(slashPos);
+//        int loops = 0;
+//        int i2;
+        while (true)
+        {
+            std::string shortname;
+            
+            if (!std::getline(f, shortname)) break;
+            shortname = shortname.substr(5);
+            std::string name;    
+            std::getline(f, name);
+            name = name.substr(2);
+            std::string author;    
+            std::getline(f, author);
+            author = author.substr(2);
+            std::string desc;    
+            std::getline(f, desc);
+            desc = desc.substr(2);
+            std::string binary;    
+            std::getline(f, binary);
+            binary = binary.substr(2);
 
-        u8 * iconData = NULL;
-        u32 iconDataSize = 0;
-        
-        homebrewButtons[idx].dirPath = homebrewPath;
-        
-        // since we got this app from the sd card, mark it local for now.
-        // if we see it later on the server, update its status appropriately to 
-        // update or installed
-        homebrewButtons[idx].status = GET;
-        
-        // download app list from wiiubru
-        std::string targetIcon;
-        std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
-        FileDownloader::getFile(targetIconUrl, targetIcon);
+              int idx = homebrewButtons.size();
+            homebrewButtons.resize(homebrewButtons.size() + 1);
 
-//        if(targetIcon != NULL)
-//        {
-            homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
-//            free(iconData);
-//        }
+            // file path
+            homebrewButtons[idx].execPath = "";
+            homebrewButtons[idx].iconImgData = NULL;
 
-        const float cfImageScale = 1.0f;
+            std::string homebrewPath = homebrewButtons[idx].execPath;
+            size_t slashPos = homebrewPath.rfind('/');
+            if(slashPos != std::string::npos)
+                homebrewPath.erase(slashPos);
 
-        homebrewButtons[idx].iconImg = new GuiImage(homebrewButtons[idx].iconImgData);
-        homebrewButtons[idx].iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        homebrewButtons[idx].iconImg->setPosition(60, 0);
-        homebrewButtons[idx].iconImg->setScale(cfImageScale);
+            u8 * iconData = NULL;
+            u32 iconDataSize = 0;
 
-        HomebrewXML metaXml;
+            homebrewButtons[idx].dirPath = homebrewPath;
 
-//        bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
+            // since we got this app from the sd card, mark it local for now.
+            // if we see it later on the server, update its status appropriately to 
+            // update or installed
+            homebrewButtons[idx].status = GET;
+            homebrewButtons[idx].shortname = shortname;
+            // download app list from wiiubru
+            std::string targetIcon;
+            std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
+            FileDownloader::getFile(targetIconUrl, targetIcon);
 
-        const char *cpName = name.c_str();
-        const char *cpDescription = desc.c_str();
+    //        if(targetIcon != NULL)
+    //        {
+                homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+    //            free(iconData);
+    //        }
 
-        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
-           cpName += strlen("sd:/wiiu/apps/");
+            const float cfImageScale = 1.0f;
 
-        homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        homebrewButtons[idx].nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-        homebrewButtons[idx].nameLabel->setPosition(256 + 80, 20);
+            homebrewButtons[idx].iconImg = new GuiImage(homebrewButtons[idx].iconImgData);
+            homebrewButtons[idx].iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+            homebrewButtons[idx].iconImg->setPosition(60, 0);
+            homebrewButtons[idx].iconImg->setScale(cfImageScale);
 
-        homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-        homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
-        
-        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-        
-        // set the right image for the status
-        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
-        homebrewButtons[idx].image->setScale(0.9f);
+            HomebrewXML metaXml;
 
-        homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
-        homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
-        homebrewButtons[idx].button->setLabel(homebrewButtons[idx].descriptionLabel, 1);
-        homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
-        float fXOffset = 0;
-        float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (idx);
-        homebrewButtons[idx].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
-        homebrewButtons[idx].button->setTrigger(&touchTrigger);
-        homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
-        homebrewButtons[idx].button->setEffectGrow();
-//        homebrewButtons[idx].button->setSoundClick(buttonClickSound);
-        homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
+    //        bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
 
-        append(homebrewButtons[idx].button);
-        
+            const char *cpName = name.c_str();
+            const char *cpDescription = desc.c_str();
+
+            if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
+               cpName += strlen("sd:/wiiu/apps/");
+
+            homebrewButtons[idx].nameLabel = new GuiText(cpName, 32, glm::vec4(0, 0, 0, 1));
+            homebrewButtons[idx].nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+            homebrewButtons[idx].nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+            homebrewButtons[idx].nameLabel->setPosition(256 + 80, 20);
+
+            homebrewButtons[idx].descriptionLabel = new GuiText(cpDescription, 32, glm::vec4(0, 0, 0, 1));
+            homebrewButtons[idx].descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+            homebrewButtons[idx].descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+            homebrewButtons[idx].descriptionLabel->setPosition(256 + 80, -20);
+
+            homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+
+            // set the right image for the status
+            homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
+            homebrewButtons[idx].image->setScale(0.9f);
+
+            homebrewButtons[idx].button->setImage(homebrewButtons[idx].image);
+            homebrewButtons[idx].button->setLabel(homebrewButtons[idx].nameLabel, 0);
+            homebrewButtons[idx].button->setLabel(homebrewButtons[idx].descriptionLabel, 1);
+            homebrewButtons[idx].button->setIcon(homebrewButtons[idx].iconImg);
+            float fXOffset = 0;
+            float fYOffset = scrollOffY + (homebrewButtons[idx].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[idx].image->getHeight() + 20) * (idx);
+            homebrewButtons[idx].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
+            homebrewButtons[idx].button->setTrigger(&touchTrigger);
+            homebrewButtons[idx].button->setTrigger(&wpadTouchTrigger);
+            homebrewButtons[idx].button->setEffectGrow();
+    //        homebrewButtons[idx].button->setSoundClick(buttonClickSound);
+            homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
+
+            append(homebrewButtons[idx].button);
+        }
     
 //    while (std::getline(f, line)) {
 //        if (!strncmp(str, substr, strlen("app: "))) {
@@ -359,13 +364,13 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
     bool disableButtons = false;
-    return;
+//    return;
 
     for(u32 i = 0; i < homebrewButtons.size(); i++)
     {
         if(button == homebrewButtons[i].button)
         {
-            HomebrewLaunchWindow * launchBox = new HomebrewLaunchWindow(homebrewButtons[i].execPath, homebrewButtons[i].iconImgData);
+            HomebrewLaunchWindow * launchBox = new HomebrewLaunchWindow(homebrewButtons[i].execPath, homebrewButtons[i].iconImgData, homebrewButtons[i].shortname);
             launchBox->setEffect(EFFECT_FADE, 10, 255);
             launchBox->setState(GuiElement::STATE_DISABLED);
             launchBox->setPosition(0.0f, 30.0f);

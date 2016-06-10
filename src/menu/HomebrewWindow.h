@@ -39,6 +39,7 @@ public:
         GuiText *descriptionLabel;
         GuiImageData *iconImgData;
         GuiImage *iconImg;
+        std::string shortname;
         int status;
         std::string dirPath;
     } homebrewButton;

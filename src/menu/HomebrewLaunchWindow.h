@@ -23,7 +23,7 @@
 class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
-    HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData);
+    HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData, std::string & shortname);
     virtual ~HomebrewLaunchWindow();
 	
 
@@ -66,6 +66,7 @@ private:
     GuiTrigger wpadTouchTrigger;
 
     const std::string homebrewLaunchPath;
+    const std::string homebrewLaunchName;
 };
 
 #endif //_HOMEBREW_LAUNCHER_WINDOW_H_

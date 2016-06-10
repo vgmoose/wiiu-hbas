@@ -21,29 +21,31 @@
 #include "utils/HomebrewXML.h"
 #include "Application.h"
 #include "dynamic_libs/sys_functions.h"
+#include "network/FileDownloader.h"
 
-HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData)
+HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData, std::string & shortname)
     : GuiFrame(0, 0)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
     , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
     , buttonImgData(Resources::GetImageData("button.png"))
     , iconImage(iconImgData)
-    , titleText((char*)NULL, 42, glm::vec4(1.0f))
-    , versionText("Version:", 32, glm::vec4(1.0f))
-    , versionValueText((char*)NULL, 32, glm::vec4(1.0f))
-    , authorText("Author:", 32, glm::vec4(1.0f))
-    , authorValueText((char*)NULL, 32, glm::vec4(1.0f))
-    , descriptionText((char*)NULL, 28, glm::vec4(1.0f))
-    , loadBtnLabel("Load", 32, glm::vec4(1.0f))
+    , titleText((char*)NULL, 42, glm::vec4(0,0,0, 1))
+    , versionText("Version:", 32, glm::vec4(0,0,0, 1))
+    , versionValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
+    , authorText("Author:", 32, glm::vec4(0,0,0, 1))
+    , authorValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
+    , descriptionText((char*)NULL, 28, glm::vec4(0,0,0, 1))
+    , loadBtnLabel("Download", 32, glm::vec4(1.0f))
     , loadImg(buttonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
-    , backBtnLabel("Back", 32, glm::vec4(1.0f))
+    , backBtnLabel("Close", 32, glm::vec4(1.0f))
     , backImg(buttonImgData)
     , backBtn(backImg.getWidth(), backImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , homebrewLaunchPath(launchPath)
+    , homebrewLaunchName(shortname)
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
@@ -180,6 +182,9 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
 {
     backBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
+    
+    FileDownloader::getFile("http://wiiubru.com/appstore/apps/"+homebrewLaunchName+"/boot.elf", "sd:/wiiu/apps/"+homebrewLaunchName+"/boot.elf", 0);
+
 
 //    struct SYSBrowserArgsIn args = {};
 //    std::string url = "http://vgmoose.com";

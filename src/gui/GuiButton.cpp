@@ -282,8 +282,8 @@ void GuiButton::update(GuiController * c)
                     clearState(STATE_CLICKED, c->chan);
                 }
                 heldTrigger = NULL;
-//                clearState(STATE_HELD, c->chan);
-//                released(this, c, trigger[i]);
+                clearState(STATE_HELD, c->chan);
+                released(this, c, trigger[i]);
             }
         }
     }
