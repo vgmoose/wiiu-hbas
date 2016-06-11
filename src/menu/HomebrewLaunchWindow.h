@@ -19,11 +19,12 @@
 
 #include "gui/Gui.h"
 #include "gui/GuiFrame.h"
+#include "menu/HomebrewWindow.h"
 
 class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
-    HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData, std::string & shortname);
+    HomebrewLaunchWindow(homebrewButton & thisButton);
     virtual ~HomebrewLaunchWindow();
 	
 
@@ -35,6 +36,7 @@ private:
     }
 
     void OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+    void OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 
     void OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result);
     void OnOpenEffectFinish(GuiElement *element);
@@ -55,8 +57,11 @@ private:
     GuiText descriptionText;
 
     GuiText loadBtnLabel;
+    GuiText delBtnLabel;
+    GuiImage delImg;
     GuiImage loadImg;
     GuiButton loadBtn;
+    GuiButton delBtn;
 
     GuiText backBtnLabel;
     GuiImage backImg;
@@ -65,8 +70,7 @@ private:
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
 
-    const std::string homebrewLaunchPath;
-    const std::string homebrewLaunchName;
+    homebrewButton selectedButton;
 };
 
 #endif //_HOMEBREW_LAUNCHER_WINDOW_H_

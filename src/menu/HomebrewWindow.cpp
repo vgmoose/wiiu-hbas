@@ -218,6 +218,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
             // update or installed
             homebrewButtons[idx].status = GET;
             homebrewButtons[idx].shortname = shortname;
+            homebrewButtons[idx].binary = binary;
             // download app list from wiiubru
             std::string targetIcon;
             std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
@@ -370,7 +371,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     {
         if(button == homebrewButtons[i].button)
         {
-            HomebrewLaunchWindow * launchBox = new HomebrewLaunchWindow(homebrewButtons[i].execPath, homebrewButtons[i].iconImgData, homebrewButtons[i].shortname);
+            HomebrewLaunchWindow * launchBox = new HomebrewLaunchWindow(homebrewButtons[i]);
             launchBox->setEffect(EFFECT_FADE, 10, 255);
             launchBox->setState(GuiElement::STATE_DISABLED);
             launchBox->setPosition(0.0f, 30.0f);

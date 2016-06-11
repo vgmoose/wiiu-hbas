@@ -23,13 +23,13 @@
 #include "dynamic_libs/sys_functions.h"
 #include "network/FileDownloader.h"
 
-HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiImageData * iconImgData, std::string & shortname)
+HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton)
     : GuiFrame(0, 0)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
     , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
     , buttonImgData(Resources::GetImageData("button.png"))
-    , iconImage(iconImgData)
+    , iconImage(thisButton.iconImgData)
     , titleText((char*)NULL, 42, glm::vec4(0,0,0, 1))
     , versionText("Version:", 32, glm::vec4(0,0,0, 1))
     , versionValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
@@ -37,20 +37,23 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     , authorValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
     , descriptionText((char*)NULL, 28, glm::vec4(0,0,0, 1))
     , loadBtnLabel("Download", 32, glm::vec4(1.0f))
+    , delBtnLabel("Delete", 32, glm::vec4(1.0f))
     , loadImg(buttonImgData)
+    , delImg(buttonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
+    , delBtn(loadImg.getWidth(), loadImg.getHeight())
     , backBtnLabel("Close", 32, glm::vec4(1.0f))
     , backImg(buttonImgData)
     , backBtn(backImg.getWidth(), backImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
-    , homebrewLaunchPath(launchPath)
-    , homebrewLaunchName(shortname)
+    , selectedButton(thisButton)
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
     append(&backgroundImg);
 
+    std::string launchPath = selectedButton.execPath;
     std::string homebrewPath = launchPath;
     size_t slashPos = homebrewPath.rfind('/');
     if(slashPos != std::string::npos)
@@ -121,6 +124,19 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(const std::string & launchPath, GuiIm
     loadBtn.setSoundClick(buttonClickSound);
     loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
     append(&loadBtn);
+        
+    delImg.setScale(scaleFactor);
+    delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
+    delBtn.setImage(&delImg);
+    delBtn.setLabel(&delBtnLabel);
+    delBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+    delBtn.setPosition(-200, -310);
+    delBtn.setTrigger(&touchTrigger);
+    delBtn.setTrigger(&wpadTouchTrigger);
+    delBtn.setEffectGrow();
+    delBtn.setSoundClick(buttonClickSound);
+    delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
+//    append(&delBtn);
 
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
@@ -177,13 +193,25 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
     }
 }
 
+void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+{
+    std::string path = "/apps/"+selectedButton.shortname+"/"+selectedButton.binary;
+    std::string sdPath = "sd:/wiiu"+path;
+    rename("sdPath", "sd:/.Trashes/oiuwroiuewr");
+}
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    backBtn.setState(GuiElement::STATE_DISABLED);
+//    backBtn.setState(GuiElement::STATE_DISABLED);
+    delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
     
-    FileDownloader::getFile("http://wiiubru.com/appstore/apps/"+homebrewLaunchName+"/boot.elf", "sd:/wiiu/apps/"+homebrewLaunchName+"/boot.elf", 0);
+    std::string path = "/apps/"+selectedButton.shortname;
+    std::string sdPath = "sd:/wiiu"+path;
+    CreateSubfolder(sdPath.c_str());
+    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/"+selectedButton.binary, sdPath+"/"+selectedButton.binary, 0);
+    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/meta.xml", sdPath+"/meta.xml", 0);
+    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/icon.png", sdPath+"/icon.png", 0);
 
 
 //    struct SYSBrowserArgsIn args = {};

@@ -20,17 +20,7 @@
 #include "gui/Gui.h"
 #include "gui/GuiFrame.h"
 
-class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
-{
-public:
-    HomebrewWindow(int w, int h);
-    virtual ~HomebrewWindow();
-	static void do_download(CThread *thread, void *arg);
-
-    void draw(CVideo *pVideo);
-    float scrollOffY = 0;
-    float lastScrollOffY = 0;
-        typedef struct
+typedef struct
     {
         std::string execPath;
         GuiImage *image;
@@ -42,7 +32,19 @@ public:
         std::string shortname;
         int status;
         std::string dirPath;
+        std::string binary;
     } homebrewButton;
+
+class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
+{
+public:
+    HomebrewWindow(int w, int h);
+    virtual ~HomebrewWindow();
+	static void do_download(CThread *thread, void *arg);
+
+    void draw(CVideo *pVideo);
+    float scrollOffY = 0;
+    float lastScrollOffY = 0;
     std::vector<homebrewButton> homebrewButtons;
 
 private:
