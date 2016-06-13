@@ -48,6 +48,7 @@ public:
     std::vector<homebrewButton> homebrewButtons;
     
     void positionHomebrewButton(homebrewButton*, int);
+    void refreshHomebrewApps();
 
 private:
     void OnOpenEffectFinish(GuiElement *element);

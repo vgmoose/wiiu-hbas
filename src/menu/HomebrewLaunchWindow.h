@@ -24,7 +24,7 @@
 class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
-    HomebrewLaunchWindow(homebrewButton & thisButton);
+    HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow* window);
     virtual ~HomebrewLaunchWindow();
 	
 
@@ -70,7 +70,8 @@ private:
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
 
-    homebrewButton selectedButton;
+    homebrewButton * selectedButton;
+    HomebrewWindow * homebrewWindow;
 };
 
 #endif //_HOMEBREW_LAUNCHER_WINDOW_H_

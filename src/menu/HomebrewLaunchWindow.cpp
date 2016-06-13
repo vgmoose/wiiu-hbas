@@ -23,8 +23,9 @@
 #include "dynamic_libs/sys_functions.h"
 #include "network/FileDownloader.h"
 
-HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton)
+HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
+    , homebrewWindow(window)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
     , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
@@ -47,13 +48,13 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton)
     , backBtn(backImg.getWidth(), backImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
-    , selectedButton(thisButton)
+    , selectedButton(&thisButton)
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
     append(&backgroundImg);
 
-    std::string launchPath = selectedButton.execPath;
+    std::string launchPath = selectedButton->execPath;
     std::string homebrewPath = launchPath;
     size_t slashPos = homebrewPath.rfind('/');
     if(slashPos != std::string::npos)
@@ -195,7 +196,7 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    std::string removePath = selectedButton.dirPath;
+    std::string removePath = selectedButton->dirPath;
     // if the remove path is the whole directory, stop!
     if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
         return;
@@ -210,6 +211,9 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     
     // close the window
     OnBackButtonClick(button, controller, trigger);
+    
+    // refresh
+    homebrewWindow->refreshHomebrewApps();
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -218,16 +222,19 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
     
-    std::string path = "/apps/"+selectedButton.shortname;
+    std::string path = "/apps/"+selectedButton->shortname;
     std::string sdPath = "sd:/wiiu"+path;
     CreateSubfolder(sdPath.c_str());
     std::string repoUrl = "http://192.168.1.104:8000";
-    FileDownloader::getFile(repoUrl+path+"/"+selectedButton.binary, sdPath+"/"+selectedButton.binary, 0);
+    FileDownloader::getFile(repoUrl+path+"/"+selectedButton->binary, sdPath+"/"+selectedButton->binary, 0);
     FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", 0);
     FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", 0);
 
     // close the window
     OnBackButtonClick(button, controller, trigger);
+    
+    // refresh
+    homebrewWindow->refreshHomebrewApps();
 
 //    struct SYSBrowserArgsIn args = {};
 //    std::string url = "http://vgmoose.com";
