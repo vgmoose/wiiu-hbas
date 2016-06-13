@@ -199,11 +199,17 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     // if the remove path is the whole directory, stop!
     if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
         return;
-
-    DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
-    for (int x=0; x<dirList.GetFilecount(); x++)
-        remove(dirList.GetFilepath(x));
-    rmdir(removePath.c_str());
+    else
+    {
+        // remove the files in the directory and the directory
+        DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
+        for (int x=0; x<dirList.GetFilecount(); x++)
+            remove(dirList.GetFilepath(x));
+        rmdir(removePath.c_str());
+    }
+    
+    // close the window
+    OnBackButtonClick(button, controller, trigger);
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -220,6 +226,8 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", 0);
     FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", 0);
 
+    // close the window
+    OnBackButtonClick(button, controller, trigger);
 
 //    struct SYSBrowserArgsIn args = {};
 //    std::string url = "http://vgmoose.com";
