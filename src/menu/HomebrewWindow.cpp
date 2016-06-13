@@ -123,7 +123,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         HomebrewXML metaXml;
 
         bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
-
+        
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx].execPath.c_str();
         const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
 
@@ -171,7 +171,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         		
         // download app list from wiiubru
         std::string fileContents;
-        std::string targetUrl = std::string("http://wiiubru.com/appstore/directory.yaml");
+        std::string repoUrl = "http://192.168.1.104:8000";
+        std::string targetUrl = std::string(repoUrl+"/directory.yaml");
         FileDownloader::getFile(targetUrl, fileContents);
         std::istringstream f(fileContents);
 
@@ -221,7 +222,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
             homebrewButtons[idx].binary = binary;
             // download app list from wiiubru
             std::string targetIcon;
-            std::string targetIconUrl = std::string("http://wiiubru.com/appstore/apps/" + shortname + "/icon.png");
+            std::string targetIconUrl = std::string(repoUrl+"/apps/" + shortname + "/icon.png");
             FileDownloader::getFile(targetIconUrl, targetIcon);
 
     //        if(targetIcon != NULL)
@@ -346,7 +347,7 @@ void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
 void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 {
     //! remove element from draw list and push to delete queue
-    remove(element);
+    removeE(element);
     AsyncDeleter::pushForDelete(element);
 
     for(u32 i = 0; i < homebrewButtons.size(); i++)
@@ -401,7 +402,7 @@ void HomebrewWindow::OnLeftArrowClick(GuiButton *button, const GuiController *co
         targetLeftPosition = -listOffset * getWidth();
 
         if(listOffset == 0)
-            remove(&arrowLeftButton);
+            removeE(&arrowLeftButton);
         append(&arrowRightButton);
     }
 }
@@ -414,7 +415,7 @@ void HomebrewWindow::OnRightArrowClick(GuiButton *button, const GuiController *c
         targetLeftPosition = -listOffset * getWidth();
 
         if(((listOffset + 1) * MAX_BUTTONS_ON_PAGE) >= (int)homebrewButtons.size())
-            remove(&arrowRightButton);
+            removeE(&arrowRightButton);
 
         append(&arrowLeftButton);
     }

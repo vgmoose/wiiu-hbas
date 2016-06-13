@@ -43,7 +43,7 @@ GuiFrame::~GuiFrame()
 	closing(this);
 
 	if(parent)
-		parent->remove(this);
+		parent->removeE(this);
 }
 
 void GuiFrame::append(GuiElement* e)
@@ -51,7 +51,7 @@ void GuiFrame::append(GuiElement* e)
 	if (e == NULL)
 		return;
 
-	remove(e);
+	removeE(e);
 	elements.push_back(e);
 	e->setParent(this);
 }
@@ -61,12 +61,12 @@ void GuiFrame::insert(GuiElement* e, u32 index)
 	if (e == NULL || (index >= elements.size()))
 		return;
 
-	remove(e);
+	removeE(e);
 	elements.insert(elements.begin()+index, e);
 	e->setParent(this);
 }
 
-void GuiFrame::remove(GuiElement* e)
+void GuiFrame::removeE(GuiElement* e)
 {
 	if (e == NULL)
 		return;

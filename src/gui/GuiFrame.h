@@ -42,11 +42,11 @@ class GuiFrame : public GuiElement
 		void insert(GuiElement* e, u32 i);
 		//!Removes the specified GuiElement from the GuiFrame
 		//!\param e GuiElement to be removed
-		void remove(GuiElement* e);
+		void removeE(GuiElement* e);
 		//!Removes all GuiElements
 		void removeAll();
 		//!Bring element to front of the window
-		void bringToFront(GuiElement *e) { remove(e); append(e); }
+		void bringToFront(GuiElement *e) { removeE(e); append(e); }
 		//!Returns the GuiElement at the specified index
 		//!\param index The index of the element
 		//!\return A pointer to the element at the index, NULL on error (eg: out of bounds)

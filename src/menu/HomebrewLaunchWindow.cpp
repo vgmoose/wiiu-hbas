@@ -117,7 +117,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton)
     loadBtn.setImage(&loadImg);
     loadBtn.setLabel(&loadBtnLabel);
     loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    loadBtn.setPosition(-200, -310);
+    loadBtn.setPosition(-600, -310);
     loadBtn.setTrigger(&touchTrigger);
     loadBtn.setTrigger(&wpadTouchTrigger);
     loadBtn.setEffectGrow();
@@ -136,7 +136,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton)
     delBtn.setEffectGrow();
     delBtn.setSoundClick(buttonClickSound);
     delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
-//    append(&delBtn);
+    append(&delBtn);
 
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
@@ -169,7 +169,7 @@ void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)
 void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
 {
     //! remove element from draw list and push to delete queue
-    remove(element);
+    removeE(element);
     AsyncDeleter::pushForDelete(element);
 
     backBtn.clearState(GuiElement::STATE_DISABLED);
@@ -195,9 +195,15 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    std::string path = "/apps/"+selectedButton.shortname+"/"+selectedButton.binary;
-    std::string sdPath = "sd:/wiiu"+path;
-    rename("sdPath", "sd:/.Trashes/oiuwroiuewr");
+    std::string removePath = selectedButton.dirPath;
+    // if the remove path is the whole directory, stop!
+    if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
+        return;
+
+    DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
+    for (int x=0; x<dirList.GetFilecount(); x++)
+        remove(dirList.GetFilepath(x));
+    rmdir(removePath.c_str());
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -209,9 +215,10 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     std::string path = "/apps/"+selectedButton.shortname;
     std::string sdPath = "sd:/wiiu"+path;
     CreateSubfolder(sdPath.c_str());
-    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/"+selectedButton.binary, sdPath+"/"+selectedButton.binary, 0);
-    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/meta.xml", sdPath+"/meta.xml", 0);
-    FileDownloader::getFile("http://wiiubru.com/appstore"+path+"/icon.png", sdPath+"/icon.png", 0);
+    std::string repoUrl = "http://192.168.1.104:8000";
+    FileDownloader::getFile(repoUrl+path+"/"+selectedButton.binary, sdPath+"/"+selectedButton.binary, 0);
+    FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", 0);
+    FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", 0);
 
 
 //    struct SYSBrowserArgsIn args = {};

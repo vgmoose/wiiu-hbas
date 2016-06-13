@@ -99,7 +99,7 @@ public:
         }
     }
 
-    void remove(GuiElement *e)
+    void removeE(GuiElement *e)
     {
         removeTv(e);
         removeDrc(e);

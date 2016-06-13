@@ -48,18 +48,18 @@ MainWindow::MainWindow(int w, int h)
 
 MainWindow::~MainWindow()
 {
-    remove(&homebrewWindow);
-    remove(&bgImageColor);
+    removeE(&homebrewWindow);
+    removeE(&bgImageColor);
 
     while(!tvElements.empty())
     {
         delete tvElements[0];
-        remove(tvElements[0]);
+        removeE(tvElements[0]);
     }
     while(!drcElements.empty())
     {
         delete drcElements[0];
-        remove(drcElements[0]);
+        removeE(drcElements[0]);
     }
     for(int i = 0; i < 4; i++)
     {
