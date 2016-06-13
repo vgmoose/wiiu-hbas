@@ -20,6 +20,12 @@
 #include "gui/Gui.h"
 #include "gui/GuiFrame.h"
 
+
+#define LOCAL 0
+#define UPDATE 1
+#define INSTALLED 2
+#define GET 3
+
 typedef struct
     {
         std::string execPath;
@@ -33,6 +39,7 @@ typedef struct
         int status;
         std::string dirPath;
         std::string binary;
+        std::string version;
     } homebrewButton;
 
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
@@ -49,6 +56,7 @@ public:
     
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
+    int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
 
 private:
     void OnOpenEffectFinish(GuiElement *element);

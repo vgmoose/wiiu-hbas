@@ -62,6 +62,14 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     HomebrewXML metaXml;
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
+        
+    // if GET or UDPATE, fetch xml from server
+//    if (selectedButton->status == GET || selectedButton->status == UPDATE)
+//    {
+//        std::string xmlFetchData;
+//        FileDownloader::getFile(std::string(repoUrl)+"/apps/"+selectedButton->shortname+"/meta.xml", xmlFetchData);
+//        xmlReadSuccess = metaXml.LoadHomebrewXMLData(xmlFetchData.c_str());
+//    }
 
     int xOffset = 500;
     int yOffset = height * 0.5f - 75.0f;
@@ -112,39 +120,44 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
     append(&descriptionText);
 
-    scaleFactor = 1.0f;
-    loadImg.setScale(scaleFactor);
-    loadBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * loadImg.getHeight());
-    loadBtn.setImage(&loadImg);
-    loadBtn.setLabel(&loadBtnLabel);
-    loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    loadBtn.setPosition(-600, -310);
-    loadBtn.setTrigger(&touchTrigger);
-    loadBtn.setTrigger(&wpadTouchTrigger);
-    loadBtn.setEffectGrow();
-    loadBtn.setSoundClick(buttonClickSound);
-    loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
-    append(&loadBtn);
-        
-    delImg.setScale(scaleFactor);
-    delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
-    delBtn.setImage(&delImg);
-    delBtn.setLabel(&delBtnLabel);
-    delBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    delBtn.setPosition(-200, -310);
-    delBtn.setTrigger(&touchTrigger);
-    delBtn.setTrigger(&wpadTouchTrigger);
-    delBtn.setEffectGrow();
-    delBtn.setSoundClick(buttonClickSound);
-    delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
-    append(&delBtn);
+    if (thisButton.status == GET || thisButton.status == UPDATE)
+    {
+        scaleFactor = 1.0f;
+        loadImg.setScale(scaleFactor);
+        loadBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * loadImg.getHeight());
+        loadBtn.setImage(&loadImg);
+        loadBtn.setLabel(&loadBtnLabel);
+        loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+        loadBtn.setPosition(-300, -310);
+        loadBtn.setTrigger(&touchTrigger);
+        loadBtn.setTrigger(&wpadTouchTrigger);
+        loadBtn.setEffectGrow();
+        loadBtn.setSoundClick(buttonClickSound);
+        loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
+        append(&loadBtn);
+    }
+    if (thisButton.status != GET)
+    {
+        delImg.setScale(scaleFactor);
+        delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
+        delBtn.setImage(&delImg);
+        delBtn.setLabel(&delBtnLabel);
+        delBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+        delBtn.setPosition(0, -310);
+        delBtn.setTrigger(&touchTrigger);
+        delBtn.setTrigger(&wpadTouchTrigger);
+        delBtn.setEffectGrow();
+        delBtn.setSoundClick(buttonClickSound);
+        delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
+        append(&delBtn);
+    }
 
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
     backBtn.setImage(&backImg);
     backBtn.setLabel(&backBtnLabel);
     backBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    backBtn.setPosition(200, -310);
+    backBtn.setPosition(300, -310);
     backBtn.setTrigger(&touchTrigger);
     backBtn.setTrigger(&wpadTouchTrigger);
     backBtn.setEffectGrow();
@@ -225,7 +238,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     std::string path = "/apps/"+selectedButton->shortname;
     std::string sdPath = "sd:/wiiu"+path;
     CreateSubfolder(sdPath.c_str());
-    std::string repoUrl = "http://192.168.1.104:8000";
+//    std::string repoUrl = "http://192.168.1.104:8000";
     FileDownloader::getFile(repoUrl+path+"/"+selectedButton->binary, sdPath+"/"+selectedButton->binary, 0);
     FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", 0);
     FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", 0);

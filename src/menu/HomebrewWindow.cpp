@@ -30,11 +30,6 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 
-#define LOCAL 0
-#define UPDATE 1
-#define INSTALLED 2
-#define GET 3
-
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
     const float cfImageScale = 0.8f;
@@ -69,6 +64,27 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     button->button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
 }
 
+int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps)
+{
+    for (int x=0; x<totalLocalApps; x++)
+    {
+        // if shortname matches
+        if (!name.compare(homebrewButtons[x].shortname))
+        {
+            homebrewButtons[x].status = INSTALLED;
+            if (version.compare(homebrewButtons[x].version))
+            {
+                // if version doesn't match
+                homebrewButtons[x].status = UPDATE;
+            }
+            removeE(homebrewButtons[x].button);
+
+            return x;
+        }
+    }
+    return -1;
+}
+
 void HomebrewWindow::refreshHomebrewApps()
 {
     GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
@@ -83,6 +99,7 @@ void HomebrewWindow::refreshHomebrewApps()
     homebrewButtons.clear();
     dirList.SortList();
 
+    int totalLocalApps = 0;
     // load up local apps
     for(int i = 0; i < dirList.GetFilecount(); i++)
     {
@@ -92,7 +109,7 @@ void HomebrewWindow::refreshHomebrewApps()
         
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
-        
+                
         // file path
         homebrewButtons[idx].execPath = dirList.GetFilepath(i);
         homebrewButtons[idx].iconImgData = NULL;
@@ -106,6 +123,9 @@ void HomebrewWindow::refreshHomebrewApps()
         u32 iconDataSize = 0;
         
         homebrewButtons[idx].dirPath = homebrewPath;
+        
+        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
+        homebrewButtons[idx].shortname = homebrewPath.substr(14);
         
         // since we got this app from the sd card, mark it local for now.
         // if we see it later on the server, update its status appropriately to 
@@ -135,16 +155,19 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx].descriptionLabel = new GuiText(metaXml.GetCoder(), 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
         homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
+        homebrewButtons[idx].version = metaXml.GetVersion();
         
         positionHomebrewButton(&homebrewButtons[idx], idx);
 
         append(homebrewButtons[idx].button);
     }
+    
+    totalLocalApps = homebrewButtons.size();
         		
     // download app list from the repo
     std::string fileContents;
-    std::string repoUrl = "http://192.168.1.104:8000";
-    std::string targetUrl = std::string(repoUrl+"/directory.yaml");
+//    std::string repoUrl = "http://192.168.1.104:8000";
+    std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
     FileDownloader::getFile(targetUrl, fileContents);
     std::istringstream f(fileContents);
 
@@ -166,6 +189,9 @@ void HomebrewWindow::refreshHomebrewApps()
         std::string binary;    
         std::getline(f, binary);
         binary = binary.substr(2);
+        std::string version;
+        std::getline(f, version);
+        version = version.substr(2);
 
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
@@ -188,10 +214,24 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx].status = GET;
         homebrewButtons[idx].shortname = shortname;
         homebrewButtons[idx].binary = binary;
+        homebrewButtons[idx].version = version;
+        
+        // update status if already a local app
+        int addedIndex = checkIfUpdateOrInstalled(homebrewButtons[idx].shortname, homebrewButtons[idx].version, totalLocalApps);
+        
+        if (addedIndex >= 0)
+        {
+            homebrewButtons.pop_back();
+            homebrewButtons[addedIndex].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+            homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
+            append(homebrewButtons[addedIndex].button);
+            positionHomebrewButton(&homebrewButtons[addedIndex], addedIndex);
+            continue;
+        }
 
         // download app icon
         std::string targetIcon;
-        std::string targetIconUrl = std::string(repoUrl+"/apps/" + shortname + "/icon.png");
+        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
         FileDownloader::getFile(targetIconUrl, targetIcon);
 
         homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());

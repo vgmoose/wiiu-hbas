@@ -21,6 +21,9 @@
 #include "video/CVideo.h"
 #include "system/CThread.h"
 
+#define repoUrl "http://wiiubru.com/appstore"
+//#define repoUrl "192.168.1.104:8000"
+
 class Application : public CThread
 {
 public:
