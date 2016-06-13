@@ -46,6 +46,8 @@ public:
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     std::vector<homebrewButton> homebrewButtons;
+    
+    void positionHomebrewButton(homebrewButton*, int);
 
 private:
     void OnOpenEffectFinish(GuiElement *element);
