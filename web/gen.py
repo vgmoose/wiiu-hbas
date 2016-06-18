@@ -5,8 +5,17 @@
 import os
 import xml.etree.ElementTree as ET
 import json
+import zipfile
+import cgi
+
+form = cgi.FieldStorage()
 
 
+def zipdir(path, ziph):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
+            
 print "Content-type: text/html\n\n"
 print "<html>Updating Appstore......<br><br></html>"
 
@@ -60,10 +69,23 @@ style = """<style>
 <div class="notice">You are currently viewing the web front-end to the Homebrew App Store. For more information, see the <a href=#">thread here</a>.</div>
 """
 
-html = style + "<table id='wiiubru'><th><td>TITLE</td><td>AUTHOR</td><td>DESCRIPTION</td><td>SOURCE</td></th>\n"
+html = style + "<table id='wiiubru'><th><td>TITLE</td><td>AUTHOR</td><td>DESCRIPTION</td><td>DOWNLOAD</td><td>SOURCE</td></th>\n"
 yaml = ""
+    
+try:
+    os.mkdir("zips")
+except:
+    pass
 
 d = {}
+    
+dozipping = False
+    
+if "dozips" in form:
+    dozipping = True
+    print "Generating new zip files as well<br>"
+else:
+    print "Not generating new zip files, to do that go <a href='gen.py?dozips=1'>here</a> (takes a while)<br>"
 
 for app in os.listdir("apps"):
     if app.startswith("."):
@@ -124,6 +146,7 @@ for app in os.listdir("apps"):
         icon = "missing.png"
     
     dl = "zips/%s.zip" % app
+    dlhref = "<a href='%s'>Download</a>" % dl
 
     src_link = "N/A"
     if source != "????":
@@ -131,9 +154,14 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td><img src='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, name, coder, desc, src_link)
+    html += "<tr><td><img src='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, name, coder, desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
+    
+    if dozipping:
+        zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
+        zipdir("apps/%s" % app, zipf)
+        zipf.close()
 
 
 html += "</table>"
