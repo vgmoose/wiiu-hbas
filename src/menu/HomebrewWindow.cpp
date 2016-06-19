@@ -87,7 +87,7 @@ int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string versi
 
 static void updateProgress(void *arg, u32 done, u32 total)
 {
-    progressWindow->setProgress(50.0f);
+    progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
 }
 
 void HomebrewWindow::refreshHomebrewApps()
@@ -174,6 +174,7 @@ void HomebrewWindow::refreshHomebrewApps()
 //    std::string repoUrl = "http://192.168.1.104:8000";
     std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
     bool gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
+
     std::istringstream f(fileContents);
 
     while (gotDirectorySuccess)

@@ -20,6 +20,7 @@
 #include "dynamic_libs/curl_functions.h"
 #include "utils/logger.h"
 
+#include "dynamic_libs/os_functions.h"
 
 bool FileDownloader::getFile(const std::string & downloadUrl, std::string & fileBuffer, ProgressCallback callback, void *arg)
 {
@@ -77,11 +78,12 @@ bool FileDownloader::internalGetFile(const std::string & downloadUrl, curl_priva
     n_curl_easy_setopt(curl, CURLOPT_URL, downloadUrl.c_str());
     n_curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, FileDownloader::curlCallback);
     n_curl_easy_setopt(curl, CURLOPT_WRITEDATA, private_data);
+    n_curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
     //n_curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
 
     if(private_data->progressCallback)
     {
-        n_curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, FileDownloader::curlProgressCallback);
+        n_curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, curlProgressCallback);
         n_curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, private_data);
     }
 
@@ -154,7 +156,7 @@ int FileDownloader::curlCallback(void *buffer, int size, int nmemb, void *userp)
     }
 }
 
-int FileDownloader::curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {
     curl_private_data_t *private_data = (curl_private_data_t *)clientp;
     if(private_data->progressCallback)

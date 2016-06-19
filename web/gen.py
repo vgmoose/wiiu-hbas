@@ -164,7 +164,7 @@ for app in os.listdir("apps"):
             pass
         try:
             long_desc = tree.find("long_description").text
-            long_desc = long_desc.replace("\n", "\n")
+            #long_desc = long_desc.replace("\n", "<br>")
         except:
             pass
         
@@ -186,7 +186,7 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td><img src='%s' class='tooltip' title='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, dlhref, src_link)
+    html += "<tr><td><img src='%s' class='tooltip' title='%s'></td><td>%s</td><td>%s</td><td>%s <a class='tooltip' title='%s'>...</a></td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, long_desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
     
