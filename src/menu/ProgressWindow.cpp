@@ -29,7 +29,7 @@ ProgressWindow::ProgressWindow(const std::string & title)
 
     append(&progressImageBlack);
     append(&progressImageColored);
-    append(&bgImage);
+//    append(&bgImage);
 
     progressImageColored.setAlignment(ALIGN_TOP_LEFT);
     progressImageColored.setImageColor((GX2Color){ 42, 159, 217, 255}, 0);

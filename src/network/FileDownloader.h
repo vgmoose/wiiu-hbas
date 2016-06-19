@@ -27,6 +27,8 @@ public:
 
     static bool getFile(const std::string & downloadUrl, std::string & fileBuffer, ProgressCallback callback = 0, void *arg = 0);
     static bool getFile(const std::string & downloadUrl, const std::string & outputPath, ProgressCallback callback = 0, void *arg = 0);
+    static int curlCallback(void *buffer, int size, int nmemb, void *userp);
+    static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 private:
     typedef struct
     {
@@ -38,8 +40,7 @@ private:
     } curl_private_data_t;
 
     static bool internalGetFile(const std::string & downloadUrl, curl_private_data_t * private_data);
-    static int curlCallback(void *buffer, int size, int nmemb, void *userp);
-    static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
+
 };
 
 #endif // _FILE_DOWNLOADER_H

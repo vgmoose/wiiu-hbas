@@ -85,6 +85,11 @@ int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string versi
     return -1;
 }
 
+static void updateProgress(void *arg, u32 done, u32 total)
+{
+    progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
+}
+
 void HomebrewWindow::refreshHomebrewApps()
 {
     GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
@@ -168,10 +173,10 @@ void HomebrewWindow::refreshHomebrewApps()
     std::string fileContents;
 //    std::string repoUrl = "http://192.168.1.104:8000";
     std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
-    FileDownloader::getFile(targetUrl, fileContents);
+    bool gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
     std::istringstream f(fileContents);
 
-    while (true)
+    while (gotDirectorySuccess)
     {
         std::string shortname;
 
@@ -232,9 +237,10 @@ void HomebrewWindow::refreshHomebrewApps()
         // download app icon
         std::string targetIcon;
         std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
-        FileDownloader::getFile(targetIconUrl, targetIcon);
+        bool imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, targetIcon);
 
-        homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+        if (imageDownloadSuccessful)
+            homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
 
         const char *cpName = name.c_str();
         const char *cpDescription = desc.c_str();
@@ -279,11 +285,14 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     currentLeftPosition = 0;
     listOffset = 0;
         
+    progressWindow = new ProgressWindow("Downloading app directory...");
     refreshHomebrewApps();
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
     hblVersionText.setPosition(0, 0);
+    progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
+    append(progressWindow);
 }
 
 HomebrewWindow::~HomebrewWindow()

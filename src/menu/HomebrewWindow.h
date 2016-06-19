@@ -19,12 +19,15 @@
 
 #include "gui/Gui.h"
 #include "gui/GuiFrame.h"
+#include "menu/ProgressWindow.h"
 
 
 #define LOCAL 0
 #define UPDATE 1
 #define INSTALLED 2
 #define GET 3
+
+static ProgressWindow * progressWindow;
 
 typedef struct
     {
@@ -42,6 +45,7 @@ typedef struct
         std::string version;
     } homebrewButton;
 
+static void updateProgress(void *arg, u32 done, u32 total);
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
@@ -57,7 +61,7 @@ public:
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
-
+    
 private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
@@ -69,6 +73,7 @@ private:
     void OnCloseTcpReceiverFinish(GuiElement *element);
     void OnTcpReceiveStart(GuiElement *element, u32 ip);
     void OnTcpReceiveFinish(GuiElement *element, u32 ip, int result);
+    
 
     GuiSound *buttonClickSound;
     GuiImageData * installedButtonImgData;
