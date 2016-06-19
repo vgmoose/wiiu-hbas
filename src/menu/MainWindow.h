@@ -24,6 +24,11 @@
 
 class CVideo;
 
+static HomebrewWindow * homebrewWindow;
+static CThread* pThread;
+
+static void asyncRefreshHomebrewApps(CThread* thread, void* args);
+
 class MainWindow : public sigslot::has_slots<>
 {
 public:
@@ -122,7 +127,6 @@ private:
     std::vector<GuiElement *> tvElements;
 
     GuiImage bgImageColor;
-    HomebrewWindow homebrewWindow;
 
     GuiImageData *pointerImgData[4];
     GuiImage *pointerImg[4];

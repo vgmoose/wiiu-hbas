@@ -52,7 +52,6 @@ public:
     HomebrewWindow(int w, int h);
     virtual ~HomebrewWindow();
 	static void do_download(CThread *thread, void *arg);
-
     void draw(CVideo *pVideo);
     float scrollOffY = 0;
     float lastScrollOffY = 0;

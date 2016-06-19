@@ -287,13 +287,14 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     listOffset = 0;
         
     progressWindow = new ProgressWindow("Downloading app directory...");
-    refreshHomebrewApps();
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
     hblVersionText.setPosition(0, 0);
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
     append(progressWindow);
+        
+//    refreshHomebrewApps();
 }
 
 HomebrewWindow::~HomebrewWindow()

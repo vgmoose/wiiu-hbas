@@ -26,7 +26,6 @@ MainWindow::MainWindow(int w, int h)
     : width(w)
     , height(h)
     , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
-    , homebrewWindow(w, h)
 {
     bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
     bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
@@ -42,13 +41,21 @@ MainWindow::MainWindow(int w, int h)
         pointerImg[i]->setScale(1.5f);
         pointerValid[i] = false;
     }
+    homebrewWindow = new HomebrewWindow(w, h);
+    append(homebrewWindow);
+        
+    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
+}
 
-    append(&homebrewWindow);
+static void asyncRefreshHomebrewApps(CThread* thread, void* args)
+{
+    homebrewWindow->refreshHomebrewApps();
 }
 
 MainWindow::~MainWindow()
 {
-    removeE(&homebrewWindow);
+    removeE(homebrewWindow);
     removeE(&bgImageColor);
 
     while(!tvElements.empty())
@@ -161,10 +168,10 @@ void MainWindow::update(GuiController *controller)
 
 void MainWindow::scrollMenu(float scrol)
 {
-    homebrewWindow.lastScrollOffY = homebrewWindow.scrollOffY;
-    if (homebrewWindow.scrollOffY + scrol < -140 || homebrewWindow.scrollOffY + scrol > homebrewWindow.homebrewButtons.size()*130)
+    homebrewWindow->lastScrollOffY = homebrewWindow->scrollOffY;
+    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()*130)
         return;
-    homebrewWindow.scrollOffY += scrol;
+    homebrewWindow->scrollOffY += scrol;
 }
 
 void MainWindow::drawDrc(CVideo *video)
