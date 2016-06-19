@@ -28,7 +28,7 @@ style = """<style>
 }
 #wiiubru table
 {
-    background-image: url("bg.jpg");
+    background-image: url("");
 }
 
 #wiiubru td, #wiiubru th {
@@ -38,14 +38,14 @@ style = """<style>
 #wiiubru tr
 { 
    -webkit-transition: -webkit-transform .2s ease-in-out;
-    -webkit-transform: scale(0.77, 0.77);
+    -webkit-transform: scale(0.9, 0.77);
 }
 
 #wiiubru tr:nth-child(even){background-color: #f2f2f2}
 
 #wiiubru tr:hover {
    background-color: #ddd;
-   -webkit-transform: scale(1, 1); 
+   -webkit-transform: scale(0.9, 1.1); 
 }
 
 #wiiubru th {
@@ -61,10 +61,48 @@ style = """<style>
     margin-top: 5px;
     font-size: 14px;
     }
+img 
+{
+   -webkit-transition: -webkit-transform .2s ease-in-out;
+    height: 50%;
+    width: 50%;
+}
+img:hover
+{
+   -webkit-transition: -webkit-transform .2s ease-in-out;
+    -webkit-transform: scale(2, 2);
+}
+img[title]:hover:after {
+  content: attr(title);
+  padding: 4px 8px;
+  color: #333;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  white-space: nowrap;
+  z-index: 20px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-shadow: 0px 0px 4px #222;
+  -webkit-box-shadow: 0px 0px 4px #222;
+  box-shadow: 0px 0px 4px #222;
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #cccccc));
+  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+}
+.ignore
+{
+   width: 256;
+   height: 96;
+}
 
 </style>
 <div style="text-align: center; width=100%;">
-<img src="hbas.png">
+<img class='ignore' id='ignore' src="hbas.png">
 </div>
 <div class="notice">You are currently viewing the web front-end to the Homebrew App Store. For more information, see the <a href=#">thread here</a>.</div>
 """
@@ -83,9 +121,9 @@ dozipping = False
     
 if "dozips" in form:
     dozipping = True
-    print "Generating new zip files as well<br>"
+    print "Generating new zip files as well<br><br>"
 else:
-    print "Not generating new zip files, to do that go <a href='gen.py?dozips=1'>here</a> (takes a while)<br>"
+    print "Not generating new zip files, to do that go <a href='gen.py?dozips=1'>here</a> (takes a while)<br><br>"
 
 for app in os.listdir("apps"):
     if app.startswith("."):
@@ -132,7 +170,7 @@ for app in os.listdir("apps"):
             pass
         try:
             long_desc = tree.find("long_description").text
-            long_desc = long_desc.replace("\n", "<br>")
+            long_desc = long_desc.replace("\n", "\n")
         except:
             pass
         
@@ -154,7 +192,7 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td><img src='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, name, coder, desc, dlhref, src_link)
+    html += "<tr><td><img src='%s' title='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
     
@@ -181,7 +219,7 @@ jsonout.write(jsonstring)
 jsonout.close()
 
 print"<html><br> Update Complete !!!<br><br></html>"
-
+print "<a href='index.html'>See the Results.</a>"
 
 #xml3 = open("directory.xml", "w+")
 #xml3.write(dict2xml(d))
