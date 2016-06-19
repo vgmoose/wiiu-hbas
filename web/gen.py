@@ -19,7 +19,11 @@ def zipdir(path, ziph):
 print "Content-type: text/html\n\n"
 print "<html>Updating Appstore......<br><br></html>"
 
-style = """<style>
+style = """<head>
+    <link rel="stylesheet" type="text/css" href="css/tooltipster.bundle.min.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script type="text/javascript" src="js/tooltipster.bundle.min.js"></script>
+<style>
 
 #wiiubru {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -72,28 +76,6 @@ img:hover
    -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(2, 2);
 }
-img[title]:hover:after {
-  content: attr(title);
-  padding: 4px 8px;
-  color: #333;
-  position: absolute;
-  left: 0;
-  top: 100%;
-  white-space: nowrap;
-  z-index: 20px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
-  -moz-box-shadow: 0px 0px 4px #222;
-  -webkit-box-shadow: 0px 0px 4px #222;
-  box-shadow: 0px 0px 4px #222;
-  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #cccccc));
-  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
-  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
-}
 .ignore
 {
    width: 256;
@@ -101,10 +83,22 @@ img[title]:hover:after {
 }
 
 </style>
+    <script>
+        $(document).ready(function() {
+            $('.tooltip').tooltipster({
+                 animation: 'grow',
+                 delay: 200,
+                 side: 'right',
+                 contentAsHTML: 'true'
+            });
+        });
+    </script>
+</head>
+
 <div style="text-align: center; width=100%;">
 <img class='ignore' id='ignore' src="hbas.png">
 </div>
-<div class="notice">You are currently viewing the web front-end to the Homebrew App Store. For more information, see the <a href=#">thread here</a>.</div>
+<div class="notice">You are currently viewing the web front-end to the Homebrew App Store. For more information, see the <a href="#">thread here</a>.</div>
 """
 
 html = style + "<table id='wiiubru'><th><td>TITLE</td><td>AUTHOR</td><td>DESCRIPTION</td><td>DOWNLOAD</td><td>SOURCE</td></th>\n"
@@ -192,7 +186,7 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td><img src='%s' title='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, dlhref, src_link)
+    html += "<tr><td><img src='%s' class='tooltip' title='%s'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
     

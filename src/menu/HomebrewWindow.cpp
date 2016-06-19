@@ -87,7 +87,7 @@ int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string versi
 
 static void updateProgress(void *arg, u32 done, u32 total)
 {
-    progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
+    progressWindow->setProgress(50.0f);
 }
 
 void HomebrewWindow::refreshHomebrewApps()
