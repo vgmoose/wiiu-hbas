@@ -21,6 +21,21 @@
 #include "gui/GuiFrame.h"
 #include "menu/HomebrewWindow.h"
 
+static std::string fullNameTarget;
+static std::string binaryTarget;
+static std::string pathTarget;
+static std::string repoUrlTarget;
+static std::string sdPathTarget;
+static const GuiButton * buttonTarget;
+static const GuiController * controllerTarget;
+static const GuiTrigger * triggerTarget;
+
+static HomebrewWindow* homebrewWindowTarget;
+
+//typedef void (GuiFrame::*fn)(GuiElement*); 
+//static fn removeETarget;
+
+
 class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
@@ -73,5 +88,8 @@ private:
     homebrewButton * selectedButton;
     HomebrewWindow * homebrewWindow;
 };
+
+static HomebrewLaunchWindow* launchWindowTarget;
+
 
 #endif //_HOMEBREW_LAUNCHER_WINDOW_H_

@@ -230,6 +230,30 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     pThread->resumeThread();
 }
 
+static void asyncDownloadTargetedFiles(CThread* thread, void* args)
+{
+    ProgressWindow * progress = getProgressWindow(); 
+    
+    progress->setTitle("Downloading " + fullNameTarget + "'s " + binaryTarget + "...");
+    FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    
+    progress->setTitle("Downloading " + fullNameTarget + "'s meta.xml...");
+    FileDownloader::getFile(repoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
+    
+    progress->setTitle("Downloading " + fullNameTarget + "'s icon.png...");
+    FileDownloader::getFile(repoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+    
+    launchWindowTarget->removeE(progress);
+    
+    homebrewWindowTarget = getHomebrewWindow();
+
+    // close the window
+    homebrewWindowTarget->removeE(launchWindowTarget);
+        
+    // refresh
+    asyncRefreshHomebrewApps(thread, args);
+}
+
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
     delBtn.setState(GuiElement::STATE_DISABLED);
@@ -243,22 +267,20 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     
     std::string fullName = selectedButton->shortname;
     
-    progress->setTitle("Downloading " + fullName + "'s " + selectedButton->binary + "...");
-    FileDownloader::getFile(repoUrl+path+"/"+selectedButton->binary, sdPath+"/"+selectedButton->binary, &updateProgress);
+    fullNameTarget = fullName;
+    binaryTarget = selectedButton->binary;
+    pathTarget = path;
+    sdPathTarget = sdPath;
+    buttonTarget = button;
+    controllerTarget = controller;
+    triggerTarget = trigger;
     
-    progress->setTitle("Downloading " + fullName + "'s meta.xml...");
-    FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", &updateProgress);
+//    removeETarget = &HomebrewLaunchWindow::removeE;
     
-    progress->setTitle("Downloading " + fullName + "'s icon.png...");
-    FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", &updateProgress);
-    
-    removeE(progress);
-
-    // close the window
-    OnBackButtonClick(button, controller, trigger);
+    launchWindowTarget = this;
     
     // refresh
-    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
 
 //    struct SYSBrowserArgsIn args = {};

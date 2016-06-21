@@ -353,6 +353,8 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
+    thisHomebrewWindow = this;
+        
     bool disableButtons = false;
 //    return;
 
@@ -454,3 +456,7 @@ void HomebrewWindow::draw(CVideo *pVideo)
 
 }
 
+HomebrewWindow* getHomebrewWindow()
+{
+    return thisHomebrewWindow;
+}
