@@ -23,63 +23,58 @@ style = """<head>
     <link rel="stylesheet" type="text/css" href="css/tooltipster.bundle.min.css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script type="text/javascript" src="js/tooltipster.bundle.min.js"></script>
+    <script type="text/javascript" src="js/tsorter.min.js"></script>
 <style>
 
 #wiiubru {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
     width: 100%;
+    color: white;
 }
-#wiiubru table
-{
-    background-image: url("");
-}
-
 #wiiubru td, #wiiubru th {
-    text-align: left;
+    text-align: center;
     padding: 8px;
+    border-radius: 5px;
 }
 #wiiubru tr
 { 
    -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(0.9, 0.77);
+    z-index: 999;
 }
 
-#wiiubru tr:nth-child(even){background-color: #f2f2f2}
+#wiiubru tr:nth-child(even){background-color: #2a2a2a}
+#wiiubru tr:nth-child(odd){background-color: #3f3f3f}
+a:link {color: red;}
+a:visited {color: red;}
+a:hover {color: white;}
 
 #wiiubru tr:hover {
-   background-color: #ddd;
+   background-color: #7e7e7e;
    -webkit-transform: scale(0.9, 1.1); 
 }
 
 #wiiubru th {
     padding-top: 12px;
     padding-bottom: 12px;
-
+    background-color: #7e7e7e;
 }
-.notice
-{
-    text-align: center;
-    font-family: Arial, sans-serif;
-    color: #999;
-    margin-top: 5px;
-    font-size: 14px;
-    }
-img 
+.image 
 {
    -webkit-transition: -webkit-transform .2s ease-in-out;
     height: 50%;
     width: 50%;
 }
-img:hover
+.image:hover
 {
+   z-index: 1;
    -webkit-transition: -webkit-transform .2s ease-in-out;
-    -webkit-transform: scale(2, 2);
+    -webkit-transform: scale(1.5, 1.5);
 }
-.ignore
+body
 {
-   width: 256;
-   height: 96;
+    background-image: url("bg.png");
 }
 
 </style>
@@ -89,19 +84,22 @@ img:hover
                  animation: 'grow',
                  delay: 200,
                  side: 'right',
-                 contentAsHTML: 'true'
+                 maxWidth: 700,
+                 contentAsHTML: 'true' 
             });
         });
+
     </script>
 </head>
-
+<body>
 <div style="text-align: center; width=100%;">
-<img class='ignore' id='ignore' src="hbas.png">
+<a href="#">
+<img src="hbasheader.png" height=161 width=1000>
+</a>
 </div>
-<div class="notice">You are currently viewing the web front-end to the Homebrew App Store. For more information, see the <a href="#">thread here</a>.</div>
 """
 
-html = style + "<table id='wiiubru'><th><td>TITLE</td><td>AUTHOR</td><td>DESCRIPTION</td><td>DOWNLOAD</td><td>SOURCE</td></th>\n"
+html = style + "<table id='wiiubru'><tr><th>ICON</th><th>TITLE</th><th>AUTHOR</th><th>DESCRIPTION</th><th>DOWNLOAD</th><th>SOURCE</th></tr>\n"
 yaml = ""
     
 try:
@@ -164,7 +162,8 @@ for app in os.listdir("apps"):
             pass
         try:
             long_desc = tree.find("long_description").text
-            #long_desc = long_desc.replace("\n", "<br>")
+            long_desc = long_desc.replace("\n", "<br>")
+            long_desc = long_desc.replace("'", "!") 
         except:
             pass
         
@@ -186,7 +185,7 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td><img src='%s' class='tooltip' title='%s'></td><td>%s</td><td>%s</td><td>%s <a class='tooltip' title='%s'>...</a></td><td>%s</td><td>%s</td></tr>\n" % (icon, long_desc, name, coder, desc, long_desc, dlhref, src_link)
+    html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image'></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, name, coder, desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
     
@@ -196,7 +195,7 @@ for app in os.listdir("apps"):
         zipf.close()
 
 
-html += "</table>"
+html += "</table></body>"
 
 jsonstring = json.dumps(d, indent=4, separators=(',', ': '))
 
