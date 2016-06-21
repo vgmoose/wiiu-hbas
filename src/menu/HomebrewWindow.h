@@ -45,7 +45,8 @@ typedef struct
         std::string version;
     } homebrewButton;
 
-static void updateProgress(void *arg, u32 done, u32 total);
+extern void updateProgress(void *arg, u32 done, u32 total);
+extern ProgressWindow* getProgressWindow();
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:

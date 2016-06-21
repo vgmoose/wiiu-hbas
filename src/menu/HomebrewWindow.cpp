@@ -85,7 +85,12 @@ int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string versi
     return -1;
 }
 
-static void updateProgress(void *arg, u32 done, u32 total)
+ProgressWindow* getProgressWindow()
+{
+    return progressWindow;
+}
+
+void updateProgress(void *arg, u32 done, u32 total)
 {
     progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
 }
@@ -174,6 +179,7 @@ void HomebrewWindow::refreshHomebrewApps()
 //    std::string repoUrl = "http://192.168.1.104:8000";
     std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
     bool gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
+    removeE(progressWindow);
 
     std::istringstream f(fileContents);
 
@@ -333,7 +339,8 @@ void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 
     for(u32 i = 0; i < homebrewButtons.size(); i++)
     {
-        homebrewButtons[i].button->clearState(GuiElement::STATE_DISABLED);
+        if (homebrewButtons[i].button != 0)
+            homebrewButtons[i].button->clearState(GuiElement::STATE_DISABLED);
     }
 }
 
@@ -370,7 +377,8 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     {
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
-            homebrewButtons[i].button->setState(GuiElement::STATE_DISABLED);
+            if (homebrewButtons[i].button != 0)
+                homebrewButtons[i].button->setState(GuiElement::STATE_DISABLED);
         }
     }
 }
@@ -431,12 +439,14 @@ void HomebrewWindow::draw(CVideo *pVideo)
     if(bUpdatePositions)
     {
         bUpdatePositions = false;
+        int imageHeight = 210;
 
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
             float fXOffset = (i % 2)? 265 : -265;
-            float fYOffset = scrollOffY + (homebrewButtons[i].image->getHeight() + 20.0f) * 1.5f - (homebrewButtons[i].image->getHeight() + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));            
-            homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
+            float fYOffset = scrollOffY + (imageHeight + 20.0f) * 1.5f - (imageHeight + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));    
+            if (homebrewButtons[i].button != 0)
+                homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
     }
 

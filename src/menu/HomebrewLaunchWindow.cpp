@@ -226,28 +226,40 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     OnBackButtonClick(button, controller, trigger);
     
     // refresh
-    homebrewWindow->refreshHomebrewApps();
+    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-//    backBtn.setState(GuiElement::STATE_DISABLED);
     delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
     
     std::string path = "/apps/"+selectedButton->shortname;
     std::string sdPath = "sd:/wiiu"+path;
     CreateSubfolder(sdPath.c_str());
-//    std::string repoUrl = "http://192.168.1.104:8000";
-    FileDownloader::getFile(repoUrl+path+"/"+selectedButton->binary, sdPath+"/"+selectedButton->binary, 0);
-    FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", 0);
-    FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", 0);
+    ProgressWindow * progress = getProgressWindow(); 
+    append(progress);
+    
+    std::string fullName = selectedButton->shortname;
+    
+    progress->setTitle("Downloading " + fullName + "'s " + selectedButton->binary + "...");
+    FileDownloader::getFile(repoUrl+path+"/"+selectedButton->binary, sdPath+"/"+selectedButton->binary, &updateProgress);
+    
+    progress->setTitle("Downloading " + fullName + "'s meta.xml...");
+    FileDownloader::getFile(repoUrl+path+"/meta.xml", sdPath+"/meta.xml", &updateProgress);
+    
+    progress->setTitle("Downloading " + fullName + "'s icon.png...");
+    FileDownloader::getFile(repoUrl+path+"/icon.png", sdPath+"/icon.png", &updateProgress);
+    
+    removeE(progress);
 
     // close the window
     OnBackButtonClick(button, controller, trigger);
     
     // refresh
-    homebrewWindow->refreshHomebrewApps();
+    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
 
 //    struct SYSBrowserArgsIn args = {};
 //    std::string url = "http://vgmoose.com";

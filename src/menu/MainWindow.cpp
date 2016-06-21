@@ -48,7 +48,7 @@ MainWindow::MainWindow(int w, int h)
     pThread->resumeThread();
 }
 
-static void asyncRefreshHomebrewApps(CThread* thread, void* args)
+void asyncRefreshHomebrewApps(CThread* thread, void* args)
 {
     homebrewWindow->refreshHomebrewApps();
 }

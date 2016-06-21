@@ -27,7 +27,7 @@ class CVideo;
 static HomebrewWindow * homebrewWindow;
 static CThread* pThread;
 
-static void asyncRefreshHomebrewApps(CThread* thread, void* args);
+extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
 
 class MainWindow : public sigslot::has_slots<>
 {
