@@ -26,12 +26,17 @@ MainWindow::MainWindow(int w, int h)
     : width(w)
     , height(h)
     , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
+    , backgroundImg2Data(Resources::GetImageData("bg.png"))
+    , backgroundImg2(backgroundImg2Data)
 {
-    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
-    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
-    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
-    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
-    append(&bgImageColor);
+//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
+//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
+//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
+//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
+//    append(&bgImageColor);
+        
+    append(&backgroundImg2);
+        
 
     for(int i = 0; i < 4; i++)
     {

@@ -61,7 +61,12 @@ private:
     GuiImageData * backgroundImgData;
     GuiImage backgroundImg;
 
-    GuiImageData *buttonImgData;
+    GuiImageData *delButtonImgData;
+    GuiImageData *getButtonImgData;
+    GuiImageData *updateButtonImgData;
+    GuiImageData *deleteButtonImgData;
+    GuiImageData *reinstallButtonImgData;
+    GuiImageData *closeButtonImgData;
     GuiImage iconImage;
 
     GuiText titleText;
@@ -71,15 +76,16 @@ private:
     GuiText authorValueText;
     GuiText descriptionText;
 
-    GuiText loadBtnLabel;
-    GuiText delBtnLabel;
     GuiImage delImg;
     GuiImage loadImg;
+    GuiImage backImg;
+    GuiImage updateImg;
+    GuiImage reinstallImg;
+    
     GuiButton loadBtn;
     GuiButton delBtn;
-
-    GuiText backBtnLabel;
-    GuiImage backImg;
+    GuiButton updateBtn;
+    GuiButton reinstallBtn;
     GuiButton backBtn;
 
     GuiTrigger touchTrigger;

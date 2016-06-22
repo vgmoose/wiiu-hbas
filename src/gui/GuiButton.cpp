@@ -236,7 +236,7 @@ void GuiButton::update(GuiController * c)
         // button triggers
         if(clickable)
         {
-            bool isClicked = trigger[i]->clicked(c);
+            bool isClicked = trigger[i]->released(c);
 
             if(   !clickedTrigger && isClicked
                && (trigger[i]->isClickEverywhere() || (isStateSet(STATE_SELECTED | STATE_OVER, c->chan) && trigger[i]->isSelectionClickEverywhere()) || this->isInside(c->data.x, c->data.y)))

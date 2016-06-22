@@ -29,23 +29,29 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
     , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
-    , buttonImgData(Resources::GetImageData("button.png"))
+    , getButtonImgData(Resources::GetImageData("GET_BUTTON.png"))
+    , updateButtonImgData(Resources::GetImageData("UPDATE_BUTTON.png"))
+    , deleteButtonImgData(Resources::GetImageData("DELETE_BUTTON.png"))
+    , reinstallButtonImgData(Resources::GetImageData("REINSTALL_BUTTON.png"))
+    , closeButtonImgData(Resources::GetImageData("CLOSE.png"))
     , iconImage(thisButton.iconImgData)
     , titleText((char*)NULL, 42, glm::vec4(0,0,0, 1))
-    , versionText("Version:", 32, glm::vec4(0,0,0, 1))
     , versionValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
-    , authorText("Author:", 32, glm::vec4(0,0,0, 1))
     , authorValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
     , descriptionText((char*)NULL, 28, glm::vec4(0,0,0, 1))
-    , loadBtnLabel("Download", 32, glm::vec4(1.0f))
-    , delBtnLabel("Delete", 32, glm::vec4(1.0f))
-    , loadImg(buttonImgData)
-    , delImg(buttonImgData)
+//    , loadBtnLabel("Download", 32, glm::vec4(1.0f))
+//    , delBtnLabel("Delete", 32, glm::vec4(1.0f))
+    , loadImg(getButtonImgData)
+    , delImg(deleteButtonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
     , delBtn(loadImg.getWidth(), loadImg.getHeight())
-    , backBtnLabel("Close", 32, glm::vec4(1.0f))
-    , backImg(buttonImgData)
+//    , backBtnLabel("Close", 32, glm::vec4(1.0f))
+    , backImg(closeButtonImgData)
     , backBtn(backImg.getWidth(), backImg.getHeight())
+    , updateImg(updateButtonImgData)
+    , updateBtn(updateImg.getWidth(), updateImg.getHeight())
+    , reinstallImg(reinstallButtonImgData)
+    , reinstallBtn(reinstallImg.getWidth(), reinstallImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , selectedButton(&thisButton)
@@ -89,27 +95,21 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     iconImage.setPosition(100, yOffset - 30 - iconImage.getHeight() * 0.5f * scaleFactor);
     iconImage.setScale(scaleFactor);
     append(&iconImage);
+        
+    
 
     yOffset -= 50;
 
-    versionText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    versionText.setPosition(width - xOffset, yOffset);
-    append(&versionText);
-
     versionValueText.setTextf("%s", xmlReadSuccess ? metaXml.GetVersion() : launchPath.c_str());
     versionValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    versionValueText.setPosition(width - xOffset + 100, yOffset);
+    versionValueText.setPosition(width - xOffset, yOffset);
     versionValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
     append(&versionValueText);
     yOffset -= 30;
 
-    authorText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    authorText.setPosition(width - xOffset, yOffset);
-    append(&authorText);
-
     authorValueText.setTextf("%s", metaXml.GetCoder());
     authorValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    authorValueText.setPosition(width - xOffset + 100, yOffset);
+    authorValueText.setPosition(width - xOffset, yOffset);
     authorValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
     append(&authorValueText);
     yOffset -= 50;
@@ -120,15 +120,15 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
     append(&descriptionText);
 
-    if (thisButton.status == GET || thisButton.status == UPDATE)
+    if (thisButton.status == GET)
     {
         scaleFactor = 1.0f;
         loadImg.setScale(scaleFactor);
         loadBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * loadImg.getHeight());
         loadBtn.setImage(&loadImg);
-        loadBtn.setLabel(&loadBtnLabel);
+//        loadBtn.setLabel(&loadBtnLabel);
         loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        loadBtn.setPosition(-300, -310);
+        loadBtn.setPosition(250, 160);
         loadBtn.setTrigger(&touchTrigger);
         loadBtn.setTrigger(&wpadTouchTrigger);
         loadBtn.setEffectGrow();
@@ -136,14 +136,47 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         loadBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&loadBtn);
     }
+        
+    if (thisButton.status == UPDATE)
+    {
+        scaleFactor = 1.0f;
+        updateImg.setScale(scaleFactor);
+        updateBtn.setSize(scaleFactor * updateImg.getWidth(), scaleFactor * updateImg.getHeight());
+        updateBtn.setImage(&updateImg);
+        updateBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+        updateBtn.setPosition(250, 200);
+        updateBtn.setTrigger(&touchTrigger);
+        updateBtn.setTrigger(&wpadTouchTrigger);
+        updateBtn.setEffectGrow();
+        updateBtn.setSoundClick(buttonClickSound);
+        updateBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
+        append(&updateBtn);
+    }
+        
+    if (thisButton.status == INSTALLED)
+    {
+        scaleFactor = 1.0f;
+        reinstallImg.setScale(scaleFactor);
+        reinstallBtn.setSize(scaleFactor * reinstallImg.getWidth(), scaleFactor * reinstallImg.getHeight());
+        reinstallBtn.setImage(&reinstallImg);
+        reinstallBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+        reinstallBtn.setPosition(250, 200);
+        reinstallBtn.setTrigger(&touchTrigger);
+        reinstallBtn.setTrigger(&wpadTouchTrigger);
+        reinstallBtn.setEffectGrow();
+        reinstallBtn.setSoundClick(buttonClickSound);
+        reinstallBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
+        append(&reinstallBtn);
+    }
+        
     if (thisButton.status != GET)
     {
         delImg.setScale(scaleFactor);
         delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
         delBtn.setImage(&delImg);
-        delBtn.setLabel(&delBtnLabel);
+//        delBtn.setLabel(&delBtnLabel);
         delBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        delBtn.setPosition(0, -310);
+        delBtn.setPosition(250, 110);
         delBtn.setTrigger(&touchTrigger);
         delBtn.setTrigger(&wpadTouchTrigger);
         delBtn.setEffectGrow();
@@ -155,9 +188,9 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
     backBtn.setImage(&backImg);
-    backBtn.setLabel(&backBtnLabel);
+//    backBtn.setLabel(&backBtnLabel);
     backBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    backBtn.setPosition(300, -310);
+    backBtn.setPosition(-410, 260);
     backBtn.setTrigger(&touchTrigger);
     backBtn.setTrigger(&wpadTouchTrigger);
     backBtn.setEffectGrow();
@@ -170,7 +203,11 @@ HomebrewLaunchWindow::~HomebrewLaunchWindow()
 {
     Resources::RemoveSound(buttonClickSound);
     Resources::RemoveImageData(backgroundImgData);
-    Resources::RemoveImageData(buttonImgData);
+    Resources::RemoveImageData(getButtonImgData);
+    Resources::RemoveImageData(updateButtonImgData);
+    Resources::RemoveImageData(deleteButtonImgData);
+    Resources::RemoveImageData(reinstallButtonImgData);
+    Resources::RemoveImageData(closeButtonImgData);
 }
 
 void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)

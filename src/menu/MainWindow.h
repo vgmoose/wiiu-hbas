@@ -34,6 +34,9 @@ class MainWindow : public sigslot::has_slots<>
 public:
     MainWindow(int w, int h);
     virtual ~MainWindow();
+    
+    GuiImageData * backgroundImg2Data;
+    GuiImage backgroundImg2;
 
     void appendTv(GuiElement *e)
     {

@@ -1,7 +1,7 @@
 /****************************************************************************
  * Loadiine resource files.
  * This file is generated automatically.
- * Includes 15 files.
+ * Includes 20 files.
  *
  * NOTE:
  * Any manual modification of this file will be overwriten by the generation.
@@ -20,17 +20,26 @@ typedef struct _RecourceFile
 	u32		    CustomFileSize;
 } RecourceFile;
 
-extern const u8 button_png[];
-extern const u32 button_png_size;
+extern const u8 bg_png[];
+extern const u32 bg_png_size;
 
 extern const u8 button_click_mp3[];
 extern const u32 button_click_mp3_size;
+
+extern const u8 CLOSE_png[];
+extern const u32 CLOSE_png_size;
+
+extern const u8 DELETE_BUTTON_png[];
+extern const u32 DELETE_BUTTON_png_size;
 
 extern const u8 font_ttf[];
 extern const u32 font_ttf_size;
 
 extern const u8 GET_png[];
 extern const u32 GET_png_size;
+
+extern const u8 GET_BUTTON_png[];
+extern const u32 GET_BUTTON_png_size;
 
 extern const u8 INSTALLED_png[];
 extern const u32 INSTALLED_png_size;
@@ -56,6 +65,9 @@ extern const u32 player4_point_png_size;
 extern const u8 progressWindow_png[];
 extern const u32 progressWindow_png_size;
 
+extern const u8 REINSTALL_BUTTON_png[];
+extern const u32 REINSTALL_BUTTON_png_size;
+
 extern const u8 slimers_mp3[];
 extern const u32 slimers_mp3_size;
 
@@ -65,12 +77,18 @@ extern const u32 titlehbas2_png_size;
 extern const u8 UPDATE_png[];
 extern const u32 UPDATE_png_size;
 
+extern const u8 UPDATE_BUTTON_png[];
+extern const u32 UPDATE_BUTTON_png_size;
+
 static RecourceFile RecourceList[] =
 {
-	{"button.png", button_png, button_png_size, NULL, 0},
+	{"bg.png", bg_png, bg_png_size, NULL, 0},
 	{"button_click.mp3", button_click_mp3, button_click_mp3_size, NULL, 0},
+	{"CLOSE.png", CLOSE_png, CLOSE_png_size, NULL, 0},
+	{"DELETE_BUTTON.png", DELETE_BUTTON_png, DELETE_BUTTON_png_size, NULL, 0},
 	{"font.ttf", font_ttf, font_ttf_size, NULL, 0},
 	{"GET.png", GET_png, GET_png_size, NULL, 0},
+	{"GET_BUTTON.png", GET_BUTTON_png, GET_BUTTON_png_size, NULL, 0},
 	{"INSTALLED.png", INSTALLED_png, INSTALLED_png_size, NULL, 0},
 	{"launchMenuBox.png", launchMenuBox_png, launchMenuBox_png_size, NULL, 0},
 	{"LOCAL.png", LOCAL_png, LOCAL_png_size, NULL, 0},
@@ -79,9 +97,11 @@ static RecourceFile RecourceList[] =
 	{"player3_point.png", player3_point_png, player3_point_png_size, NULL, 0},
 	{"player4_point.png", player4_point_png, player4_point_png_size, NULL, 0},
 	{"progressWindow.png", progressWindow_png, progressWindow_png_size, NULL, 0},
+	{"REINSTALL_BUTTON.png", REINSTALL_BUTTON_png, REINSTALL_BUTTON_png_size, NULL, 0},
 	{"slimers.mp3", slimers_mp3, slimers_mp3_size, NULL, 0},
 	{"titlehbas2.png", titlehbas2_png, titlehbas2_png_size, NULL, 0},
 	{"UPDATE.png", UPDATE_png, UPDATE_png_size, NULL, 0},
+	{"UPDATE_BUTTON.png", UPDATE_BUTTON_png, UPDATE_BUTTON_png_size, NULL, 0},
 	{NULL, NULL, 0, NULL, 0}
 };
 
