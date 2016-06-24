@@ -45,7 +45,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     
     button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     button->coderLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-    button->coderLabel->setPosition(300, -20);
+    button->coderLabel->setPosition(300, 20);
     
     button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     button->versionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
@@ -179,7 +179,6 @@ void HomebrewWindow::refreshHomebrewApps()
         positionHomebrewButton(&homebrewButtons[idx], idx);
         
         scrollOffY = 0;
-        scrollMenu(0);
 
         append(homebrewButtons[idx].button);
     }
@@ -280,6 +279,8 @@ void HomebrewWindow::refreshHomebrewApps()
 
         append(homebrewButtons[idx].button);
     }
+    
+    scrollMenu(0);
 }
 
 HomebrewWindow::HomebrewWindow(int w, int h)

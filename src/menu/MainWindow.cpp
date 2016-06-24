@@ -21,6 +21,7 @@
 #include "utils/StringTools.h"
 #include "utils/logger.h"
 
+#include "dynamic_libs/vpad_functions.h"
 
 MainWindow::MainWindow(int w, int h)
     : width(w)
@@ -120,6 +121,25 @@ void MainWindow::update(GuiController *controller)
         pointerImg[wpadIdx]->setPosition(posX, posY);
         pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
         pointerValid[wpadIdx] = true;
+    }
+    
+    // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c
+    		
+	// Handle analog stick movements
+//	Vec2D left =  controller->data.lstick;
+//	Vec2D right = controller->data.rstick;
+
+	// get the differences
+//	float ydif = left.y + right.y;
+    
+    int ydif = 0;
+    
+	// Handle D-pad movements as well
+	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_UP)?    20 : ydif;
+	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_DOWN)? -20: ydif;
+    
+    if (ydif != 0) {
+        scrollMenu(ydif);
     }
     
     if (controller->data.touched) {

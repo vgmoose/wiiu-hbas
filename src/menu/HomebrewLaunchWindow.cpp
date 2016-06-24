@@ -71,12 +71,12 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
         
     // if GET or UDPATE, fetch xml from server
-//    if (selectedButton->status == GET || selectedButton->status == UPDATE)
-//    {
-//        std::string xmlFetchData;
-//        FileDownloader::getFile(std::string(repoUrl)+"/apps/"+selectedButton->shortname+"/meta.xml", xmlFetchData);
-//        xmlReadSuccess = metaXml.LoadHomebrewXMLData(xmlFetchData.c_str());
-//    }
+    if (selectedButton->status == GET || selectedButton->status == UPDATE)
+    {
+        std::string xmlFetchData;
+        FileDownloader::getFile(std::string(repoUrl)+"/apps/"+selectedButton->shortname+"/meta.xml", xmlFetchData);
+        xmlReadSuccess = metaXml.LoadHomebrewXMLFromString(xmlFetchData.c_str());
+    }
 
     int xOffset = 500;
     int yOffset = height * 0.5f - 75.0f - 50;

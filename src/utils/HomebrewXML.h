@@ -11,6 +11,7 @@ class HomebrewXML
 		HomebrewXML(const char* filename) { LoadHomebrewXMLData(filename); };
 
 		bool LoadHomebrewXMLData(const char* filename);
+        bool LoadHomebrewXMLFromString(const char* str);
 
 		const char * GetName() const;
 		void SetName(char * newName);
