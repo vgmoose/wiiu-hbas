@@ -175,7 +175,7 @@ void MainWindow::update(GuiController *controller)
 //    }
 }
 
-void MainWindow::scrollMenu(float scrol)
+void scrollMenu(float scrol)
 {
     scrolledSoFar += abs(scrol);
 
@@ -187,7 +187,7 @@ void MainWindow::scrollMenu(float scrol)
     movedALittleBit = 10; // we scrolled
 
     homebrewWindow->lastScrollOffY = homebrewWindow->scrollOffY;
-    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()/2*130)
+    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()*130)
         return;
     homebrewWindow->scrollOffY += scrol;
 }

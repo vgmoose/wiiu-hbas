@@ -21,7 +21,6 @@
 #include "gui/GuiFrame.h"
 #include "menu/ProgressWindow.h"
 
-
 #define LOCAL 0
 #define UPDATE 1
 #define INSTALLED 2
@@ -35,6 +34,8 @@ typedef struct
         GuiImage *image;
         GuiButton *button;
         GuiText *nameLabel;
+        GuiText *versionLabel;
+        GuiText *coderLabel;
         GuiText *descriptionLabel;
         GuiImageData *iconImgData;
         GuiImage *iconImg;

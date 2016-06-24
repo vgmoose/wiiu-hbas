@@ -36,16 +36,24 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 
     button->iconImg = new GuiImage(button->iconImgData);
     button->iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    button->iconImg->setPosition(30, 0);
+    button->iconImg->setPosition(60, 0);
     button->iconImg->setScale(cfImageScale);
     
-    button->nameLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+    button->nameLabel->setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
     button->nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-    button->nameLabel->setPosition(256 + 10, 20);
-
-    button->descriptionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+    button->nameLabel->setPosition(0, 70);
+    
+    button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+    button->coderLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+    button->coderLabel->setPosition(300, -20);
+    
+    button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
+    button->versionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+    button->versionLabel->setPosition(300, -15);
+    
+    button->descriptionLabel->setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
     button->descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
-    button->descriptionLabel->setPosition(256 + 10, -20);
+    button->descriptionLabel->setPosition(0, -60);
 
     // set the right image for the status
     button->image->setScale(0.9);
@@ -53,10 +61,9 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     button->button->setImage(button->image);
     button->button->setLabel(button->nameLabel, 0);
     button->button->setLabel(button->descriptionLabel, 1);
+    button->button->setLabel(button->coderLabel, 2);
+    button->button->setLabel(button->versionLabel, 3);
     button->button->setIcon(button->iconImg);
-    float fXOffset = (index % 2)? 270 : -270;
-    float fYOffset = scrollOffY + (button->image->getHeight() + 20.0f) * 1.5f - (button->image->getHeight() + 20) * ((index % 2)? (int)(index/2)-1 : (int)(index/2));
-    button->button->setPosition(currentLeftPosition + fXOffset, fYOffset);
     button->button->setTrigger(&touchTrigger);
     button->button->setTrigger(&wpadTouchTrigger);
     button->button->setEffectGrow();
@@ -162,12 +169,17 @@ void HomebrewWindow::refreshHomebrewApps()
             cpName += strlen("sd:/wiiu/apps/");
         
         homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].descriptionLabel = new GuiText(metaXml.GetCoder(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].versionLabel = new GuiText(metaXml.GetVersion(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].coderLabel = new GuiText(metaXml.GetCoder(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].descriptionLabel = new GuiText(metaXml.GetShortDescription(), 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
         homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
         homebrewButtons[idx].version = metaXml.GetVersion();
         
         positionHomebrewButton(&homebrewButtons[idx], idx);
+        
+        scrollOffY = 0;
+        scrollMenu(0);
 
         append(homebrewButtons[idx].button);
     }
@@ -238,6 +250,8 @@ void HomebrewWindow::refreshHomebrewApps()
             homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
             append(homebrewButtons[addedIndex].button);
             positionHomebrewButton(&homebrewButtons[addedIndex], addedIndex);
+            homebrewButtons[addedIndex].binary = binary;
+            homebrewButtons[addedIndex].version = version;
             continue;
         }
 
@@ -256,7 +270,9 @@ void HomebrewWindow::refreshHomebrewApps()
            cpName += strlen("sd:/wiiu/apps/");
 
         homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].descriptionLabel = new GuiText(author.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].versionLabel = new GuiText(version.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].coderLabel = new GuiText(author.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].descriptionLabel = new GuiText(desc.c_str(), 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
         homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
 

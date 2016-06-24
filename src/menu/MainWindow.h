@@ -29,7 +29,7 @@ static CThread* pThread;
 static int movedALittleBit = 0;
 static int scrolledSoFar = 0;
 
-
+extern void scrollMenu(float scrol);
 extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
 
 class MainWindow : public sigslot::has_slots<>
@@ -125,7 +125,6 @@ public:
     void drawTv(CVideo *video);
     void update(GuiController *controller);
     void updateEffects();
-    void scrollMenu(float scrol);
     float lastTouchX2 = 0;
 private:
     int width, height;

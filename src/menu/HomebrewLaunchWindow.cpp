@@ -58,6 +58,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
+    backgroundImg.setPosition(0, -30);
     append(&backgroundImg);
 
     std::string launchPath = selectedButton->execPath;
@@ -78,7 +79,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 //    }
 
     int xOffset = 500;
-    int yOffset = height * 0.5f - 75.0f;
+    int yOffset = height * 0.5f - 75.0f - 50;
 
     const char *cpName = xmlReadSuccess ? metaXml.GetName() : launchPath.c_str();
     if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
@@ -86,13 +87,13 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     titleText.setText(cpName);
     titleText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    titleText.setPosition(0, yOffset);
+    titleText.setPosition(0, yOffset + 10);
     titleText.setMaxWidth(width - 100, GuiText::DOTTED);
     append(&titleText);
 
-    float scaleFactor = 1.0f;
+    float scaleFactor = 1.4f;
     iconImage.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    iconImage.setPosition(100, yOffset - 30 - iconImage.getHeight() * 0.5f * scaleFactor);
+    iconImage.setPosition(80, yOffset - 30 - iconImage.getHeight() * 0.5f * scaleFactor);
     iconImage.setScale(scaleFactor);
     append(&iconImage);
         
@@ -102,23 +103,25 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     versionValueText.setTextf("%s", xmlReadSuccess ? metaXml.GetVersion() : launchPath.c_str());
     versionValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    versionValueText.setPosition(width - xOffset, yOffset);
-    versionValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
+    versionValueText.setPosition(width - xOffset - 35, yOffset);
+    versionValueText.setMaxWidth(xOffset - 50, GuiText::DOTTED);
     append(&versionValueText);
     yOffset -= 30;
 
     authorValueText.setTextf("%s", metaXml.GetCoder());
     authorValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    authorValueText.setPosition(width - xOffset, yOffset);
-    authorValueText.setMaxWidth(xOffset - 150, GuiText::DOTTED);
+    authorValueText.setPosition(width - xOffset - 35, yOffset);
+    authorValueText.setMaxWidth(xOffset - 50, GuiText::DOTTED);
     append(&authorValueText);
     yOffset -= 50;
 
     descriptionText.setText(metaXml.GetLongDescription());
     descriptionText.setAlignment(ALIGN_LEFT | ALIGN_TOP);
-    descriptionText.setPosition(100, -250);
+    descriptionText.setPosition(100, -370);
     descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
     append(&descriptionText);
+        
+    int actionButtonYOff = -30;
 
     if (thisButton.status == GET)
     {
@@ -128,7 +131,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         loadBtn.setImage(&loadImg);
 //        loadBtn.setLabel(&loadBtnLabel);
         loadBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        loadBtn.setPosition(250, 160);
+        loadBtn.setPosition(300, 160 + actionButtonYOff);
         loadBtn.setTrigger(&touchTrigger);
         loadBtn.setTrigger(&wpadTouchTrigger);
         loadBtn.setEffectGrow();
@@ -144,7 +147,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         updateBtn.setSize(scaleFactor * updateImg.getWidth(), scaleFactor * updateImg.getHeight());
         updateBtn.setImage(&updateImg);
         updateBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        updateBtn.setPosition(250, 200);
+        updateBtn.setPosition(300, 200 + actionButtonYOff);
         updateBtn.setTrigger(&touchTrigger);
         updateBtn.setTrigger(&wpadTouchTrigger);
         updateBtn.setEffectGrow();
@@ -160,7 +163,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         reinstallBtn.setSize(scaleFactor * reinstallImg.getWidth(), scaleFactor * reinstallImg.getHeight());
         reinstallBtn.setImage(&reinstallImg);
         reinstallBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        reinstallBtn.setPosition(250, 200);
+        reinstallBtn.setPosition(300, 200 + actionButtonYOff);
         reinstallBtn.setTrigger(&touchTrigger);
         reinstallBtn.setTrigger(&wpadTouchTrigger);
         reinstallBtn.setEffectGrow();
@@ -176,7 +179,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         delBtn.setImage(&delImg);
 //        delBtn.setLabel(&delBtnLabel);
         delBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        delBtn.setPosition(250, 110);
+        delBtn.setPosition(300, 110 + actionButtonYOff);
         delBtn.setTrigger(&touchTrigger);
         delBtn.setTrigger(&wpadTouchTrigger);
         delBtn.setEffectGrow();
@@ -190,7 +193,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     backBtn.setImage(&backImg);
 //    backBtn.setLabel(&backBtnLabel);
     backBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-    backBtn.setPosition(-410, 260);
+    backBtn.setPosition(-465, 275);
     backBtn.setTrigger(&touchTrigger);
     backBtn.setTrigger(&wpadTouchTrigger);
     backBtn.setEffectGrow();
@@ -269,15 +272,16 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
 
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
+
     ProgressWindow * progress = getProgressWindow(); 
     
-    progress->setTitle("Downloading " + fullNameTarget + "'s " + binaryTarget + "...");
+    progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
     FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
     
-    progress->setTitle("Downloading " + fullNameTarget + "'s meta.xml...");
+    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
     FileDownloader::getFile(repoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
     
-    progress->setTitle("Downloading " + fullNameTarget + "'s icon.png...");
+    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
     FileDownloader::getFile(repoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
     
     launchWindowTarget->removeE(progress);
@@ -295,6 +299,9 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
 {
     delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
+    backBtn.setState(GuiElement::STATE_DISABLED);
+    updateBtn.setState(GuiElement::STATE_DISABLED);
+    reinstallBtn.setState(GuiElement::STATE_DISABLED);
     
     std::string path = "/apps/"+selectedButton->shortname;
     std::string sdPath = "sd:/wiiu"+path;
@@ -316,7 +323,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     
     launchWindowTarget = this;
     
-    // refresh
+    // download target files
     pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
 
