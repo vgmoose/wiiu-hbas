@@ -133,7 +133,11 @@ void MainWindow::update(GuiController *controller)
             lastTouchX2 = controller->data.y;
         }
     } else {
+        // on touchup, reset everything
         lastTouchX2 = -1;
+        if (movedALittleBit > 0)
+            movedALittleBit --;
+        scrolledSoFar = 0;
     }
 
     if(controller->chan & GuiTrigger::CHANNEL_1)
@@ -173,8 +177,17 @@ void MainWindow::update(GuiController *controller)
 
 void MainWindow::scrollMenu(float scrol)
 {
+    scrolledSoFar += abs(scrol);
+
+    if (scrolledSoFar < 70 && !movedALittleBit) // must move by at least 70
+    {
+        return;
+    }
+    
+    movedALittleBit = 10; // we scrolled
+
     homebrewWindow->lastScrollOffY = homebrewWindow->scrollOffY;
-    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()*130)
+    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()/2*130)
         return;
     homebrewWindow->scrollOffY += scrol;
 }
@@ -212,4 +225,10 @@ void MainWindow::drawTv(CVideo *video)
             pointerValid[i] = false;
         }
     }
+}
+
+
+int getHasScrolled()
+{
+    return movedALittleBit;
 }

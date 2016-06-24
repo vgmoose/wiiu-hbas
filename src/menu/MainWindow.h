@@ -26,6 +26,9 @@ class CVideo;
 
 static HomebrewWindow * homebrewWindow;
 static CThread* pThread;
+static int movedALittleBit = 0;
+static int scrolledSoFar = 0;
+
 
 extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
 
@@ -135,5 +138,7 @@ private:
     GuiImage *pointerImg[4];
     bool pointerValid[4];
 };
+extern int getHasScrolled();
+
 
 #endif //_MAIN_WINDOW_H_

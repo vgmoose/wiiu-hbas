@@ -1,0 +1,26 @@
+In file included from /Users/Ricky/hbas/src/menu/MainWindow.cpp:17:0:
+/Users/Ricky/hbas/src/menu/MainWindow.h: In constructor 'MainWindow::MainWindow(int, int)':
+/Users/Ricky/hbas/src/menu/MainWindow.h:135:14: warning: 'MainWindow::bgImageColor' will be initialized after [-Wreorder]
+     GuiImage bgImageColor;
+              ^
+/Users/Ricky/hbas/src/menu/MainWindow.h:41:20: warning:   'GuiImageData* MainWindow::backgroundImg2Data' [-Wreorder]
+     GuiImageData * backgroundImg2Data;
+                    ^
+/Users/Ricky/hbas/src/menu/MainWindow.cpp:25:1: warning:   when initialized here [-Wreorder]
+ MainWindow::MainWindow(int w, int h)
+ ^
+/Users/Ricky/hbas/src/menu/MainWindow.cpp: In member function 'void MainWindow::update(GuiController*)':
+/Users/Ricky/hbas/src/menu/MainWindow.cpp:138:13: error: 'movedALitteBit' was not declared in this scope
+         if (movedALitteBit > 0)
+             ^
+In file included from /Users/Ricky/hbas/src/menu/MainWindow.h:23:0,
+                 from /Users/Ricky/hbas/src/menu/MainWindow.cpp:17:
+/Users/Ricky/hbas/src/menu/HomebrewWindow.h: At global scope:
+/Users/Ricky/hbas/src/menu/HomebrewWindow.h:30:25: warning: 'progressWindow' defined but not used [-Wunused-variable]
+ static ProgressWindow * progressWindow;
+                         ^
+/Users/Ricky/hbas/src/menu/HomebrewWindow.h:101:24: warning: 'thisHomebrewWindow' defined but not used [-Wunused-variable]
+ static HomebrewWindow* thisHomebrewWindow;
+                        ^
+make[1]: *** [MainWindow.o] Error 1
+make: *** [build] Error 2

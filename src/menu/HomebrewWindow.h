@@ -101,4 +101,5 @@ private:
 static HomebrewWindow* thisHomebrewWindow;
 extern HomebrewWindow* getHomebrewWindow();
 
+
 #endif //_HOMEBREW_WINDOW_H_

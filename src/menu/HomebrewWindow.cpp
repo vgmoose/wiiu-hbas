@@ -353,6 +353,10 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
+    if (getHasScrolled()) {
+        return;
+    }
+    
     thisHomebrewWindow = this;
         
     bool disableButtons = false;
