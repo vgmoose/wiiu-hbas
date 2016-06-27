@@ -68,8 +68,8 @@ extern const u32 progressWindow_png_size;
 extern const u8 REINSTALL_BUTTON_png[];
 extern const u32 REINSTALL_BUTTON_png_size;
 
-extern const u8 slimers_mp3[];
-extern const u32 slimers_mp3_size;
+extern const u8 screampics_mp3[];
+extern const u32 screampics_mp3_size;
 
 extern const u8 titlehbas2_png[];
 extern const u32 titlehbas2_png_size;
@@ -98,7 +98,7 @@ static RecourceFile RecourceList[] =
 	{"player4_point.png", player4_point_png, player4_point_png_size, NULL, 0},
 	{"progressWindow.png", progressWindow_png, progressWindow_png_size, NULL, 0},
 	{"REINSTALL_BUTTON.png", REINSTALL_BUTTON_png, REINSTALL_BUTTON_png_size, NULL, 0},
-	{"slimers.mp3", slimers_mp3, slimers_mp3_size, NULL, 0},
+	{"screampics.mp3", screampics_mp3, screampics_mp3_size, NULL, 0},
 	{"titlehbas2.png", titlehbas2_png, titlehbas2_png_size, NULL, 0},
 	{"UPDATE.png", UPDATE_png, UPDATE_png_size, NULL, 0},
 	{"UPDATE_BUTTON.png", UPDATE_BUTTON_png, UPDATE_BUTTON_png_size, NULL, 0},

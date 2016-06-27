@@ -65,6 +65,12 @@ bool FileDownloader::getFile(const std::string & downloadUrl, const std::string 
 
     private_data.file->close();
     delete private_data.file;
+    
+    if (!result)
+    {
+        // clean up downloaded file, we don't want to store it with a bad result
+        remove(outputPath.c_str());
+    }
     return result;
 }
 
@@ -88,18 +94,19 @@ bool FileDownloader::internalGetFile(const std::string & downloadUrl, curl_priva
     }
 
     int ret = n_curl_easy_perform(curl);
-    if(ret)
-    {
-        log_printf("n_curl_easy_perform ret %i\n", ret);
-        n_curl_easy_cleanup(curl);
-        return false;
-    }
+//
+//    if(ret)
+//    {
+//        log_printf("n_curl_easy_perform ret %i\n", ret);
+//        n_curl_easy_cleanup(curl);
+//        return false;
+//    }
 
-    if(!private_data->filesize) {
-        log_printf("file length is 0");
-        n_curl_easy_cleanup(curl);
-        return false;
-    }
+//    if(!private_data->filesize) {
+//        log_printf("file length is 0");
+//        n_curl_easy_cleanup(curl);
+//        return false;
+//    }
 
     int resp = 404;
     n_curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp);
