@@ -61,6 +61,7 @@ public:
     
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
+    void refreshHomebrewAppIcons();
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
     
 private:

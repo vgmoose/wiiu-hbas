@@ -266,8 +266,9 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     OnBackButtonClick(button, controller, trigger);
     
     // refresh
-    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+    globalRefreshHomebrewApps();
+//    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+//    pThread->resumeThread();
 }
 
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
@@ -276,7 +277,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     ProgressWindow * progress = getProgressWindow(); 
     
     progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
-    FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    int success = FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
     
     progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
     FileDownloader::getFile(repoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
@@ -292,7 +293,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     homebrewWindowTarget->removeE(launchWindowTarget);
         
     // refresh
-    asyncRefreshHomebrewApps(thread, args);
+    globalRefreshHomebrewApps();
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)

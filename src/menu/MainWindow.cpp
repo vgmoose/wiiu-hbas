@@ -50,11 +50,19 @@ MainWindow::MainWindow(int w, int h)
     homebrewWindow = new HomebrewWindow(w, h);
     append(homebrewWindow);
         
-    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+    // perform a synchronous refresh
+    globalRefreshHomebrewApps();
+        
+//    pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+//    pThread->resumeThread();
 }
 
-void asyncRefreshHomebrewApps(CThread* thread, void* args)
+void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
+{
+    homebrewWindow->refreshHomebrewAppIcons();
+}
+
+void globalRefreshHomebrewApps()
 {
     homebrewWindow->refreshHomebrewApps();
 }

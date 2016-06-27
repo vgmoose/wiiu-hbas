@@ -257,7 +257,7 @@ void HomebrewWindow::refreshHomebrewApps()
         // download app icon
         std::string targetIcon;
         std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
-        bool imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, targetIcon);
+        bool imageDownloadSuccessful = false; //FileDownloader::getFile(targetIconUrl, targetIcon);
 
         if (imageDownloadSuccessful)
             homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
@@ -315,7 +315,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     hblVersionText.setPosition(0, 0);
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
-    append(progressWindow);
+//    append(progressWindow);
         
 //    refreshHomebrewApps();
 }
@@ -475,6 +475,11 @@ void HomebrewWindow::draw(CVideo *pVideo)
 
     GuiFrame::draw(pVideo);
 
+}
+
+void refreshHomebrewAppIcons()
+{
+    
 }
 
 HomebrewWindow* getHomebrewWindow()

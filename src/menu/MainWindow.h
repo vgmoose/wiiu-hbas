@@ -30,7 +30,8 @@ static int movedALittleBit = 0;
 static int scrolledSoFar = 0;
 
 extern void scrollMenu(float scrol);
-extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
+extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
+extern void globalRefreshHomebrewApps();
 
 class MainWindow : public sigslot::has_slots<>
 {
