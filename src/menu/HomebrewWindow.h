@@ -58,6 +58,7 @@ public:
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     std::vector<homebrewButton> homebrewButtons;
+    std::vector<homebrewButton> remoteAppButtons;
     
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
