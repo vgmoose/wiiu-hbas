@@ -137,7 +137,9 @@ void MainWindow::update(GuiController *controller)
         pointerValid[wpadIdx] = true;
     }
     
-    if (controller->data.touched && showingSplashScreen)
+    if ((controller->data.touched ||
+        (controller->data.buttons_h & VPAD_BUTTON_A)) &&
+        showingSplashScreen)
     {
         removeE(&splashScreen);
         showingSplashScreen = false;
@@ -152,19 +154,18 @@ void MainWindow::update(GuiController *controller)
     // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c
     		
 	// Handle analog stick movements
-//	Vec2D left =  controller->data.lstick;
-//	Vec2D right = controller->data.rstick;
+	Vec2D left =  controller->data.lstick;
+	Vec2D right = controller->data.rstick;
 
 	// get the differences
-//	float ydif = left.y + right.y;
-    
-    int ydif = 0;
-    
+	float ydif = -20*left.y + -20*right.y;
+        
 	// Handle D-pad movements as well
-	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_UP)?    20 : ydif;
-	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_DOWN)? -20: ydif;
+	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;
+	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_UP)? -20: ydif;
     
     if (ydif != 0) {
+        movedALittleBit = 10;
         scrollMenu(ydif);
     }
     
