@@ -29,6 +29,8 @@ MainWindow::MainWindow(int w, int h)
     , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
     , backgroundImg2Data(Resources::GetImageData("bg.png"))
     , backgroundImg2(backgroundImg2Data)
+    , splashScreenImgData(Resources::GetImageData("splash.png"))
+    , splashScreen(splashScreenImgData)
 {
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
 //    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
@@ -38,6 +40,11 @@ MainWindow::MainWindow(int w, int h)
         
     append(&backgroundImg2);
         
+//    splashScreenImgData = new GuiImageData(Resources::GetImageData("splash.png");
+//    splashScreen = new GuiImage(splashScreenImgData);
+                        
+    append(&splashScreen);
+    showingSplashScreen = true;
 
     for(int i = 0; i < 4; i++)
     {
@@ -47,11 +54,8 @@ MainWindow::MainWindow(int w, int h)
         pointerImg[i]->setScale(1.5f);
         pointerValid[i] = false;
     }
-    homebrewWindow = new HomebrewWindow(w, h);
-    append(homebrewWindow);
         
-    // perform a synchronous refresh
-    globalRefreshHomebrewApps();
+    homebrewWindow = new HomebrewWindow(w, h);
         
 //    pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
 //    pThread->resumeThread();
@@ -71,6 +75,8 @@ MainWindow::~MainWindow()
 {
     removeE(homebrewWindow);
     removeE(&bgImageColor);
+    if (showingSplashScreen)
+        removeE(&splashScreen);
 
     while(!tvElements.empty())
     {
@@ -129,6 +135,18 @@ void MainWindow::update(GuiController *controller)
         pointerImg[wpadIdx]->setPosition(posX, posY);
         pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
         pointerValid[wpadIdx] = true;
+    }
+    
+    if (controller->data.touched && showingSplashScreen)
+    {
+        removeE(&splashScreen);
+        showingSplashScreen = false;
+        
+        append(homebrewWindow);
+
+        // perform a synchronous refresh
+        globalRefreshHomebrewApps();
+        return;
     }
     
     // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c

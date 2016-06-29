@@ -47,6 +47,8 @@ public:
             data.buttons_d = vpad.btns_d;
             data.validPointer = !vpad.tpdata.invalid;
             data.touched = vpad.tpdata.touched;
+            data.lstick = vpad.lstick;
+            data.rstick = vpad.rstick;
             //! calculate the screen offsets
             data.x = -(width >> 1) + (int)((vpad.tpdata1.x * width) >> 12);
             data.y = (height >> 1) - (int)(height - ((vpad.tpdata1.y * height) >> 12));

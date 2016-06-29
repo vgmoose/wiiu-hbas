@@ -58,10 +58,12 @@ public:
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     std::vector<homebrewButton> homebrewButtons;
-    std::vector<homebrewButton> remoteAppButtons;
+    std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
+    std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
     
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
+    void refreshLocalApps();
     void refreshHomebrewAppIcons();
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
     

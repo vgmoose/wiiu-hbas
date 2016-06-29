@@ -19,6 +19,7 @@
 
 #include <string.h>
 #include "GuiTrigger.h"
+#include "dynamic_libs/vpad_functions.h"
 
 class GuiController
 {
@@ -64,6 +65,8 @@ public:
         bool validPointer;
         bool touched;
         float pointerAngle;
+        Vec2D lstick;
+        Vec2D rstick;
         int x;
         int y;
     } PadData;

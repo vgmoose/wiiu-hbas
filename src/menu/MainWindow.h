@@ -39,8 +39,12 @@ public:
     MainWindow(int w, int h);
     virtual ~MainWindow();
     
+    bool showingSplashScreen;
     GuiImageData * backgroundImg2Data;
     GuiImage backgroundImg2;
+    
+    GuiImageData * splashScreenImgData;
+    GuiImage splashScreen;
 
     void appendTv(GuiElement *e)
     {
