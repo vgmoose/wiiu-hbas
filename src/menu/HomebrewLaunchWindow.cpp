@@ -275,6 +275,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
 
     ProgressWindow * progress = getProgressWindow(); 
+    progress->setProgress(0);
     
     progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
     int success = FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);

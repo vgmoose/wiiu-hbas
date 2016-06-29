@@ -60,11 +60,16 @@ public:
     std::vector<homebrewButton> homebrewButtons;
     std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
-    
+    std::string fileContents;
+    int totalLocalApps;
+    bool gotDirectorySuccess;
+    std::vector<std::string> cachedIcons;
+    void populateIconCache();
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
+    void findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon);
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
     
 private:

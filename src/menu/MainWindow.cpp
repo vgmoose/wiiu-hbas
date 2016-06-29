@@ -57,19 +57,27 @@ MainWindow::MainWindow(int w, int h)
         
     homebrewWindow = new HomebrewWindow(w, h);
         
-//    pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-//    pThread->resumeThread();
 }
 
 void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
 {
-    homebrewWindow->refreshHomebrewAppIcons();
+    homebrewWindow->populateIconCache();
+}
+
+void asyncRefreshHomebrewApps(CThread* thread, void* args)
+{
+    homebrewWindow->refreshHomebrewApps();
+    // when refresh is done, start preloading the icon cache
+    pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
 }
 
 void globalRefreshHomebrewApps()
 {
     homebrewWindow->refreshHomebrewApps();
 }
+
+
 
 MainWindow::~MainWindow()
 {
@@ -147,7 +155,11 @@ void MainWindow::update(GuiController *controller)
         append(homebrewWindow);
 
         // perform a synchronous refresh
-        globalRefreshHomebrewApps();
+//        globalRefreshHomebrewApps();
+        pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
+        
+
         return;
     }
     

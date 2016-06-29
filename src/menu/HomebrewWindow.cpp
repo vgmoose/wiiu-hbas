@@ -44,7 +44,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     button->nameLabel->setPosition(0, 70);
     
     button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-    button->coderLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+    button->coderLabel->setMaxWidth(170, GuiText::SCROLL_HORIZONTAL);
     button->coderLabel->setPosition(300, 20);
     
     button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
@@ -116,7 +116,6 @@ void HomebrewWindow::refreshHomebrewApps()
     homebrewButtons.clear();
     dirList.SortList();
 
-    int totalLocalApps = 0;
     // load up local apps
     for(int i = 0; i < dirList.GetFilecount(); i++)
     {
@@ -182,20 +181,24 @@ void HomebrewWindow::refreshHomebrewApps()
 
         append(homebrewButtons[idx].button);
     }
-    
-    totalLocalApps = homebrewButtons.size();
-        		
+            		
     // download app list from the repo
-    std::string fileContents;
-//    std::string repoUrl = "http://192.168.1.104:8000";
     std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
-    bool gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
-    removeE(progressWindow);
+    if (!gotDirectorySuccess)
+    {
+        gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
+        removeE(progressWindow);
+    }
 
     std::istringstream f(fileContents);
+    
+    totalLocalApps = homebrewButtons.size();
+    int iterCount = -1;
 
     while (gotDirectorySuccess)
     {
+        iterCount ++;
+        
         std::string shortname;
 
         if (!std::getline(f, shortname)) break;
@@ -221,7 +224,7 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // file path
         homebrewButtons[idx].execPath = "";
-        homebrewButtons[idx].iconImgData = NULL;
+//        homebrewButtons[idx].iconImgData = NULL;
 
         std::string homebrewPath = homebrewButtons[idx].execPath;
         size_t slashPos = homebrewPath.rfind('/');
@@ -242,6 +245,12 @@ void HomebrewWindow::refreshHomebrewApps()
         // update status if already a local app
         int addedIndex = checkIfUpdateOrInstalled(homebrewButtons[idx].shortname, homebrewButtons[idx].version, totalLocalApps);
         
+        if (remoteAppButtons.size() <= iterCount)
+        {
+            // add this to the remote button array
+            remoteAppButtons.push_back(homebrewButtons[idx]);
+        }
+        
         if (addedIndex >= 0)
         {
             homebrewButtons.pop_back();
@@ -256,10 +265,14 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // download app icon
         std::string targetIcon;
-        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
-        bool imageDownloadSuccessful = false; //FileDownloader::getFile(targetIconUrl, targetIcon);
+//        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
+//        bool imageDownloadSuccessful = false;
+        // try to load file from our memory cache
+        if (cachedIcons.size() > iterCount)
+            targetIcon = cachedIcons[iterCount];
+        //FileDownloader::getFile(targetIconUrl, targetIcon);
 
-        if (imageDownloadSuccessful)
+        if (!targetIcon.empty())
             homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
 
         const char *cpName = name.c_str();
@@ -283,6 +296,46 @@ void HomebrewWindow::refreshHomebrewApps()
     scrollMenu(0);
 }
 
+void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon)
+{
+    for (int x=0; x<homebrewButtons.size(); x++)
+    {
+        if (homebrewButtons[x].shortname == shortname)
+        {
+            homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+            positionHomebrewButton(&homebrewButtons[x],  x);
+//            removeE(homebrewButtons[x].button);
+//            append(homebrewButtons[x].button);
+        }
+    }
+}
+
+void HomebrewWindow::populateIconCache()
+{
+    cachedIcons.clear();
+    
+    for (int x=0; x<remoteAppButtons.size(); x++)
+    {
+        // download app icon
+        std::string targetIcon;
+        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + remoteAppButtons[x].shortname + "/icon.png";
+        bool imageDownloadSuccessful = false;
+        
+        FileDownloader::getFile(targetIconUrl, targetIcon);
+        
+        cachedIcons.push_back(targetIcon);
+        
+        findHomebrewIconAndSetImage(remoteAppButtons[x].shortname, targetIcon);
+        
+//        remoteAppButtons[x]->iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+//        removeE(remoteAppButtons[x].button);
+//        append(remoteAppButtons[x].button);
+        
+        // update icon for this iteration
+        
+    }
+}
+
 HomebrewWindow::HomebrewWindow(int w, int h)
     : GuiFrame(w, h)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
@@ -296,7 +349,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , arrowLeftImage(arrowLeftImageData)
     , arrowRightButton(arrowRightImage.getWidth(), arrowRightImage.getHeight())
     , arrowLeftButton(arrowLeftImage.getWidth(), arrowLeftImage.getHeight())
-    , hblVersionText("Homebrew App Store by VGMoose, Music by (T-T)b (google t tb bandcamp)", 32, glm::vec4(1.0f))
+    , hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
@@ -308,11 +361,12 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     targetLeftPosition = 0;
     currentLeftPosition = 0;
     listOffset = 0;
+    gotDirectorySuccess = false;
         
     progressWindow = new ProgressWindow("Downloading app directory...");
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
-    hblVersionText.setPosition(0, 0);
+    hblVersionText.setPosition(0, 50.0f);
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
 //    append(progressWindow);
