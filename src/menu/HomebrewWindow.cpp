@@ -114,6 +114,7 @@ void HomebrewWindow::refreshHomebrewApps()
     }
     
     homebrewButtons.clear();
+    localAppButtons.clear();
     dirList.SortList();
 
     // load up local apps
@@ -180,6 +181,7 @@ void HomebrewWindow::refreshHomebrewApps()
         scrollOffY = 0;
 
         append(homebrewButtons[idx].button);
+        localAppButtons.push_back(homebrewButtons[idx]);
     }
             		
     // download app list from the repo
@@ -194,6 +196,7 @@ void HomebrewWindow::refreshHomebrewApps()
     
     totalLocalApps = homebrewButtons.size();
     int iterCount = -1;
+    globalUpdatePosition = true;
 
     while (gotDirectorySuccess)
     {
@@ -293,7 +296,8 @@ void HomebrewWindow::refreshHomebrewApps()
         append(homebrewButtons[idx].button);
     }
     
-    scrollMenu(0);
+    initialLoadInProgress = false;
+    globalUpdatePosition = true;
 }
 
 void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon)
@@ -304,11 +308,34 @@ void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::str
         {
             homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
             positionHomebrewButton(&homebrewButtons[x],  x);
+            break;
 //            removeE(homebrewButtons[x].button);
 //            append(homebrewButtons[x].button);
         }
     }
 }
+
+bool HomebrewWindow::checkLocalAppExists(std::string shortname)
+{
+    for (int x=0; x<localAppButtons.size(); x++)
+    {
+        if (localAppButtons[x].shortname == shortname)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+//void HomebrewWindow::fetchThisIcon(int x, std::string targetIconUrl)
+//{
+//        std::string targetIcon;        
+//        FileDownloader::getFile(targetIconUrl, targetIcon);
+//        cachedIcons.insert(cachedIcons.begin()+targetIcon);
+//        
+//        findHomebrewIconAndSetImage(remoteAppButtons[x].shortname, targetIcon);
+//}
 
 void HomebrewWindow::populateIconCache()
 {
@@ -316,6 +343,13 @@ void HomebrewWindow::populateIconCache()
     
     for (int x=0; x<remoteAppButtons.size(); x++)
     {
+        // if we already have this app
+//        if (checkLocalAppExists(remoteAppButtons[x].shortname))
+//        {
+//            cachedIcons.push_back("");
+//            continue;
+//        }
+        
         // download app icon
         std::string targetIcon;
         std::string targetIconUrl = std::string(repoUrl)+"/apps/" + remoteAppButtons[x].shortname + "/icon.png";
@@ -364,12 +398,19 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     gotDirectorySuccess = false;
         
     progressWindow = new ProgressWindow("Downloading app directory...");
+    std::string qualifiedName = " "+std::string(repoUrl);
+        
+    hblRepoText = new GuiText(qualifiedName.c_str(), 32, glm::vec4(1.0f));
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
+    hblRepoText->setAlignment(ALIGN_BOTTOM | ALIGN_LEFT);
     hblVersionText.setPosition(0, 50.0f);
+    hblRepoText->setPosition(0, 50.0f);
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
-//    append(progressWindow);
+    append(hblRepoText);
+
+    append(progressWindow);
         
 //    refreshHomebrewApps();
 }
@@ -424,7 +465,7 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    if (getHasScrolled()) {
+    if (getHasScrolled() || initialLoadInProgress) {
         return;
     }
     
@@ -489,7 +530,7 @@ void HomebrewWindow::OnRightArrowClick(GuiButton *button, const GuiController *c
 
 void HomebrewWindow::draw(CVideo *pVideo)
 {
-    bool bUpdatePositions = false;
+    bool bUpdatePositions = false || globalUpdatePosition;
     
     if (scrollOffY != lastScrollOffY)
         bUpdatePositions = true;

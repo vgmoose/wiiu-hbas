@@ -262,6 +262,9 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
         rmdir(removePath.c_str());
     }
     
+    if (launchWindowTarget != 0)
+        removeE(launchWindowTarget);
+    
     // close the window
     OnBackButtonClick(button, controller, trigger);
     
@@ -277,21 +280,31 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     ProgressWindow * progress = getProgressWindow(); 
     progress->setProgress(0);
     
+    HomebrewLaunchWindow* curLaunchWindow = launchWindowTarget;
+    
+    std::string mRepoUrl = std::string(repoUrl);
+    
     progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
-    int success = FileDownloader::getFile(repoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    int success = FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
     
     progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
-    FileDownloader::getFile(repoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
+    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
     
     progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
-    FileDownloader::getFile(repoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
     
-    launchWindowTarget->removeE(progress);
+    curLaunchWindow->removeE(progress);
+    
+    
+//    if (homebrewWindowTarget != 0)
+//        launchWindowTarget->removeE(homebrewWindowTarget);
     
     homebrewWindowTarget = getHomebrewWindow();
 
     // close the window
-    homebrewWindowTarget->removeE(launchWindowTarget);
+    homebrewWindowTarget->removeE(curLaunchWindow);
+    
+    curLaunchWindow->OnBackButtonClick(buttonTarget, controllerTarget, triggerTarget);
         
     // refresh
     globalRefreshHomebrewApps();
@@ -323,6 +336,8 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     
 //    removeETarget = &HomebrewLaunchWindow::removeE;
     
+    if (launchWindowTarget != 0)
+        removeE(launchWindowTarget);
     launchWindowTarget = this;
     
     // download target files

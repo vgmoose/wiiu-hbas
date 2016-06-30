@@ -26,9 +26,9 @@ static std::string binaryTarget;
 static std::string pathTarget;
 static std::string repoUrlTarget;
 static std::string sdPathTarget;
-static const GuiButton * buttonTarget;
+static GuiButton * buttonTarget;
 static const GuiController * controllerTarget;
-static const GuiTrigger * triggerTarget;
+static GuiTrigger * triggerTarget;
 
 static HomebrewWindow* homebrewWindowTarget;
 
@@ -44,11 +44,12 @@ public:
 	
 
     sigslot::signal1<GuiElement *> backButtonClicked;
-private:
-    void OnBackButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+        void OnBackButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
     {
         backButtonClicked(this);
     }
+private:
+
 
     void OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
     void OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);

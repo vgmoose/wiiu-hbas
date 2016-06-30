@@ -41,7 +41,7 @@ Application::Application()
     controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
 
     //! load resources
-    Resources::LoadFiles("sd:/wiiu/apps/hbappstore/resources");
+    Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
 
     //! create bgMusic
     bgMusic = new GuiSound(Resources::GetFile("screampics.mp3"), Resources::GetFileSize("screampics.mp3"));

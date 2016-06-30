@@ -61,14 +61,18 @@ public:
     std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
     std::string fileContents;
+    bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
     bool gotDirectorySuccess;
+    bool initialLoadInProgress = true;
+    bool globalUpdatePosition = false;
     std::vector<std::string> cachedIcons;
     void populateIconCache();
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
+    void fetchThisIcon(int x, std::string targetIconUrl);
     void findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon);
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
     
@@ -98,6 +102,7 @@ private:
     GuiButton arrowRightButton;
     GuiButton arrowLeftButton;
     GuiText hblVersionText;
+    GuiText * hblRepoText;
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
