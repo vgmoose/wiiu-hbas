@@ -306,7 +306,10 @@ void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::str
     {
         if (homebrewButtons[x].shortname == shortname)
         {
-            homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+            if (targetIcon.compare("missing.png"))
+                homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+            else
+                homebrewButtons[x].iconImgData = Resources::GetImageData("missing.png");
             positionHomebrewButton(&homebrewButtons[x],  x);
             break;
 //            removeE(homebrewButtons[x].button);
@@ -355,7 +358,10 @@ void HomebrewWindow::populateIconCache()
         std::string targetIconUrl = std::string(repoUrl)+"/apps/" + remoteAppButtons[x].shortname + "/icon.png";
         bool imageDownloadSuccessful = false;
         
-        FileDownloader::getFile(targetIconUrl, targetIcon);
+        imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, targetIcon);
+        
+        if (!imageDownloadSuccessful)
+            targetIcon = "missing.png";
         
         cachedIcons.push_back(targetIcon);
         
