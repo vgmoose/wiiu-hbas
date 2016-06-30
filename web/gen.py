@@ -44,38 +44,42 @@ style = """<head>
     -webkit-transform: scale(0.9, 0.77);
 }
 
-#wiiubru tr:nth-child(even){background-color: #2a2a2a}
-#wiiubru tr:nth-child(odd){background-color: #3f3f3f}
+#wiiubru tr:nth-child(even){background-color:rgba(63, 63, 63, 0.6)}
+#wiiubru tr:nth-child(odd){background-color:rgba(42, 42, 42, 0.6);}
 a:link {color: #b30000;}
 a:visited {color: #b30000;}
 a:hover {color: white;}
 
 #wiiubru tr:hover {
-   background-color: #7e7e7e;
+   background-color:rgba(11, 10, 10, 0.6);
    -webkit-transform: scale(0.9, 1.1); 
 }
 
 #wiiubru th {
     padding-top: 12px;
     padding-bottom: 12px;
-    background-color: #b30000;
+    background-color:rgba(59, 0, 0, 0.4); 
 
 }
-/*icon stretch*/
+/*icon stretch and grey*/
 .image 
 {
+    -webkit-filter: grayscale(75%);
+    filter: grayscale(75%);
    -webkit-transition: -webkit-transform .2s ease-in-out;
     height: 50%;
     width: 50%;
 }
 .image:hover
 {
+    -webkit-filter: grayscale(0);
+    filter: grayscale(0);
    -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(1.5, 1.5);
 }
 body
 {
-    background-image: url("bg.png");
+    background-image: url("images/bg.png");
 /*table sort icons .. to be continued*/
 }
 table.sortable th::after, th.sorttable_sorted::after, th.sorttable_sorted_reverse::after {
@@ -85,41 +89,66 @@ table.sortable th::after, th.sorttable_sorted::after, th.sorttable_sorted_revers
   height: 24px;
 }
 th.sorttable_sorted::after {
-  background: url(my-sorted-icon.png);
+  background: url(images/my-sorted-icon.png);
   background-size: contain;
 }
 th.sorttable_sorted_reverse::after {
-  background: url(my-sorted-reversed-icon.png);
+  background: url(images/my-sorted-reversed-icon.png);
   background-size: cover;
 }
 /*search box styling*/
 input[type=text]
 {
-    width: 130px;
-    box-sizing: border-box;
-    border: 2px solid #b30000;
+    float: left;
+    width: 120px;
+    border: 1px solid #cacaca;
     border-radius: 4px;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: #3f3f3f;
-    background-image: url("search.png");
-    background-position: 5px 8px;
-    background-repeat: no-repeat;
-    padding: 10px 30px 10px 40px;
+    font-size: 16px;
+    color: white;
+    background-color: rgba(42, 42, 42, 0.4);
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
 }
 
-input[type=text]:focus {
-    width: 1000;
-    background-image: url("searchex.png");
-    placeholder: 'Search for an app.....';
+input[type=text]:focus { 
+    padding-left: 15px;
+    float: left;
+    width: 500;
+    outline: none;
+}
+input[type=text]:hover {
+  background-color: rgba(42, 42, 42, 0.8);  
+}
+.pull-left {
+    margin-left: 80px;
+    float: left;
+}
+.pull-right {
+    margin-right: 80px;
+    float: right;
+}
+.logo
+{
+    width : 1000;
+    height: 160;
+    max-width: 100%;
+}
+.icon
+{
+    width: 24px;
+    height: 24px;
+    -webkit-transition: -webkit-transform .2s ease-in-out;
+    -webkit-transform: scale(1.0, 1.0);
+}
+.icon:hover
+{
+       -webkit-transform: scale(1.4, 1.4); 
 }
 
 
 </style>
-<!-- tooltip script to display the homebrews long_description when mousing over the table cell -->
+<!-- tooltip script to display the homebrews long_description when mousing over the icon table cell -->
     <script>
         $(document).ready(function() {
             $('.tooltip').tooltipster({
@@ -130,20 +159,32 @@ input[type=text]:focus {
                  contentAsHTML: 'true' 
             });
         });
-
     </script>
+
 </head>
-<!-- website header logo and search box -->
+<!-- website header logo ,nav and search box -->
 <body>
 <div style="text-align: center; width=100%;">
 <a href="#">
-<img src="hbasheader.png" height=161 width=1000>
+<img src="images/hbasheader.png" class='logo'>
 </a>
 <br>
 </div>
 <div style='font-family: "Trebuchet MS", Arial, Helvetica, sans-serif; text-align: center; width=100%; color: white;'>
-<input type="text" id="search" placeholder=""><br>
+
+<span class='pull-left'><input type="text" id="search" placeholder="  Search..."></span>
+<span class='pull-right'>
+<a href="https://github.com/vgmoose/hbas">
+<img src="images/github.png" class='icon' title='Github'>
+</a>
+<a href="https://kiwiirc.com/client?settings=76b79dc4baeccc495e0b78d2a052f984">
+<img src="images/chat.png" class='icon' title='IRC'>
+</a>
+</span>
+<br>
 </div>
+
+
 """
 search = """
 <!-- search script -->
@@ -160,7 +201,7 @@ $('#search').keyup(function() {
 </script>
 """
 
-html = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;'>TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;'>AUTHOR</th><th style = 'cursor:pointer;'>DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
+html = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'>TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'>AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'>DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
 yaml = ""
     
 try:
@@ -235,7 +276,7 @@ for app in os.listdir("apps"):
     
     icon = "apps/%s/icon.png" % app
     if not os.path.isfile(icon):
-        icon = "missing.png"
+        icon = "images/missing.png"
     
     dl = "zips/%s.zip" % app
     dlhref = "<a href='%s'>Download</a>" % dl
