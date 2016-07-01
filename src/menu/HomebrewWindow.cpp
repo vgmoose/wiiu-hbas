@@ -29,6 +29,9 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
+const char * repoUrl = "http://wiiubru.com/appstore";
+
+ProgressWindow* progressWindow;
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
@@ -108,7 +111,7 @@ void HomebrewWindow::refreshHomebrewApps()
 
     DirList dirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
 
-    for (int x=0; x<homebrewButtons.size(); x++)
+    for (u32 x=0; x<homebrewButtons.size(); x++)
     {
         removeE(homebrewButtons[x].button);  
     }
@@ -163,7 +166,7 @@ void HomebrewWindow::refreshHomebrewApps()
         bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
         
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx].execPath.c_str();
-        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
+//        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
 
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
             cpName += strlen("sd:/wiiu/apps/");
@@ -195,12 +198,11 @@ void HomebrewWindow::refreshHomebrewApps()
     std::istringstream f(fileContents);
     
     totalLocalApps = homebrewButtons.size();
-    int iterCount = -1;
+    u32 iterCount = 0;
     globalUpdatePosition = true;
 
     while (gotDirectorySuccess)
     {
-        iterCount ++;
         
         std::string shortname;
 
@@ -234,8 +236,8 @@ void HomebrewWindow::refreshHomebrewApps()
         if(slashPos != std::string::npos)
             homebrewPath.erase(slashPos);
 
-        u8 * iconData = NULL;
-        u32 iconDataSize = 0;
+//        u8 * iconData = NULL;
+//        u32 iconDataSize = 0;
 
         homebrewButtons[idx].dirPath = homebrewPath;
 
@@ -263,6 +265,7 @@ void HomebrewWindow::refreshHomebrewApps()
             positionHomebrewButton(&homebrewButtons[addedIndex], addedIndex);
             homebrewButtons[addedIndex].binary = binary;
             homebrewButtons[addedIndex].version = version;
+            iterCount ++;
             continue;
         }
 
@@ -279,7 +282,7 @@ void HomebrewWindow::refreshHomebrewApps()
             homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
 
         const char *cpName = name.c_str();
-        const char *cpDescription = desc.c_str();
+//        const char *cpDescription = desc.c_str();
 
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
            cpName += strlen("sd:/wiiu/apps/");
@@ -294,6 +297,7 @@ void HomebrewWindow::refreshHomebrewApps()
         positionHomebrewButton(&homebrewButtons[idx], idx);
 
         append(homebrewButtons[idx].button);
+        iterCount ++;
     }
     
     initialLoadInProgress = false;
@@ -302,7 +306,7 @@ void HomebrewWindow::refreshHomebrewApps()
 
 void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon)
 {
-    for (int x=0; x<homebrewButtons.size(); x++)
+    for (u32 x=0; x<homebrewButtons.size(); x++)
     {
         if (homebrewButtons[x].shortname == shortname)
         {
@@ -320,7 +324,7 @@ void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::str
 
 bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 {
-    for (int x=0; x<localAppButtons.size(); x++)
+    for (u32 x=0; x<localAppButtons.size(); x++)
     {
         if (localAppButtons[x].shortname == shortname)
         {
@@ -344,14 +348,8 @@ void HomebrewWindow::populateIconCache()
 {
     cachedIcons.clear();
     
-    for (int x=0; x<remoteAppButtons.size(); x++)
+    for (u32 x=0; x<remoteAppButtons.size(); x++)
     {
-        // if we already have this app
-//        if (checkLocalAppExists(remoteAppButtons[x].shortname))
-//        {
-//            cachedIcons.push_back("");
-//            continue;
-//        }
         
         // download app icon
         std::string targetIcon;
@@ -367,11 +365,6 @@ void HomebrewWindow::populateIconCache()
         
         findHomebrewIconAndSetImage(remoteAppButtons[x].shortname, targetIcon);
         
-//        remoteAppButtons[x]->iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
-//        removeE(remoteAppButtons[x].button);
-//        append(remoteAppButtons[x].button);
-        
-        // update icon for this iteration
         
     }
 }
@@ -475,7 +468,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
         return;
     }
     
-    thisHomebrewWindow = this;
+//    thisHomebrewWindow = this;
         
     bool disableButtons = false;
 //    return;
@@ -583,7 +576,7 @@ void refreshHomebrewAppIcons()
     
 }
 
-HomebrewWindow* getHomebrewWindow()
-{
-    return thisHomebrewWindow;
-}
+//HomebrewWindow* getHomebrewWindow()
+//{
+//    return thisHomebrewWindow;
+//}

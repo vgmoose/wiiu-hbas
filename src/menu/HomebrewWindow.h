@@ -26,7 +26,7 @@
 #define INSTALLED 2
 #define GET 3
 
-static ProgressWindow * progressWindow;
+extern ProgressWindow * progressWindow;
 
 typedef struct
     {
@@ -113,8 +113,8 @@ private:
     int targetLeftPosition;
 
 };
-static HomebrewWindow* thisHomebrewWindow;
-extern HomebrewWindow* getHomebrewWindow();
+//extern HomebrewWindow* thisHomebrewWindow;
+//extern HomebrewWindow* getHomebrewWindow();
 
 
 #endif //_HOMEBREW_WINDOW_H_

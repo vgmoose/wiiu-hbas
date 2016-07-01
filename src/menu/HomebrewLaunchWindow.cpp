@@ -25,7 +25,6 @@
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
-    , homebrewWindow(window)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
     , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
@@ -39,22 +38,20 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     , versionValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
     , authorValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
     , descriptionText((char*)NULL, 28, glm::vec4(0,0,0, 1))
-//    , loadBtnLabel("Download", 32, glm::vec4(1.0f))
-//    , delBtnLabel("Delete", 32, glm::vec4(1.0f))
     , loadImg(getButtonImgData)
     , delImg(deleteButtonImgData)
+    , updateImg(updateButtonImgData)
+    , reinstallImg(reinstallButtonImgData)
+    , backImg(closeButtonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
     , delBtn(loadImg.getWidth(), loadImg.getHeight())
-//    , backBtnLabel("Close", 32, glm::vec4(1.0f))
-    , backImg(closeButtonImgData)
-    , backBtn(backImg.getWidth(), backImg.getHeight())
-    , updateImg(updateButtonImgData)
     , updateBtn(updateImg.getWidth(), updateImg.getHeight())
-    , reinstallImg(reinstallButtonImgData)
     , reinstallBtn(reinstallImg.getWidth(), reinstallImg.getHeight())
+    , backBtn(backImg.getWidth(), backImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , selectedButton(&thisButton)
+    , homebrewWindow(window)
 {
     width = backgroundImg.getWidth();
     height = backgroundImg.getHeight();
@@ -262,13 +259,13 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
         rmdir(removePath.c_str());
     }
     
-    if (launchWindowTarget != 0)
-        removeE(launchWindowTarget);
+//    if (launchWindowTarget != 0)
+//        removeE(launchWindowTarget);
     
     // close the window
     OnBackButtonClick(button, controller, trigger);
     
-    // refresh
+//     refresh
     globalRefreshHomebrewApps();
 //    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
 //    pThread->resumeThread();
@@ -277,37 +274,33 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
 
-    ProgressWindow * progress = getProgressWindow(); 
-    progress->setProgress(0);
-    
-    HomebrewLaunchWindow* curLaunchWindow = launchWindowTarget;
-    
-    std::string mRepoUrl = std::string(repoUrl);
-    
-    progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
-    int success = FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
-    
-    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
-    
-    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
-    
-    curLaunchWindow->removeE(progress);
-    
-    
-//    if (homebrewWindowTarget != 0)
-//        launchWindowTarget->removeE(homebrewWindowTarget);
-    
-    homebrewWindowTarget = getHomebrewWindow();
-
-    // close the window
-    homebrewWindowTarget->removeE(curLaunchWindow);
-    
-    curLaunchWindow->OnBackButtonClick(buttonTarget, controllerTarget, triggerTarget);
-        
-    // refresh
-    globalRefreshHomebrewApps();
+//    ProgressWindow * progress = getProgressWindow(); 
+//    progress->setProgress(0);
+//    
+//    HomebrewLaunchWindow* curLaunchWindow = launchWindowTarget;
+//    
+//    std::string mRepoUrl = std::string(repoUrl);
+//    
+//    progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
+//    FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+//    
+//    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
+//    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
+//    
+//    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
+//    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+//    
+//    curLaunchWindow->removeE(progress);
+//    
+//    homebrewWindowTarget = getHomebrewWindow();
+//
+//    // close the window
+//    homebrewWindowTarget->removeE(curLaunchWindow);
+//    
+//    curLaunchWindow->OnBackButtonClick(buttonTarget, controllerTarget, triggerTarget);
+//        
+//    // refresh
+//    globalRefreshHomebrewApps();
 }
 
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -326,22 +319,22 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     
     std::string fullName = selectedButton->shortname;
     
-    fullNameTarget = fullName;
-    binaryTarget = selectedButton->binary;
-    pathTarget = path;
-    sdPathTarget = sdPath;
-    buttonTarget = button;
-    controllerTarget = controller;
-    triggerTarget = trigger;
+//    fullNameTarget = fullName;
+//    binaryTarget = selectedButton->binary;
+//    pathTarget = path;
+//    sdPathTarget = sdPath;
+//    buttonTarget = button;
+//    controllerTarget = controller;
+//    triggerTarget = trigger;
     
 //    removeETarget = &HomebrewLaunchWindow::removeE;
     
-    if (launchWindowTarget != 0)
-        removeE(launchWindowTarget);
-    launchWindowTarget = this;
+//    if (launchWindowTarget != 0)
+//        removeE(launchWindowTarget);
+//    launchWindowTarget = this;
     
     // download target files
-    pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
 
 //    struct SYSBrowserArgsIn args = {};

@@ -39,7 +39,7 @@ Application::Application()
     controller[2] = new WPadController(GuiTrigger::CHANNEL_3);
     controller[3] = new WPadController(GuiTrigger::CHANNEL_4);
     controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
-
+        
     //! load resources
     Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
 

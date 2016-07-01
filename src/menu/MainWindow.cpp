@@ -23,6 +23,11 @@
 
 #include "dynamic_libs/vpad_functions.h"
 
+int movedALittleBit = 0;
+int scrolledSoFar = 0;
+
+HomebrewWindow * homebrewWindow;
+
 MainWindow::MainWindow(int w, int h)
     : width(w)
     , height(h)
@@ -68,7 +73,7 @@ void asyncRefreshHomebrewApps(CThread* thread, void* args)
 {
     homebrewWindow->refreshHomebrewApps();
     // when refresh is done, start preloading the icon cache
-    pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
 }
 
@@ -156,7 +161,7 @@ void MainWindow::update(GuiController *controller)
 
         // perform a synchronous refresh
 //        globalRefreshHomebrewApps();
-        pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+        CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
         
 

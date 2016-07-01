@@ -24,10 +24,10 @@
 
 class CVideo;
 
-static HomebrewWindow * homebrewWindow;
-static CThread* pThread;
-static int movedALittleBit = 0;
-static int scrolledSoFar = 0;
+extern HomebrewWindow * homebrewWindow;
+extern int movedALittleBit;
+extern int scrolledSoFar;
+
 
 extern void scrollMenu(float scrol);
 extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
@@ -38,6 +38,9 @@ class MainWindow : public sigslot::has_slots<>
 public:
     MainWindow(int w, int h);
     virtual ~MainWindow();
+    int width, height;
+
+    GuiImage bgImageColor;
     
     bool showingSplashScreen;
     GuiImageData * backgroundImg2Data;
@@ -132,11 +135,9 @@ public:
     void updateEffects();
     float lastTouchX2 = 0;
 private:
-    int width, height;
     std::vector<GuiElement *> drcElements;
     std::vector<GuiElement *> tvElements;
 
-    GuiImage bgImageColor;
 
     GuiImageData *pointerImgData[4];
     GuiImage *pointerImg[4];

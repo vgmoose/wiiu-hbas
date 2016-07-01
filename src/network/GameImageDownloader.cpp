@@ -25,7 +25,7 @@ using namespace std;
 
 #define VALID_IMAGE(size) (!(size == 36864 || size <= 1024 || size == 7386 || size <= 1174 || size == 4446))
 
-static const char *mainRepoURL = "http://hbas.vgmoose.com/";
+const char *mainRepoURL = "http://hbas.vgmoose.com/";
 
 void GameImageDownloader::executeThread()
 {

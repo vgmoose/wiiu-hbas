@@ -21,17 +21,6 @@
 #include "gui/GuiFrame.h"
 #include "menu/HomebrewWindow.h"
 
-static std::string fullNameTarget;
-static std::string binaryTarget;
-static std::string pathTarget;
-static std::string repoUrlTarget;
-static std::string sdPathTarget;
-static GuiButton * buttonTarget;
-static const GuiController * controllerTarget;
-static GuiTrigger * triggerTarget;
-
-static HomebrewWindow* homebrewWindowTarget;
-
 //typedef void (GuiFrame::*fn)(GuiElement*); 
 //static fn removeETarget;
 
@@ -77,11 +66,11 @@ private:
     GuiText authorValueText;
     GuiText descriptionText;
 
-    GuiImage delImg;
     GuiImage loadImg;
-    GuiImage backImg;
+    GuiImage delImg;
     GuiImage updateImg;
     GuiImage reinstallImg;
+    GuiImage backImg;
     
     GuiButton loadBtn;
     GuiButton delBtn;
@@ -96,7 +85,7 @@ private:
     HomebrewWindow * homebrewWindow;
 };
 
-static HomebrewLaunchWindow* launchWindowTarget;
+//static HomebrewLaunchWindow* launchWindowTarget;
 
 
 #endif //_HOMEBREW_LAUNCHER_WINDOW_H_

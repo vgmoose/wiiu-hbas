@@ -22,6 +22,17 @@
 
 #include "dynamic_libs/os_functions.h"
 
+
+static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
+{
+    curl_private_data_t *private_data = (curl_private_data_t *)clientp;
+    if(private_data->progressCallback)
+    {
+        private_data->progressCallback(private_data->progressArg, (u32)dlnow, (u32)dltotal);
+    }
+    return 0;
+}
+
 bool FileDownloader::getFile(const std::string & downloadUrl, std::string & fileBuffer, ProgressCallback callback, void *arg)
 {
     curl_private_data_t private_data;
@@ -93,7 +104,7 @@ bool FileDownloader::internalGetFile(const std::string & downloadUrl, curl_priva
         n_curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, private_data);
     }
 
-    int ret = n_curl_easy_perform(curl);
+    n_curl_easy_perform(curl);
 //
 //    if(ret)
 //    {
@@ -163,13 +174,4 @@ int FileDownloader::curlCallback(void *buffer, int size, int nmemb, void *userp)
     }
 }
 
-static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
-{
-    curl_private_data_t *private_data = (curl_private_data_t *)clientp;
-    if(private_data->progressCallback)
-    {
-        private_data->progressCallback(private_data->progressArg, (u32)dlnow, (u32)dltotal);
-    }
-    return 0;
-}
 

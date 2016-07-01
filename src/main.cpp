@@ -55,7 +55,7 @@ extern "C" int Menu_Main(void)
     //!                    Enter main application                        *
     //!*******************************************************************
     log_printf("Start main application\n");
-    int returnCode = Application::instance()->exec();
+    Application::instance()->exec();
     log_printf("Main application stopped\n");
 
     Application::destroyInstance();

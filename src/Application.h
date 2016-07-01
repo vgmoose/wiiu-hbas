@@ -21,7 +21,7 @@
 #include "video/CVideo.h"
 #include "system/CThread.h"
 
-static const char* repoUrl = "http://wiiubru.com/appstore";
+extern const char* repoUrl;
 //static const char* repoUrl = "192.168.1.103:8000";
 
 class Application : public CThread

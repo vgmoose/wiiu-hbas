@@ -20,7 +20,7 @@
 #include <string>
 #include "fs/CFile.hpp"
 
-static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
+//static int curlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow);
 
 typedef void (*ProgressCallback)(void *arg, u32 done, u32 total);
 
