@@ -15,6 +15,7 @@
 #include "utils/utils.h"
 #include "common/common.h"
 #include "dynamic_libs/curl_functions.h"
+#include "quark/exception.h"
 
 /* Entry point */
 extern "C" int Menu_Main(void)
@@ -36,6 +37,7 @@ extern "C" int Menu_Main(void)
     InitPadScoreFunctionPointers();
     InitAXFunctionPointers();
     InitCurlFunctionPointers();
+    InstallExceptionHandler();
 
     log_print("Function exports loaded\n");
 
