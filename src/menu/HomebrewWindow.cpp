@@ -30,8 +30,11 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 const char * repoUrl = "http://wiiubru.com/appstore";
+//const char* repoUrl = "192.168.1.103:8000";
 
 ProgressWindow* progressWindow;
+static HomebrewWindow* thisHomebrewWindow;
+
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
@@ -105,19 +108,29 @@ void updateProgress(void *arg, u32 done, u32 total)
     progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
 }
 
+/**
+This method updates local apps (and fetches server apps if they haven't been fetched yet)
+It refreshes the listing on the "home page" of the app store
+**/
 void HomebrewWindow::refreshHomebrewApps()
 {
+    // get the 4 different types of app backgrounds
     GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
 
+    // get a list of directories
     DirList dirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
 
+    // remove any existing buttons
     for (u32 x=0; x<homebrewButtons.size(); x++)
     {
         removeE(homebrewButtons[x].button);  
     }
     
+    // clear both arrays
     homebrewButtons.clear();
     localAppButtons.clear();
+    
+    // sort the dir list
     dirList.SortList();
 
     // load up local apps
@@ -152,6 +165,7 @@ void HomebrewWindow::refreshHomebrewApps()
         // update or installed
         homebrewButtons[idx].status = LOCAL;
 
+        // load the icon
         LoadFileToMem((homebrewPath + "/icon.png").c_str(), &iconData, &iconDataSize);
 
         if(iconData != NULL)
@@ -197,7 +211,9 @@ void HomebrewWindow::refreshHomebrewApps()
 
     std::istringstream f(fileContents);
     
+    // totalLocalApps will represent how many apps aren't on the server
     totalLocalApps = homebrewButtons.size();
+    
     u32 iterCount = 0;
     globalUpdatePosition = true;
 
@@ -206,6 +222,7 @@ void HomebrewWindow::refreshHomebrewApps()
         
         std::string shortname;
 
+        // very poor xml parsing, to be replaced with json in the future
         if (!std::getline(f, shortname)) break;
         shortname = shortname.substr(5);
         std::string name;    
@@ -236,9 +253,6 @@ void HomebrewWindow::refreshHomebrewApps()
         if(slashPos != std::string::npos)
             homebrewPath.erase(slashPos);
 
-//        u8 * iconData = NULL;
-//        u32 iconDataSize = 0;
-
         homebrewButtons[idx].dirPath = homebrewPath;
 
         // since we got this app from the net, mark it as a GET
@@ -258,6 +272,8 @@ void HomebrewWindow::refreshHomebrewApps()
         
         if (addedIndex >= 0)
         {
+            // the logic in here checks if the current app already exists, and if so,
+            // updates the existing localApp entry rather than continuing to make a new one
             homebrewButtons.pop_back();
             homebrewButtons[addedIndex].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
             homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
@@ -271,13 +287,13 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // download app icon
         std::string targetIcon;
-//        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + shortname + "/icon.png";
-//        bool imageDownloadSuccessful = false;
+
         // try to load file from our memory cache
+        // this is populated asychronously at app launch
         if (cachedIcons.size() > iterCount)
             targetIcon = cachedIcons[iterCount];
-        //FileDownloader::getFile(targetIconUrl, targetIcon);
 
+        // if the icon is present, set it to the image
         if (!targetIcon.empty())
             homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
 
@@ -468,7 +484,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
         return;
     }
     
-//    thisHomebrewWindow = this;
+    thisHomebrewWindow = this;
         
     bool disableButtons = false;
 //    return;
@@ -576,7 +592,7 @@ void refreshHomebrewAppIcons()
     
 }
 
-//HomebrewWindow* getHomebrewWindow()
-//{
-//    return thisHomebrewWindow;
-//}
+HomebrewWindow* getHomebrewWindow()
+{
+    return thisHomebrewWindow;
+}

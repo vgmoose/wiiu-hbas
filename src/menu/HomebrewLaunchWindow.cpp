@@ -66,7 +66,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     HomebrewXML metaXml;
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
-        
+                
     // if GET or UDPATE, fetch xml from server
     if (selectedButton->status == GET || selectedButton->status == UPDATE)
     {
@@ -233,123 +233,122 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
 
-    if(result > 0)
-    {
-        u32 ApplicationMemoryEnd;
-        asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
-
-        ELF_DATA_ADDR = ApplicationMemoryEnd;
-        ELF_DATA_SIZE = result;
-        Application::instance()->quit(EXIT_SUCCESS);
-    }
+//    if(result > 0)
+//    {
+//        u32 ApplicationMemoryEnd;
+//        asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
+//
+//        ELF_DATA_ADDR = ApplicationMemoryEnd;
+//        ELF_DATA_SIZE = result;
+//        Application::instance()->quit(EXIT_SUCCESS);
+//    }
 }
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
     std::string removePath = selectedButton->dirPath;
+    
     // if the remove path is the whole directory, stop!
     if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
         return;
     else
     {
-        // remove the files in the directory and the directory
+        // remove the files in the directory
         DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
         for (int x=0; x<dirList.GetFilecount(); x++)
             remove(dirList.GetFilepath(x));
+        
+        // now remove the directory
         rmdir(removePath.c_str());
     }
-    
-//    if (launchWindowTarget != 0)
-//        removeE(launchWindowTarget);
     
     // close the window
     OnBackButtonClick(button, controller, trigger);
     
-//     refresh
-    globalRefreshHomebrewApps();
-//    pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-//    pThread->resumeThread();
+    // refresh main directory (crashes at the moment)
+//    globalRefreshHomebrewApps();
+
 }
 
+/**
+This method is invoked after green is pressed, and is in a separate thread
+so that the animation of the progress bar can be controlled.
+
+The main issue with tis function is it needs some variables passed in order
+to fetch them. Currently this is done by attaching variables to the singleton
+instance of HomebrewWindow, which was set up at start.
+**/
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
 
-//    ProgressWindow * progress = getProgressWindow(); 
-//    progress->setProgress(0);
-//    
-//    HomebrewLaunchWindow* curLaunchWindow = launchWindowTarget;
-//    
-//    std::string mRepoUrl = std::string(repoUrl);
-//    
-//    progress->setTitle("Downloading " + sdPathTarget+"/"+binaryTarget + "...");
-//    FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
-//    
-//    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
-//    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
-//    
-//    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
-//    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
-//    
-//    curLaunchWindow->removeE(progress);
-//    
-//    homebrewWindowTarget = getHomebrewWindow();
-//
-//    // close the window
-//    homebrewWindowTarget->removeE(curLaunchWindow);
-//    
-//    curLaunchWindow->OnBackButtonClick(buttonTarget, controllerTarget, triggerTarget);
-//        
-//    // refresh
+    // Set the progress bar to 0%
+    ProgressWindow * progress = getProgressWindow(); 
+    progress->setProgress(0);
+    
+    // get the homebrew window, which holds variables we need access to
+    HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
+    
+    // convert the repo url into a std::string
+    std::string mRepoUrl = std::string(repoUrl);
+    
+    // three previously stored variables that are used belong to know which files to download
+    std::string sdPathTarget = homebrewWindowTarget->sdPathTarget;
+    std::string binaryTarget = homebrewWindowTarget->binaryTarget;
+    std::string pathTarget = homebrewWindowTarget->pathTarget;
+    
+    // download the elf to sd card, and update the progres bar description
+    progress->setTitle("Downloading " + sdPathTarget + "/" + binaryTarget + "...");
+    FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    
+    // download meta.xml to sd card, and update the progres bar description
+    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
+    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
+    
+    // download the app image icon for this app. (If the icon download is interrupted,
+    // HBL may crash when it tries to read it
+    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
+    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+    
+    // remove the progress bar
+    homebrewWindowTarget->removeE(progress);
+
+    // refresh main directory (crashes at the moment)
 //    globalRefreshHomebrewApps();
 }
 
+/**
+This method is called when the gren GET button is pushed. It is on the main thread, and
+spawns another thread to handle the downloading in the background.
+**/
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
+    // disable the buttons
     delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
-    backBtn.setState(GuiElement::STATE_DISABLED);
+//    backBtn.setState(GuiElement::STATE_DISABLED);
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
     
+    // setup the paths based on the selected button
     std::string path = "/apps/"+selectedButton->shortname;
     std::string sdPath = "sd:/wiiu"+path;
+    
+    // create a new directory on sd
     CreateSubfolder(sdPath.c_str());
+    
+    // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 
-    append(progress);
+    HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
+    homebrewWindowTarget->append(progress);
+
+    // store information about the desired files to homebrewWindowTarget, so that
+    // the thread can access it
+    homebrewWindowTarget->sdPathTarget = sdPath;
+    homebrewWindowTarget->pathTarget = path;
+    homebrewWindowTarget->binaryTarget = selectedButton->binary;
     
-    std::string fullName = selectedButton->shortname;
-    
-//    fullNameTarget = fullName;
-//    binaryTarget = selectedButton->binary;
-//    pathTarget = path;
-//    sdPathTarget = sdPath;
-//    buttonTarget = button;
-//    controllerTarget = controller;
-//    triggerTarget = trigger;
-    
-//    removeETarget = &HomebrewLaunchWindow::removeE;
-    
-//    if (launchWindowTarget != 0)
-//        removeE(launchWindowTarget);
-//    launchWindowTarget = this;
-    
-    // download target files
+    // Create a new thread to do the downloading it, so the prgress bar can be updated
     CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
-
-//    struct SYSBrowserArgsIn args = {};
-//    std::string url = "http://vgmoose.com";
-//    args.url = url.c_str();
-//    args.urlSize = url.size();
-//    SYSSwitchToBrowser(&args);
     
-    
-//    u32 ApplicationMemoryEnd;
-//    asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
-
-//    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(homebrewLaunchPath, (unsigned char*)ApplicationMemoryEnd);
-//    loader->setEffect(EFFECT_FADE, 15, 255);
-//    loader->effectFinished.connect(this, &HomebrewLaunchWindow::OnOpenEffectFinish);
-//    loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
-//    append(loader);
 }

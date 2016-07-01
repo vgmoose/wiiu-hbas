@@ -75,6 +75,9 @@ public:
     void fetchThisIcon(int x, std::string targetIconUrl);
     void findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon);
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
+    std::string binaryTarget;
+    std::string pathTarget;
+    std::string sdPathTarget;
     
 private:
     void OnOpenEffectFinish(GuiElement *element);
@@ -113,8 +116,7 @@ private:
     int targetLeftPosition;
 
 };
-//extern HomebrewWindow* thisHomebrewWindow;
-//extern HomebrewWindow* getHomebrewWindow();
+extern HomebrewWindow* getHomebrewWindow();
 
 
 #endif //_HOMEBREW_WINDOW_H_

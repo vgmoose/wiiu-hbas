@@ -24,7 +24,6 @@
 //typedef void (GuiFrame::*fn)(GuiElement*); 
 //static fn removeETarget;
 
-
 class HomebrewLaunchWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
@@ -37,6 +36,7 @@ public:
     {
         backButtonClicked(this);
     }
+
 private:
 
 

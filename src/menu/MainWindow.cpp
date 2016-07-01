@@ -61,7 +61,6 @@ MainWindow::MainWindow(int w, int h)
     }
         
     homebrewWindow = new HomebrewWindow(w, h);
-        
 }
 
 void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
@@ -87,25 +86,25 @@ void globalRefreshHomebrewApps()
 MainWindow::~MainWindow()
 {
     removeE(homebrewWindow);
-    removeE(&bgImageColor);
+//    removeE(&bgImageColor);
     if (showingSplashScreen)
         removeE(&splashScreen);
 
-    while(!tvElements.empty())
-    {
-        delete tvElements[0];
-        removeE(tvElements[0]);
-    }
-    while(!drcElements.empty())
-    {
-        delete drcElements[0];
-        removeE(drcElements[0]);
-    }
-    for(int i = 0; i < 4; i++)
-    {
-        delete pointerImg[i];
-        Resources::RemoveImageData(pointerImgData[i]);
-    }
+//    while(!tvElements.empty())
+//    {
+//        delete tvElements[0];
+//        removeE(tvElements[0]);
+//    }
+//    while(!drcElements.empty())
+//    {
+//        delete drcElements[0];
+//        removeE(drcElements[0]);
+//    }
+//    for(int i = 0; i < 4; i++)
+//    {
+//        delete pointerImg[i];
+//        Resources::RemoveImageData(pointerImgData[i]);
+//    }
 }
 
 void MainWindow::updateEffects()
@@ -156,7 +155,6 @@ void MainWindow::update(GuiController *controller)
     {
         removeE(&splashScreen);
         showingSplashScreen = false;
-        
         append(homebrewWindow);
 
         // perform a synchronous refresh

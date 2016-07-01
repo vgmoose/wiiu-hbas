@@ -22,7 +22,6 @@
 #include "system/CThread.h"
 
 extern const char* repoUrl;
-//static const char* repoUrl = "192.168.1.103:8000";
 
 class Application : public CThread
 {

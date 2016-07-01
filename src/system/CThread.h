@@ -28,7 +28,7 @@ public:
 	typedef void (* Callback)(CThread *thread, void *arg);
 
 	//! constructor
-	CThread(int iAttr, int iPriority = 16, int iStackSize = 0x8000, CThread::Callback callback = NULL, void *callbackArg = NULL)
+	CThread(int iAttr, int iPriority = 16, int iStackSize = 0x8000, CThread::Callback callback = NULL, void *callbackArg = NULL, int argc=0)
 		: pThread(NULL)
 		, pThreadStack(NULL)
 		, pCallback(callback)
@@ -42,15 +42,20 @@ public:
 		pThreadStack = (u8 *) memalign(0x20, iStackSize);
         //! create the thread
 		if(pThread && pThreadStack)
-            OSCreateThread(pThread, &CThread::threadCallback, 1, this, (u32)pThreadStack+iStackSize, iStackSize, iPriority, iAttributes);
+		{
+			if (argc == 0)
+            	OSCreateThread(pThread, &CThread::threadCallback, 1, this, (u32)pThreadStack+iStackSize, iStackSize, iPriority, iAttributes);
+			else
+				OSCreateThread(pThread, &CThread::threadCallback, argc, callbackArg, (u32)pThreadStack+iStackSize, iStackSize, iPriority, iAttributes);
+		}
 	}
 
 	//! destructor
 	virtual ~CThread() { shutdownThread(); }
 
-	static CThread *create(CThread::Callback callback, void *callbackArg, int iAttr = eAttributeNone, int iPriority = 16, int iStackSize = 0x8000)
+	static CThread *create(CThread::Callback callback, void *callbackArg, int iAttr = eAttributeNone, int iPriority = 16, int iStackSize = 0x8000, int argc=0)
 	{
-	    return ( new CThread(iAttr, iPriority, iStackSize, callback, callbackArg) );
+	    return ( new CThread(iAttr, iPriority, iStackSize, callback, callbackArg, argc) );
 	}
 
 	//! Get thread ID
