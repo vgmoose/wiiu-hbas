@@ -1,0 +1,136 @@
+/*table style*/
+#wiiubru {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    color: white;
+}
+#wiiubru td, #wiiubru th {
+    text-align: center;
+    padding: 8px;
+    border-radius: 5px;
+}
+#wiiubru tr
+{ 
+   -webkit-transition: -webkit-transform .2s ease-in-out;
+    -webkit-transform: scale(0.9, 0.77);
+}
+
+#wiiubru tr:nth-child(even){background-color:rgba(63, 63, 63, 0.6)}
+#wiiubru tr:nth-child(odd){background-color:rgba(42, 42, 42, 0.6);}
+a:link {color: #b30000;}
+a:visited {color: #b30000;}
+a:hover {color: white;}
+
+#wiiubru tr:hover {
+   background-color:rgba(11, 10, 10, 0.6);
+   -webkit-transform: scale(0.9, 1.1); 
+}
+
+#wiiubru th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color:rgba(59, 0, 0, 0.4); 
+
+}
+/*icon stretch and grey*/
+.image 
+{
+    -webkit-filter: grayscale(75%);
+    filter: grayscale(75%);
+   -webkit-transition: -webkit-transform .2s ease-in-out;
+    height: 50%;
+    width: 50%;
+}
+.image:hover
+{
+    -webkit-filter: grayscale(0);
+    filter: grayscale(0);
+   -webkit-transition: -webkit-transform .2s ease-in-out;
+    -webkit-transform: scale(1.5, 1.5);
+}
+body
+{
+    background-image: url("../images/bg.png");
+/*table sort icons .. to be continued*/
+}
+table.sortable th::after, th.sorttable_sorted::after, th.sorttable_sorted_reverse::after {
+  content: " ";
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+th.sorttable_sorted::after {
+  background: url(images/my-sorted-icon.png);
+  background-size: contain;
+}
+th.sorttable_sorted_reverse::after {
+  background: url(images/my-sorted-reversed-icon.png);
+  background-size: cover;
+}
+/*search box styling*/
+input[type=text]
+{
+    float: left;
+    width: 120px;
+    border: 1px solid #cacaca;
+    border-radius: 4px;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    color: white;
+    background-color: rgba(42, 42, 42, 0.4);
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus { 
+    padding-left: 15px;
+    float: left;
+    width: 500;
+    outline: none;
+}
+input[type=text]:hover {
+  background-color: rgba(42, 42, 42, 0.8);  
+}
+.pull-left {
+    margin-left: 80px;
+    float: left;
+}
+.pull-right {
+    margin-right: 80px;
+    float: right;
+}
+.logo
+{
+    width : 1000;
+    height: 160;
+    max-width: 100%;
+    text-decoration: none;
+}
+footer 
+{
+   /*position:fixed;*/
+   left:0px;
+   bottom:0px;
+   height:28px;
+   width:100%;
+   background-color: rgba(42, 42, 42, 0.6);
+}
+footer:hover 
+{
+   /*position:fixed;*/
+   left:0px;
+   bottom:0px;
+   height:28px;
+   width:100%;
+   background-color: rgba(42, 42, 42, 0.9);
+}
+header 
+{
+   vertical-align: middle;
+   left:0px;
+   top:0px;
+   height:30px;
+   width:100%;
+   background-color: rgba(42, 42, 42, 0.8);
+}
