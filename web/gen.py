@@ -133,6 +133,7 @@ input[type=text]:hover {
     width : 1000;
     height: 160;
     max-width: 100%;
+    text-decoration: none;
 }
 .icon
 {
@@ -140,6 +141,7 @@ input[type=text]:hover {
     height: 24px;
     -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(1.0, 1.0);
+    text-decoration: none;
 }
 .icon:hover
 {
@@ -228,6 +230,8 @@ for app in os.listdir("apps"):
     name = app
     coder = "???"
     desc = "???"
+    long_desc = "???"
+    version = '???'
     
     binary = None
     
@@ -283,7 +287,7 @@ for app in os.listdir("apps"):
 
     src_link = "N/A"
     if source != "????":
-        src_link = "<a href='%s'>Source</a>" % source
+        src_link = "<a href='%s' target='_blank'>Source</a>" % source
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
@@ -320,3 +324,4 @@ print "<a href='index.html'>See the Results.</a>"
 #xml3 = open("directory.xml", "w+")
 #xml3.write(dict2xml(d))
 #xml3.close()
+
