@@ -4,7 +4,7 @@
 
 Known Homebrew app store repos:
 - [My apps - hbas.vgmoose.com](http://hbas.vgmoose.com)
-- [WiiUBru - wiiubru.com/appstore](http://wiiubru.com/appstore)
+- [WiiUBru - appstore.wiiubru.com](http://appstore.wiiubru.com)
 
 ### Usage
 Copy the release to /wiiu/apps on the SD card, and launch it from the homebrew launcher. You can then launch this app to install and manage downloaded software for the HBL onto your SD card from any HBAS server. 
