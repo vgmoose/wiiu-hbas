@@ -112,8 +112,8 @@ input[type=text]:hover {
 }
 .logo
 {
-    width : 1000;
-    height: 160;
+    width: 90%;
+    height: auto;
     max-width: 100%;
     text-decoration: none;
 }
