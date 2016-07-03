@@ -127,6 +127,7 @@ for app in os.listdir("apps"):
     desc = "???"
     long_desc = "???"
     version = '???'
+    source = '????'
     
     binary = None
     
