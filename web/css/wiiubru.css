@@ -1,3 +1,7 @@
+/*Homebrew Appstore CSS*/
+/*Wiiubru's stylesheet for its hbas server*/
+/*pwsincd*/
+
 /*table style*/
 #wiiubru {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -14,6 +18,8 @@
 { 
    -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(0.9, 0.77);
+    transition: transform .2s ease-in-out;
+    transform: scale(0.9, 0.77);
 }
 
 #wiiubru tr:nth-child(even){background-color:rgba(63, 63, 63, 0.6)}
@@ -25,6 +31,7 @@ a:hover {color: white;}
 #wiiubru tr:hover {
    background-color:rgba(11, 10, 10, 0.6);
    -webkit-transform: scale(0.9, 1.1); 
+   transform: scale(0.9, 1.1);
 }
 
 #wiiubru th {
@@ -39,6 +46,7 @@ a:hover {color: white;}
     -webkit-filter: grayscale(75%);
     filter: grayscale(75%);
    -webkit-transition: -webkit-transform .2s ease-in-out;
+   transition: transform .2s ease-in-out;
     height: 50%;
     width: 50%;
 }
@@ -48,6 +56,8 @@ a:hover {color: white;}
     filter: grayscale(0);
    -webkit-transition: -webkit-transform .2s ease-in-out;
     -webkit-transform: scale(1.5, 1.5);
+    transition: transform .2s ease-in-out;
+    transform: scale(1.5, 1.5);
 }
 body
 {
