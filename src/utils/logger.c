@@ -80,6 +80,7 @@ void log_printf(const char *format, ...)
 	if((vasprintf(&tmp, format, va) >= 0) && tmp)
 	{
         log_print(tmp);
+        log_print("\n");
 	}
 	va_end(va);
 

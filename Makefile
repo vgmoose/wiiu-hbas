@@ -82,8 +82,7 @@ LIBS	:= -lgcc -lgd -lpng -lz -lfreetype -lmad -lvorbisidec
 LIBDIRS	:=	$(CURDIR)	\
 			$(DEVKITPPC)/lib  \
 			$(DEVKITPPC)/lib/gcc/powerpc-eabi/4.8.2
-
-
+            
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
 # rules for different file extensions

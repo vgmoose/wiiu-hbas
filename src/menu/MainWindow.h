@@ -31,6 +31,7 @@ extern int scrolledSoFar;
 
 extern void scrollMenu(float scrol);
 extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
+extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
 extern void globalRefreshHomebrewApps();
 
 class MainWindow : public sigslot::has_slots<>

@@ -119,6 +119,8 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     append(&descriptionText);
         
     int actionButtonYOff = -30;
+        
+    log_printf("Creating the button with click events");
 
     if (thisButton.status == GET)
     {
@@ -232,16 +234,6 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
     element->setState(GuiElement::STATE_DISABLED);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
-
-//    if(result > 0)
-//    {
-//        u32 ApplicationMemoryEnd;
-//        asm volatile("lis %0, __CODE_END@h; ori %0, %0, __CODE_END@l" : "=r" (ApplicationMemoryEnd));
-//
-//        ELF_DATA_ADDR = ApplicationMemoryEnd;
-//        ELF_DATA_SIZE = result;
-//        Application::instance()->quit(EXIT_SUCCESS);
-//    }
 }
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -266,7 +258,7 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     OnBackButtonClick(button, controller, trigger);
     
     // refresh main directory (crashes at the moment)
-//    globalRefreshHomebrewApps();
+    globalRefreshHomebrewApps();
 
 }
 
@@ -280,6 +272,7 @@ instance of HomebrewWindow, which was set up at start.
 **/
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
+    log_printf("asyncDownloadTargetedFiles: start");
 
     // Set the progress bar to 0%
     ProgressWindow * progress = getProgressWindow(); 
@@ -299,33 +292,41 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     // download the elf to sd card, and update the progres bar description
     progress->setTitle("Downloading " + sdPathTarget + "/" + binaryTarget + "...");
     FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    log_printf("asyncDownloadTargetedFiles: downloaded %s", binaryTarget.c_str());
     
     // download meta.xml to sd card, and update the progres bar description
     progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
     FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
+log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
     
     // download the app image icon for this app. (If the icon download is interrupted,
     // HBL may crash when it tries to read it
     progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
     FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+    log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
     
     // remove the progress bar
     homebrewWindowTarget->removeE(progress);
+    
+    // really hacky way to dismiss this window
+    homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget);
 
     // refresh main directory (crashes at the moment)
-//    globalRefreshHomebrewApps();
+    globalRefreshHomebrewApps();
+    log_printf("asyncDownloadTargetedFiles: stop");
 }
 
 /**
-This method is called when the gren GET button is pushed. It is on the main thread, and
+This method is called when the green GET button is pushed. It is on the main thread, and
 spawns another thread to handle the downloading in the background.
 **/
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
+    log_printf("OnLoadButtonClick: Load button clicked");
     // disable the buttons
     delBtn.setState(GuiElement::STATE_DISABLED);
     loadBtn.setState(GuiElement::STATE_DISABLED);
-//    backBtn.setState(GuiElement::STATE_DISABLED);
+    backBtn.setState(GuiElement::STATE_DISABLED);
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
     
@@ -347,6 +348,13 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     homebrewWindowTarget->pathTarget = path;
     homebrewWindowTarget->binaryTarget = selectedButton->binary;
     
+    // targets to store to dismiss the window later
+//    homebrewWindowTarget->controllerTarget = controller;
+//    homebrewWindowTarget->buttonTarget = button;
+//    homebrewWindowTarget->triggerTarget = trigger;
+    homebrewWindowTarget->launchWindowTarget = this;
+    
+    log_printf("OnLoadButtonClick: starting downloading thread");
     // Create a new thread to do the downloading it, so the prgress bar can be updated
     CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();

@@ -61,19 +61,27 @@ MainWindow::MainWindow(int w, int h)
     }
         
     homebrewWindow = new HomebrewWindow(w, h);
+        
+    log_printf("MainWindow done loading");
+    CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    pThread->resumeThread();
 }
 
 void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
 {
+    log_printf("NEW THREAD START: Icon async refresh");
     homebrewWindow->populateIconCache();
+    log_printf("EXISTING THREAD END: Icon async refresh");
 }
 
 void asyncRefreshHomebrewApps(CThread* thread, void* args)
 {
+    log_printf("NEW THREAD START: Async refresh homebrew apps");
     homebrewWindow->refreshHomebrewApps();
     // when refresh is done, start preloading the icon cache
     CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
+    log_printf("EXISTING THREAD END: Async refresh homebrew apps");
 }
 
 void globalRefreshHomebrewApps()
@@ -159,8 +167,8 @@ void MainWindow::update(GuiController *controller)
 
         // perform a synchronous refresh
 //        globalRefreshHomebrewApps();
-        CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+        
+        log_printf("update made");
         
 
         return;

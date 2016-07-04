@@ -79,10 +79,18 @@ public:
     std::string pathTarget;
     std::string sdPathTarget;
     
+    void OnLaunchBoxCloseClick(GuiElement *element);
+    
+    // this is wrong, should pass args instead of doing this
+//    GuiButton *buttonTarget;
+//    const GuiController *controllerTarget;
+//    GuiTrigger *triggerTarget;
+    GuiFrame * launchWindowTarget;
+
+    
 private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
-    void OnLaunchBoxCloseClick(GuiElement *element);
     void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
     void OnLeftArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
     void OnRightArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
