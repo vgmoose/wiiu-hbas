@@ -86,7 +86,7 @@ public:
 //    const GuiController *controllerTarget;
 //    GuiTrigger *triggerTarget;
     GuiFrame * launchWindowTarget;
-
+    std::string bufString;
     
 private:
     void OnOpenEffectFinish(GuiElement *element);

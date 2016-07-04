@@ -28,7 +28,6 @@ extern HomebrewWindow * homebrewWindow;
 extern int movedALittleBit;
 extern int scrolledSoFar;
 
-
 extern void scrollMenu(float scrol);
 extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
 extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
@@ -44,9 +43,10 @@ public:
     GuiImage bgImageColor;
     
     bool showingSplashScreen;
+    bool disableSplashScreenNextUpdate;
     GuiImageData * backgroundImg2Data;
     GuiImage backgroundImg2;
-    
+        
     GuiImageData * splashScreenImgData;
     GuiImage splashScreen;
 

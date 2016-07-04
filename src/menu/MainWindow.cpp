@@ -26,6 +26,8 @@
 int movedALittleBit = 0;
 int scrolledSoFar = 0;
 
+bool doIntroScroll;
+
 HomebrewWindow * homebrewWindow;
 
 MainWindow::MainWindow(int w, int h)
@@ -45,6 +47,7 @@ MainWindow::MainWindow(int w, int h)
         
     append(&backgroundImg2);
         
+    disableSplashScreenNextUpdate = false;
 //    splashScreenImgData = new GuiImageData(Resources::GetImageData("splash.png");
 //    splashScreen = new GuiImage(splashScreenImgData);
                         
@@ -157,7 +160,10 @@ void MainWindow::update(GuiController *controller)
         pointerValid[wpadIdx] = true;
     }
     
-    if ((controller->data.touched ||
+    if (showingSplashScreen && controller->data.touched)
+        disableSplashScreenNextUpdate = true;
+    
+    else if ((disableSplashScreenNextUpdate ||
         (controller->data.buttons_h & VPAD_BUTTON_A)) &&
         showingSplashScreen)
     {
@@ -186,6 +192,10 @@ void MainWindow::update(GuiController *controller)
 	// Handle D-pad movements as well
 	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;
 	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_UP)? -20: ydif;
+    
+//    // do auto scrolling on first load to the top
+//    if (!showingSplashScreen && doIntroScroll)
+//        ydif -= 20;
     
     if (ydif != 0) {
         movedALittleBit = 10;
@@ -257,8 +267,11 @@ void scrollMenu(float scrol)
     movedALittleBit = 10; // we scrolled
 
     homebrewWindow->lastScrollOffY = homebrewWindow->scrollOffY;
-    if (homebrewWindow->scrollOffY + scrol < -140 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()*130)
+    if (homebrewWindow->scrollOffY + scrol < -120 || homebrewWindow->scrollOffY + scrol > homebrewWindow->homebrewButtons.size()*130)
+    {
+//        doIntroScroll = false;
         return;
+    }
     homebrewWindow->scrollOffY += scrol;
 }
 

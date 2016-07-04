@@ -29,7 +29,7 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
-const char * repoUrl = "http://wiiubru.com/appstore";
+char * repoUrl = "http://wiiubru.com/appstore";
 //const char* repoUrl = "192.168.1.103:8000";
 
 ProgressWindow* progressWindow;
@@ -39,7 +39,7 @@ static HomebrewWindow* thisHomebrewWindow;
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
     const float cfImageScale = 0.8f;
-
+    
     button->iconImg = new GuiImage(button->iconImgData);
     button->iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     button->iconImg->setPosition(60, 0);
@@ -198,7 +198,7 @@ void HomebrewWindow::refreshHomebrewApps()
         positionHomebrewButton(&homebrewButtons[idx], idx);
         homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
         
-        scrollOffY = 0;
+        scrollOffY = -120;
 
         append(homebrewButtons[idx].button);
         localAppButtons.push_back(homebrewButtons[idx]);
@@ -208,7 +208,7 @@ void HomebrewWindow::refreshHomebrewApps()
     std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
     if (!gotDirectorySuccess)
     {
-        log_printf("refreshHomebrewApps: Downloading remote directory.yaml");
+        log_printf("refreshHomebrewApps: Downloading remote %s", targetUrl.c_str());
         gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
         removeE(progressWindow);
         log_printf("refreshHomebrewApps: Updated directory");
@@ -424,6 +424,30 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     currentLeftPosition = 0;
     listOffset = 0;
     gotDirectorySuccess = false;
+        
+    char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
+        
+     struct stat buffer;   
+    if (stat (localRepoUrl, &buffer) == 0)
+    {
+        // load repo from repository.txt if it exists
+        FILE* file = fopen(localRepoUrl, "r");
+
+        // Get the file size
+        long length = 0;
+        fseek( file, 0, SEEK_END );
+        length = ftell( file );
+        fseek( file, 0, SEEK_SET );
+
+        char buf[length+1];
+        if ( fread( buf, length, 1, file ) == 1 ) {
+            buf[length] = '\0';
+            bufString = std::string(buf);
+            repoUrl = (char*)bufString.c_str();
+        }
+    }
+
+    log_printf(repoUrl);
         
     progressWindow = new ProgressWindow("Downloading app directory...");
     std::string qualifiedName = " "+std::string(repoUrl);

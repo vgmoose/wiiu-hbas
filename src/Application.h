@@ -21,7 +21,7 @@
 #include "video/CVideo.h"
 #include "system/CThread.h"
 
-extern const char* repoUrl;
+extern char* repoUrl;
 
 class Application : public CThread
 {
