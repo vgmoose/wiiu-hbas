@@ -356,7 +356,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     
     log_printf("OnLoadButtonClick: starting downloading thread");
     // Create a new thread to do the downloading it, so the prgress bar can be updated
-    CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore0 | CThread::eAttributePinnedAff, 10);
     pThread->resumeThread();
     
 }
