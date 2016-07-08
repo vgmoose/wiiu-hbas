@@ -46,11 +46,11 @@ style = """<head>
 <header>
 <span class='pull-left'><input type='text' id='search' placeholder='  Search...'></span>
 <span class='pull-right'>
-<a href="https://github.com/vgmoose/hbas">
+<a href="https://github.com/vgmoose/hbas" target='_blank'>
 <i class='fa fa-github fa-2x' aria-hidden="true"></i>
 </a>
 
-<a href="https://kiwiirc.com/client?settings=76b79dc4baeccc495e0b78d2a052f984">
+<a href="https://kiwiirc.com/client?settings=76b79dc4baeccc495e0b78d2a052f984" target='_blank'>
 <i class="fa fa-comments-o fa-2x" aria-hidden="true"></i>
 </a>
 
@@ -59,8 +59,8 @@ style = """<head>
 </head>
 <body>
 <br>
-<div style="text-align: center; width=100%;">
-<a href="#">
+<div style="text-align: center;">
+<a href="https://gbatemp.net/threads/release-homebrew-app-store.433275/" target='_blank'>
 <img src="images/hbasheader.png" class='logo'>
 </a>
 <br>
@@ -84,13 +84,16 @@ $('#search').keyup(function() {
 
 footer = """
 <footer>
-<span class='pull-right'><input type='text' id='search' placeholder='  Search...'></span>
+<br>
+<span class='pull-right' style='color: white'>
+You are currently viewing the web front-end to the Homebrew App Store.
+</span>
 <span class='pull-left'>
-<a href="https://github.com/vgmoose/hbas">
+<a href="https://github.com/vgmoose/hbas" target='_blank'>
 <i class='fa fa-github fa-2x' aria-hidden='true'></i>
 </a>
 
-<a href="https://kiwiirc.com/client?settings=76b79dc4baeccc495e0b78d2a052f984">
+<a href="https://kiwiirc.com/client?settings=76b79dc4baeccc495e0b78d2a052f984" target='_blank'>
 <i class="fa fa-comments-o fa-2x" aria-hidden="true"></i>
 </a>
 
