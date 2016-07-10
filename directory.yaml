@@ -3,8 +3,10 @@ app: appstore
 - vgmoose
 - Download homebrew apps
 - hbas.elf
+- 1.0
 app: spacegame
 - Space Game
 - vgmoose
 - Generic space shooter
 - space.elf
+- 1.5
