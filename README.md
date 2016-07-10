@@ -5,7 +5,7 @@
 Known Homebrew app store repos:
 - [WiiUBru - wiiubru.com/apppstore](http://wiiubru.com/apppstore) (default)
 - [Utools - coc4tm.github.io/Utools/web](http://coc4tm.github.io/Utools/web)
-- [3utilities - wiiu.3utilities.com](http://wiiu.3utilities.com/appstore.html)
+- [Useful Utilities - wiiu.3utilities.com](http://wiiu.3utilities.com/appstore.html)
 - [My apps - hbas.vgmoose.com](http://hbas.vgmoose.com)
 
 At this time, only one repository at a time is supported. See below on how to use a custom repository.
