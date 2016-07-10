@@ -1,18 +1,22 @@
-**Work in progress! The actual client application (HBAS) [is in beta!](http://github.com/vgmoose/hbas/releases)**
+**The 1.0 version of HBAS [is released!](http://github.com/vgmoose/hbas/releases)**
 
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
 
 Known Homebrew app store repos:
+- [WiiUBru - wiiubru.com/apppstore](http://wiiubru.com/apppstore) (default)
+- [Utools - coc4tm.github.io/Utools/web](http://coc4tm.github.io/Utools/web)
+- [3utilities - wiiu.3utilities.com](http://wiiu.3utilities.com/appstore.html)
 - [My apps - hbas.vgmoose.com](http://hbas.vgmoose.com)
-- [WiiUBru - appstore.wiiubru.com](http://appstore.wiiubru.com)
+
+At this time, only one repository at a time is supported. See below on how to use a custom repository.
 
 ### Usage
 Copy the release to /wiiu/apps on the SD card, and launch it from the homebrew launcher. You can then launch this app to install and manage downloaded software for the HBL onto your SD card from any HBAS server. 
 
 ### Customizing the server
-You can put a text file in the /wiiu/apps/hbas folder called "server.txt". If this file is detected then HBAS will use the contents of this file as the specified server. It will expect a [yaml file](https://github.com/vgmoose/hbas/blob/gh-pages/directory.yaml) at a GET request to /directory.yaml . If this file is not in the app bundle, it will default to [hbas.vgmoose.com](http://hbas.vgmoose.com/directory.yaml).
+You can put a text file in the /wiiu/apps/hbas folder called "repository.txt". If this file is detected then HBAS will use the contents of this file as the specified server. It will expect a [yaml file](https://github.com/vgmoose/hbas/blob/gh-pages/directory.yaml) at a GET request to /directory.yaml . If this file is not in the app bundle, it will default to [hbas.vgmoose.com](http://hbas.vgmoose.com/directory.yaml).
 
-By using the configuration file, you can distribute (freely!) your own custom copy of HBAS that only manages apps from your server. Since my site is a USA server, this would be especially useful to increase download speeds for people outside of the US.
+By using the configuration file, you can distribute (freely!) your own custom copy of HBAS that only manages apps from your server. To make the file, make sure that only the contents of the URL (with no trailing slash) are in the repository.txt file, with no new line at the end either. This file should be placed inside of the "appstore" folder, when redistributing the appstore.
 
 ### Adding your app
 If you are a developer and would like to add an app to HBAS, you will need to find the repository maintainer and ask them to add it. You should also supply a compiled app bundle for your application. The web frontend provides a contact link in the form of a chat icon in the upper right corner, which can be used to contact the maintainer if they are using the web template.
