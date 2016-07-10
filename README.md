@@ -14,7 +14,7 @@ At this time, only one repository at a time is supported. See below on how to us
 Copy the release to /wiiu/apps on the SD card, and launch it from the homebrew launcher. You can then launch this app to install and manage downloaded software for the HBL onto your SD card from any HBAS server. 
 
 ### Customizing the server
-You can put a text file in the /wiiu/apps/hbas folder called "repository.txt". If this file is detected then HBAS will use the contents of this file as the specified server. It will expect a [yaml file](https://github.com/vgmoose/hbas/blob/gh-pages/directory.yaml) at a GET request to /directory.yaml . If this file is not in the app bundle, it will default to [hbas.vgmoose.com](http://hbas.vgmoose.com/directory.yaml).
+You can put a text file in the /wiiu/apps/appstore/ folder called "repository.txt". If this file is detected then HBAS will use the contents of this file as the specified server. It will expect a [yaml file](https://github.com/vgmoose/hbas/blob/gh-pages/directory.yaml) at a GET request to /directory.yaml . If this file is not in the app bundle, it will default to [hbas.vgmoose.com](http://hbas.vgmoose.com/directory.yaml).
 
 By using the configuration file, you can distribute (freely!) your own custom copy of HBAS that only manages apps from your server. To make the file, make sure that only the contents of the URL (with no trailing slash) are in the repository.txt file, with no new line at the end either. This file should be placed inside of the "appstore" folder, when redistributing the appstore.
 
