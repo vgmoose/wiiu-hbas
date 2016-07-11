@@ -3,8 +3,9 @@
 /*pwsincd*/
 
 /*table style*/
+    @import url(http://fonts.googleapis.com/css?family=Ubuntu);
 #wiiubru {
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-family: Ubuntu, arial, verdana;
     border-collapse: collapse;
     width: 100%;
     color: white;
@@ -43,12 +44,15 @@ a:hover {color: white;}
 /*icon stretch and grey*/
 .image 
 {
-    -webkit-filter: grayscale(75%);
-    filter: grayscale(75%);
+    -webkit-filter: grayscale(50%);
+    filter: grayscale(50%);
    -webkit-transition: -webkit-transform .2s ease-in-out;
    transition: transform .2s ease-in-out;
     height: 50%;
     width: 50%;
+    -webkit-border-radius: 15px;
+   -moz-border-radius: 15px;
+    border-radius: 15px;  
 }
 .image:hover
 {
@@ -58,6 +62,9 @@ a:hover {color: white;}
     -webkit-transform: scale(1.5, 1.5);
     transition: transform .2s ease-in-out;
     transform: scale(1.5, 1.5);
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px; 
 }
 body
 {
@@ -116,24 +123,19 @@ input[type=text]:hover {
     height: auto;
     max-width: 100%;
     text-decoration: none;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
 }
 footer 
 {
    /*position:fixed;*/
+   margin-top:10px;
    left:0px;
    bottom:0px;
-   height:28px;
+   height:50px;
    width:100%;
    background-color: rgba(42, 42, 42, 0.6);
-}
-footer:hover 
-{
-   /*position:fixed;*/
-   left:0px;
-   bottom:0px;
-   height:28px;
-   width:100%;
-   background-color: rgba(42, 42, 42, 0.9);
 }
 header 
 {
