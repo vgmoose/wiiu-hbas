@@ -19,7 +19,9 @@ def zipdir(path, ziph):
 print "Content-type: text/html\n\n"
 print "<html>Updating Appstore......<br><br></html>"
 
-style = """<head>
+style = """<!DOCTYPE html>
+<html lang="en">
+<head>
 <link rel='icon' href='http://appstore.wiiubru.com/icon.ico' type='image/x-icon'>
 <link rel='shortcut icon' href='http://appstore.wiiubru.com/icon.ico' type='image/x-icon'>
 <!-- javascript and css styling for the icon tooltip and js for sorting-->
@@ -43,6 +45,8 @@ style = """<head>
         });
     </script>
 
+</head>
+<body>
 <header>
 <span class='pull-left'><input type='text' id='search' placeholder='  Search...'></span>
 <span class='pull-right'>
@@ -56,8 +60,6 @@ style = """<head>
 
 </span>
 </header>
-</head>
-<body>
 <br>
 <div style="text-align: center;">
 <a href="https://gbatemp.net/threads/release-homebrew-app-store.433275/" target='_blank'>
@@ -190,7 +192,7 @@ for app in os.listdir("apps"):
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
 
-    html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, name, version, coder, desc, dlhref, src_link)
+    html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
     
     yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
     
@@ -200,9 +202,10 @@ for app in os.listdir("apps"):
         zipf.close()
 
 
-html += "</tbody></table><br><br></body>"
+html += "</tbody></table><br><br>"
 html += search
 html += footer
+html += "</body></html>"
 
 jsonstring = json.dumps(d, indent=4, separators=(',', ': '))
 
