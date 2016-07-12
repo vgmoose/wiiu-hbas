@@ -3,7 +3,7 @@
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
 
 Known Homebrew app store repos:
-- [WiiUBru - wiiubru.com/apppstore](http://wiiubru.com/apppstore) (default)
+- [WiiUBru - wiiubru.com/appstore](http://wiiubru.com/appstore) (default)
 - [Utools - coc4tm.github.io/Utools/web](http://coc4tm.github.io/Utools/web)
 - [Useful Utilities - wiiu.3utilities.com](http://wiiu.3utilities.com/appstore.html)
 - [My apps - hbas.vgmoose.com](http://hbas.vgmoose.com)
