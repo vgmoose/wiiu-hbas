@@ -48,7 +48,7 @@ style = """<!DOCTYPE html>
 </head>
 <body>
 <header>
-<span class='pull-left'><input type='text' id='search' placeholder='  Search...'></span>
+<span class='pull-left'><input type='text' id='search' placeholder='&#xF002;' style='font-family:Arial, FontAwesome'></span>
 <span class='pull-right'>
 <a href="https://github.com/vgmoose/hbas" target='_blank'>
 <i class='fa fa-github fa-2x' aria-hidden="true"></i>
@@ -60,6 +60,7 @@ style = """<!DOCTYPE html>
 
 </span>
 </header>
+
 <br>
 <div style="text-align: center;">
 <a href="https://gbatemp.net/threads/release-homebrew-app-store.433275/" target='_blank'>
@@ -205,7 +206,9 @@ for app in os.listdir("apps"):
 html += "</tbody></table><br><br>"
 html += search
 html += footer
-html += "</body></html>"
+html += "</body>"
+html += "</html>"
+
 
 jsonstring = json.dumps(d, indent=4, separators=(',', ': '))
 
@@ -227,3 +230,4 @@ print "<a href='index.html'>See the Results.</a>"
 #xml3 = open("directory.xml", "w+")
 #xml3.write(dict2xml(d))
 #xml3.close()
+
