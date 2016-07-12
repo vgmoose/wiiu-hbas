@@ -88,26 +88,28 @@ th.sorttable_sorted_reverse::after {
 /*search box styling*/
 input[type=text]
 {
+    text-transform: uppercase;
     float: left;
+    font-family: Ubuntu, arial, verdana;
+    padding-left: 10px;
     width: 120px;
     border: 1px solid #cacaca;
     border-radius: 4px;
-    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     font-size: 16px;
     color: white;
-    background-color: rgba(42, 42, 42, 0.4);
+    background-color: rgba(42, 42, 42, 0.3);
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
 }
 
 input[type=text]:focus { 
-    padding-left: 15px;
+    padding-left: 10px;
     float: left;
-    width: 500;
+    width: 400px;
     outline: none;
 }
 input[type=text]:hover {
-  background-color: rgba(42, 42, 42, 0.8);  
+  background-color: rgba(42, 42, 42, 0.9);  
 }
 .pull-left {
     margin-left: 80px;
@@ -126,6 +128,11 @@ input[type=text]:hover {
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
     border-radius: 20px;
+}
+.logo:hover
+{
+  -webkit-filter: hue-rotate(205deg);
+  filter: hue-rotate(205deg);
 }
 footer 
 {
@@ -146,3 +153,4 @@ header
    width:100%;
    background-color: rgba(42, 42, 42, 0.8);
 }
+
