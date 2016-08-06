@@ -1,8 +1,8 @@
 /*Homebrew Appstore CSS*/
 /*Wiiubru's stylesheet for its hbas server*/
-/*pwsincd*/
+/*designed by pwsincd*/
 
-/*table style*/
+/*wiiubru table style*/
     @import url(http://fonts.googleapis.com/css?family=Ubuntu);
 #wiiubru {
     font-family: Ubuntu, arial, verdana;
@@ -36,11 +36,13 @@ a:hover {color: white;}
 }
 
 #wiiubru th {
+    text-align: center;
     padding-top: 12px;
     padding-bottom: 12px;
-    background-color:rgba(59, 0, 0, 0.4); 
-
+    background-color: #b30000;
+    opacity: 0.7;
 }
+
 /*icon stretch and grey*/
 .image 
 {
@@ -69,10 +71,10 @@ a:hover {color: white;}
 body
 {
     background-image: url("../images/bg.png");
-/*table sort icons .. to be continued*/
+/* Table sortable icons ... not complete*/
 }
 table.sortable th::after, th.sorttable_sorted::after, th.sorttable_sorted_reverse::after {
-  content: " ";
+  content: "";
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -88,6 +90,7 @@ th.sorttable_sorted_reverse::after {
 /*search box styling*/
 input[type=text]
 {
+    margin: 13px;
     text-transform: uppercase;
     float: left;
     font-family: Ubuntu, arial, verdana;
@@ -105,7 +108,7 @@ input[type=text]
 input[type=text]:focus { 
     padding-left: 10px;
     float: left;
-    width: 400px;
+    width: 300px;
     outline: none;
 }
 input[type=text]:hover {
@@ -149,8 +152,58 @@ header
    vertical-align: middle;
    left:0px;
    top:0px;
-   height:30px;
-   width:100%;
-   background-color: rgba(42, 42, 42, 0.8);
+}
+
+   /* NavBar Styling */
+ul {
+    font-family: Ubuntu, arial, verdana;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgba(42, 42, 42, 0.8);
+}
+
+li {
+    float: right;
+}
+
+li a, .dropbtn {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover, .dropdown:hover .dropbtn {
+  color: white;
+    background-color: #b30000;
+}
+
+li.dropdown {
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color:rgba(63, 63, 63, 0.9);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown-content a:hover {background-color:rgba(11, 10, 10, 0.6)}
+
+.dropdown:hover .dropdown-content {
+    display: block;
 }
 
