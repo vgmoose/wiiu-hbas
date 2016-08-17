@@ -1,6 +1,7 @@
 #! /usr/bin/python
 # This script generates the directory of apps
 # which is parsed by the client app
+# and creates the web interface for wiiubru(by default)
 
 import os
 import xml.etree.ElementTree as ET
