@@ -173,6 +173,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         
     if (thisButton.status != GET)
     {
+		scaleFactor = 1.0f;
         delImg.setScale(scaleFactor);
         delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
         delBtn.setImage(&delImg);

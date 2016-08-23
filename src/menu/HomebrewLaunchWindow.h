@@ -77,6 +77,7 @@ private:
     GuiButton updateBtn;
     GuiButton reinstallBtn;
     GuiButton backBtn;
+	
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;

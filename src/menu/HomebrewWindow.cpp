@@ -30,7 +30,7 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 char * repoUrl = "http://wiiubru.com/appstore";
-//const char* repoUrl = "192.168.1.103:8000";
+//char * repoUrl = "192.168.1.103:8000";
 
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
@@ -201,6 +201,7 @@ void HomebrewWindow::refreshHomebrewApps()
         scrollOffY = -120;
 
         append(homebrewButtons[idx].button);
+		
         localAppButtons.push_back(homebrewButtons[idx]);
     }
             		
@@ -405,13 +406,13 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , getButtonImgData(Resources::GetImageData("GET.png"))
     , updateButtonImgData(Resources::GetImageData("UPDATE.png"))
     , localButtonImgData(Resources::GetImageData("LOCAL.png"))
-    , arrowRightImageData(Resources::GetImageData("rightArrow.png"))
-    , arrowLeftImageData(Resources::GetImageData("leftArrow.png"))
-    , arrowRightImage(arrowRightImageData)
-    , arrowLeftImage(arrowLeftImageData)
-    , arrowRightButton(arrowRightImage.getWidth(), arrowRightImage.getHeight())
-    , arrowLeftButton(arrowLeftImage.getWidth(), arrowLeftImage.getHeight())
-    , hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
+	, hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
+	, hblTabImgData(Resources::GetImageData("hbl_tab.png"))
+	, rpxTabImgData(Resources::GetImageData("rpx_tab.png"))
+	, hblTabImg(hblTabImgData)
+	, rpxTabImg(rpxTabImgData)
+	, hblTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
+	, rpxTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
@@ -424,6 +425,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     currentLeftPosition = 0;
     listOffset = 0;
     gotDirectorySuccess = false;
+		
+	listingMode = 1;
         
     char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
         
@@ -463,6 +466,21 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     append(hblRepoText);
 
     append(progressWindow);
+	hblTabBtn.setImage(&hblTabImg);
+	rpxTabBtn.setImage(&rpxTabImg);
+		
+	hblTabBtn.setScale(0.6);
+	rpxTabBtn.setScale(0.6);
+	hblTabBtn.setAlignment(ALIGN_LEFT);
+	rpxTabBtn.setAlignment(ALIGN_LEFT);
+	hblTabBtn.setPosition(0, 85);
+	rpxTabBtn.setPosition(-20, -85);
+		
+	hblTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
+    rpxTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
+
+	append(&hblTabBtn);
+	append(&rpxTabBtn);
         
 //    refreshHomebrewApps();
 }
@@ -484,8 +502,27 @@ HomebrewWindow::~HomebrewWindow()
     Resources::RemoveImageData(getButtonImgData);
     Resources::RemoveImageData(updateButtonImgData);
     Resources::RemoveImageData(localButtonImgData);
-    Resources::RemoveImageData(arrowRightImageData);
-    Resources::RemoveImageData(arrowLeftImageData);
+	Resources::RemoveImageData(hblTabImgData);
+	Resources::RemoveImageData(rpxTabImgData);
+}
+
+
+void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+{
+	if (listingMode == 1) // already hbl mode
+		return;
+	
+	listingMode = 1;
+	globalUpdatePosition = true;
+}
+
+void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+{
+	if (listingMode == 2) // already rpx mode
+		return;
+	
+	listingMode = 2;
+	globalUpdatePosition = true;
 }
 
 void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
@@ -520,7 +557,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     log_printf("clicked a homebrew button");
     if (getHasScrolled() || initialLoadInProgress) {
         return;
-    }
+    }		
     
     thisHomebrewWindow = this;
         
@@ -555,32 +592,6 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     }
 }
 
-void HomebrewWindow::OnLeftArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
-{
-    if(listOffset > 0)
-    {
-        listOffset--;
-        targetLeftPosition = -listOffset * getWidth();
-
-        if(listOffset == 0)
-            removeE(&arrowLeftButton);
-        append(&arrowRightButton);
-    }
-}
-
-void HomebrewWindow::OnRightArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
-{
-    if((listOffset * MAX_BUTTONS_ON_PAGE) < (int)homebrewButtons.size())
-    {
-        listOffset++;
-        targetLeftPosition = -listOffset * getWidth();
-
-        if(((listOffset + 1) * MAX_BUTTONS_ON_PAGE) >= (int)homebrewButtons.size())
-            removeE(&arrowRightButton);
-
-        append(&arrowLeftButton);
-    }
-}
 
 void HomebrewWindow::draw(CVideo *pVideo)
 {
@@ -611,20 +622,35 @@ void HomebrewWindow::draw(CVideo *pVideo)
     if(bUpdatePositions)
     {
         bUpdatePositions = false;
+		globalUpdatePosition = false;
         int imageHeight = 210;
 
         for(u32 i = 0; i < homebrewButtons.size(); i++)
         {
-            float fXOffset = (i % 2)? 265 : -265;
+            float fXOffset = ((i % 2)? 265 : -265);
             float fYOffset = scrollOffY + (imageHeight + 20.0f) * 1.5f - (imageHeight + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));    
             if (homebrewButtons[i].button != 0)
                 homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
+		
+		if (listingMode == 1)
+		{
+			hblTabBtn.setPosition(0, 85);
+			rpxTabBtn.setPosition(-15, -85);
+		}
+		else if (listingMode == 2)
+		{
+			hblTabBtn.setPosition(-15, 85);
+			rpxTabBtn.setPosition(0, -85);
+		}
     }
+	
+	
 
     GuiFrame::draw(pVideo);
 
 }
+
 
 void refreshHomebrewAppIcons()
 {

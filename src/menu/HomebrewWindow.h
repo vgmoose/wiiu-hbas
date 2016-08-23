@@ -63,6 +63,7 @@ public:
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
+	int listingMode; // 1 is hbl, 2 is rpx
     bool gotDirectorySuccess;
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
@@ -92,8 +93,10 @@ private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
     void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-    void OnLeftArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-    void OnRightArrowClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+	
+	void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+	void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+
 
     void OnCloseTcpReceiverFinish(GuiElement *element);
     void OnTcpReceiveStart(GuiElement *element, u32 ip);
@@ -106,14 +109,15 @@ private:
     GuiImageData * updateButtonImgData;
     GuiImageData * localButtonImgData;
 
-    GuiImageData* arrowRightImageData;
-    GuiImageData* arrowLeftImageData;
-    GuiImage arrowRightImage;
-    GuiImage arrowLeftImage;
-    GuiButton arrowRightButton;
-    GuiButton arrowLeftButton;
     GuiText hblVersionText;
     GuiText * hblRepoText;
+	
+	GuiImageData *hblTabImgData;
+    GuiImageData *rpxTabImgData;
+	GuiImage hblTabImg;
+    GuiImage rpxTabImg;
+	GuiButton hblTabBtn;
+    GuiButton rpxTabBtn;
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
