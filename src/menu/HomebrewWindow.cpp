@@ -471,10 +471,25 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 		
 	hblTabBtn.setScale(0.6);
 	rpxTabBtn.setScale(0.6);
+		
 	hblTabBtn.setAlignment(ALIGN_LEFT);
 	rpxTabBtn.setAlignment(ALIGN_LEFT);
+		
 	hblTabBtn.setPosition(0, 85);
 	rpxTabBtn.setPosition(-20, -85);
+		
+	hblTabBtn.setEffectGrow();
+	rpxTabBtn.setEffectGrow();
+		
+    hblTabBtn.setTrigger(&touchTrigger);
+    hblTabBtn.setTrigger(&wpadTouchTrigger);
+    hblTabBtn.setTrigger(&buttonRTrigger);
+    hblTabBtn.setSoundClick(buttonClickSound);
+				
+    rpxTabBtn.setTrigger(&touchTrigger);
+    rpxTabBtn.setTrigger(&wpadTouchTrigger);
+    rpxTabBtn.setTrigger(&buttonRTrigger);
+    rpxTabBtn.setSoundClick(buttonClickSound);
 		
 	hblTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
     rpxTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
