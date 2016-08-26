@@ -152,6 +152,7 @@ You are currently viewing the web front-end to the Homebrew App Store.
 
 html = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
 yaml = ""
+yaml2 = ""
     
 try:
     os.mkdir("zips")
@@ -167,12 +168,26 @@ if "dozips" in form:
     print "Generating new zip files as well<br><br>"
 else:
     print "Not generating new zip files, to do that go <a href='gen.py?dozips=1'>here</a> (takes a while)<br><br>"
+    
+appsandgames = os.listdir("apps") + os.listdir("games")
+gamepoint = len(os.listdir("apps"))
 
-for app in os.listdir("apps"):
+count = 0
+for app in appsandgames:
     if app.startswith("."):
         continue
+        
+    if count >= gamepoint-1:
+        typee = "rpx"
+        targdir = "games"
+    else:
+        typee = "hbl"
+        targdir = "apps"
+        
+    count += 1
+        
     print "Indexing " + app + "...<br>"
-    xmlfile = "apps/%s/meta.xml" % app
+    xmlfile = targdir+"/%s/meta.xml" % app
     
     name = app
     coder = "???"
@@ -183,9 +198,13 @@ for app in os.listdir("apps"):
     
     binary = None
     
-    for file in os.listdir("apps/%s" % app):
+    for file in os.listdir(targdir+"/%s" % app):
         if file.endswith(".elf"):
             binary = file
+        if file == "code":
+            for file2 in os.listdir(targdir+"/%s/code" % app):
+                if file2.endswith(".rpx"):
+                    binary = file2
     
     if not binary:
         continue
@@ -226,7 +245,7 @@ for app in os.listdir("apps"):
         except:
             pass
     
-    icon = "apps/%s/icon.png" % app
+    icon = targdir+"/%s/icon.png" % app
     if not os.path.isfile(icon):
         icon = "images/missing.png"
     
@@ -237,15 +256,18 @@ for app in os.listdir("apps"):
     if source != "????":
         src_link = "<a href='%s' target='_blank'>Source</a>" % source
 
-    d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc}
+    d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc, "type": typee}
 
     html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
     
-    yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
+    if typee == "hbl":
+        yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
+	
+    yaml2 += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version, typee)
     
     if dozipping:
         zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
-        zipdir("apps/%s" % app, zipf)
+        zipdir(targdir+"/%s" % app, zipf)
         zipf.close()
 
 
@@ -266,6 +288,10 @@ directory = open("directory.yaml", "w+")
 directory.write(yaml)
 directory.close()
 
+directory = open("directory12.yaml", "w+")
+directory.write(yaml2)
+directory.close()
+
 jsonout = open("directory.json", "w+")
 jsonout.write(jsonstring)
 jsonout.close()
@@ -273,7 +299,7 @@ jsonout.close()
 print"<html><br> Update Complete !!!<br><br></html>"
 print "<a href='index.html'>See the Results.</a>"
 
-xml3 = open("directory.xml", "w+")
-xml3.write(dict2xml(d))
-xml3.close()
+#xml3 = open("directory.xml", "w+")
+#xml3.write(dict2xml(d))
+#xml3.close()
 
