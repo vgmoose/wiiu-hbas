@@ -32,8 +32,6 @@ style = """<!DOCTYPE html>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script type="text/javascript" src="js/tooltipster.bundle.min.js"></script>
     <script type="text/javascript" src="js/sorttable.js"></script>
-
-
 <!-- tooltip script to display the homebrews long_description when mousing over the icon table cell -->
     <script>
         $(document).ready(function() {
@@ -46,15 +44,12 @@ style = """<!DOCTYPE html>
             });
         });
     </script>
-
-
 </head>
 <body>
 <header>
 <ul>
 <li style='float: left'><img src='http://www.wiiubru.com/forum/forum/styles/digi_red/theme/images/logo.png' alt='wiiubru' width='95px' height='45px'></img></li>
 <li style='float: left'><input type='text' id='search' placeholder='&#xF002;' style='font-family:Arial, FontAwesome'></li>
-
   <li class="dropdown">
     <a href="#" class="dropbtn"><i class="fa fa-link" aria-hidden="true"></i> USEFUL LINKS</a>
     <div class="dropdown-content">
@@ -70,10 +65,8 @@ style = """<!DOCTYPE html>
   <li><a href="http://forum.wiiubru.com/" target='_blank'><i class="fa fa-forumbee" aria-hidden="true"></i> FORUM</a></li>
   <li><a href="http://www.wiiubru.com/ask" target='_blank'><i class="fa fa-question" aria-hidden="true"></i> ASK</a></li>
   <li><a href="http://www.wiiubru.com/appstore/stats/index.html" target='_blank'><i class="fa fa-line-chart" aria-hidden="true"></i> STATS</a></li>
-
 </ul>
 </header>
-
 <br>
 <div style="text-align: center;">
 <a href="https://gbatemp.net/threads/release-homebrew-app-store.433275/" target='_blank'>
@@ -92,10 +85,8 @@ style = """<!DOCTYPE html>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 </div>
-
 """
 search = """
-
 <script>
 // search script
 var $rows = $('#wiiubru tbody tr');
@@ -107,7 +98,6 @@ $('#search').keyup(function() {
         return !~text.indexOf(val);
     }).hide();
 });
-
 </script>
 """
 
@@ -144,13 +134,14 @@ You are currently viewing the web front-end to the Homebrew App Store.
 <a href="https://www.wiiubru.com/ask" target='_blank' title='ASK'>
 <i class="fa fa-question fa-2x" aria-hidden="true"></i>
 </a>
-
-
 </span>
 </footer>
 """
 
+
 html = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
+html2 = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
+
 yaml = ""
 yaml2 = ""
     
@@ -245,7 +236,10 @@ for app in appsandgames:
         except:
             pass
     
-    icon = targdir+"/%s/icon.png" % app
+    if typee == "hbl":
+        icon = targdir+"/%s/icon.png" % app
+    else:
+        icon = targdir+"/%s/meta/iconTex.tga" % app
     if not os.path.isfile(icon):
         icon = "images/missing.png"
     
@@ -258,13 +252,17 @@ for app in appsandgames:
 
     d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc, "type": typee}
 
-    html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
+    
     
     if typee == "hbl":
         yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
-	
-    yaml2 += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version, typee)
-    
+        html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
+    else:
+        html2 += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
+
+
+    yaml2 += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version, typee)    
+
     if dozipping:
         zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
         zipdir(targdir+"/%s" % app, zipf)
@@ -272,9 +270,13 @@ for app in appsandgames:
 
 
 html += "</tbody></table><br><br>"
+html2 += "</tbody></table><br><br>"
 html += search
+html2 += search
 html += footer
+html2 += footer
 html += "</body></html>"
+html2 += "</body></html>"
 
 
 
@@ -282,6 +284,10 @@ jsonstring = json.dumps(d, indent=4, separators=(',', ': '))
 
 index = open("index.html", "w+")
 index.write(html)
+index.close()
+
+index = open("rpx.html", "w+")
+index.write(html2)
 index.close()
 
 directory = open("directory.yaml", "w+")
@@ -302,4 +308,3 @@ print "<a href='index.html'>See the Results.</a>"
 #xml3 = open("directory.xml", "w+")
 #xml3.write(dict2xml(d))
 #xml3.close()
-
