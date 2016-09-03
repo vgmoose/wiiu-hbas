@@ -44,6 +44,7 @@ typedef struct
         std::string dirPath;
         std::string binary;
         std::string version;
+        int typee;
     } homebrewButton;
 
 extern void updateProgress(void *arg, u32 done, u32 total);
@@ -57,9 +58,16 @@ public:
     void draw(CVideo *pVideo);
     float scrollOffY = 0;
     float lastScrollOffY = 0;
+    // all homebrew buttons
     std::vector<homebrewButton> homebrewButtons;
+    
     std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
+    
+    // separate vectors for the current tab (some combo off local and remote)
+    std::vector<homebrewButton> curTabButtons;
+
+    
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
@@ -73,6 +81,7 @@ public:
     void refreshHomebrewApps();
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
+    void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
     void findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon);
     int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);

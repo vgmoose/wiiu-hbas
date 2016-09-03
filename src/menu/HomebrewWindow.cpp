@@ -29,8 +29,12 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
-char * repoUrl = "http://wiiubru.com/appstore";
+//char * repoUrl = "http://wiiubru.com/appstore";
 //char * repoUrl = "192.168.1.103:8000";
+char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
+
+#define HBL 1
+#define RPX 2
 
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
@@ -108,6 +112,41 @@ void updateProgress(void *arg, u32 done, u32 total)
 }
 
 /**
+This method filters the visible apps in in the current tab based on the display mode.
+
+It goes throw the list of all apps (homebrewButtons) and puts only the relevant ones into
+the curTabButtons list, which is what's actually rendered.
+**/
+void HomebrewWindow::filter()
+{
+    scrollOffY = -120;
+
+    // remove any existing buttons
+    for (u32 x=0; x<curTabButtons.size(); x++)
+    {
+        log_printf("filter: about to remove button %d", x);
+        removeE(curTabButtons[x].button);  
+    }
+    
+    // empty the current tab
+    curTabButtons.clear();
+    
+    for (int x=0; x<homebrewButtons.size(); x++)
+    {
+        if (homebrewButtons[x].typee == listingMode)
+        {
+            curTabButtons.push_back(homebrewButtons[x]);
+        }
+    }
+    
+    for (int x=0; x<curTabButtons.size(); x++)
+    {
+        log_printf("filter: adding button %d, %s", x, curTabButtons[x].shortname.c_str());
+        append(curTabButtons[x].button);
+    }
+}
+
+/**
 This method updates local apps (and fetches server apps if they haven't been fetched yet)
 It refreshes the listing on the "home page" of the app store
 **/
@@ -119,13 +158,6 @@ void HomebrewWindow::refreshHomebrewApps()
 
     // get a list of directories
     DirList dirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
-
-    // remove any existing buttons
-    for (u32 x=0; x<homebrewButtons.size(); x++)
-    {
-        log_printf("refreshHomebrewApps: about to remove button %d", x);
-        removeE(homebrewButtons[x].button);  
-    }
     
     // clear both arrays
     homebrewButtons.clear();
@@ -200,13 +232,13 @@ void HomebrewWindow::refreshHomebrewApps()
         
         scrollOffY = -120;
 
-        append(homebrewButtons[idx].button);
+//        append(homebrewButtons[idx].button);
 		
         localAppButtons.push_back(homebrewButtons[idx]);
     }
             		
     // download app list from the repo
-    std::string targetUrl = std::string(repoUrl)+"/directory.yaml";
+    std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
     if (!gotDirectorySuccess)
     {
         log_printf("refreshHomebrewApps: Downloading remote %s", targetUrl.c_str());
@@ -246,7 +278,10 @@ void HomebrewWindow::refreshHomebrewApps()
         std::string version;
         std::getline(f, version);
         version = version.substr(2);
-
+        std::string typee;
+        std::getline(f, typee);
+        typee = typee.substr(2);
+        
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
 
@@ -267,6 +302,11 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx].binary = binary;
         homebrewButtons[idx].version = version;
         
+        // default to HBL type, set to RPX type if typee string matches
+        homebrewButtons[idx].typee = HBL;
+        if (typee.compare("rpx") == 0)
+            homebrewButtons[idx].typee = RPX;
+        
         // update status if already a local app
         int addedIndex = checkIfUpdateOrInstalled(homebrewButtons[idx].shortname, homebrewButtons[idx].version, totalLocalApps);
         
@@ -283,7 +323,7 @@ void HomebrewWindow::refreshHomebrewApps()
             homebrewButtons.pop_back();
             homebrewButtons[addedIndex].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
             homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
-            append(homebrewButtons[addedIndex].button);
+//            append(homebrewButtons[addedIndex].button);
             positionHomebrewButton(&homebrewButtons[addedIndex], addedIndex);
             homebrewButtons[addedIndex].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
             homebrewButtons[addedIndex].binary = binary;
@@ -320,13 +360,15 @@ void HomebrewWindow::refreshHomebrewApps()
         positionHomebrewButton(&homebrewButtons[idx], idx);
         homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
 
-        append(homebrewButtons[idx].button);
+//        append(homebrewButtons[idx].button);
         iterCount ++;
     }
     
     initialLoadInProgress = false;
     globalUpdatePosition = true;
     log_printf("refreshHomebrewApps: done");
+    
+    filter();
 }
 
 void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon)
@@ -426,7 +468,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     listOffset = 0;
     gotDirectorySuccess = false;
 		
-	listingMode = 1;
+	listingMode = HBL;
         
     char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
         
@@ -524,20 +566,22 @@ HomebrewWindow::~HomebrewWindow()
 
 void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode == 1) // already hbl mode
+	if (listingMode == HBL) // already hbl mode
 		return;
 	
-	listingMode = 1;
+	listingMode = HBL;
 	globalUpdatePosition = true;
+    filter();
 }
 
 void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode == 2) // already rpx mode
+	if (listingMode == RPX) // already rpx mode
 		return;
 	
-	listingMode = 2;
+	listingMode = RPX;
 	globalUpdatePosition = true;
+    filter();
 }
 
 void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
@@ -640,22 +684,22 @@ void HomebrewWindow::draw(CVideo *pVideo)
 		globalUpdatePosition = false;
         int imageHeight = 210;
 
-        for(u32 i = 0; i < homebrewButtons.size(); i++)
+        for(u32 i = 0; i < curTabButtons.size(); i++)
         {
             float fXOffset = ((i % 2)? 265 : -265);
             float fYOffset = scrollOffY + (imageHeight + 20.0f) * 1.5f - (imageHeight + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));    
-            if (homebrewButtons[i].button != 0)
-                homebrewButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
+            if (curTabButtons[i].button != 0)
+                curTabButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
         }
 		
 		if (listingMode == 1)
 		{
 			hblTabBtn.setPosition(0, 85);
-			rpxTabBtn.setPosition(-15, -85);
+			rpxTabBtn.setPosition(-20, -85);
 		}
 		else if (listingMode == 2)
 		{
-			hblTabBtn.setPosition(-15, 85);
+			hblTabBtn.setPosition(-20, 85);
 			rpxTabBtn.setPosition(0, -85);
 		}
     }
