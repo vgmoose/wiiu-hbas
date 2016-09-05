@@ -26,6 +26,9 @@
 #define INSTALLED 2
 #define GET 3
 
+#define HBL 1
+#define RPX 2
+
 extern ProgressWindow * progressWindow;
 
 typedef struct
@@ -67,7 +70,7 @@ public:
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton> curTabButtons;
 
-    
+    bool filterInProgress;
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
