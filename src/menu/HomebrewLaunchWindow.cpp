@@ -24,15 +24,7 @@
 #include "network/FileDownloader.h"
 #include <algorithm>
 
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-    }
-    log_printf("Here's the formatted string: %s", str.c_str());
-    return str;
-}
+
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
@@ -78,9 +70,6 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
         
     std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";  
-        
-    // fix the %20glitch
-    selectedButton->shortname = ReplaceAll(selectedButton->shortname, " ", "%20");
                         
     // if GET or UDPATE, fetch xml from server
     if (selectedButton->status == GET || selectedButton->status == UPDATE)

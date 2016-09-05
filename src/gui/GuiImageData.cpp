@@ -103,7 +103,7 @@ void GuiImageData::loadImage(const u8 *img, int imgSize, int textureClamp, int t
 	else if(img[0] == 0x00)
 	{
 		// Try loading TGA image
-		//gdImg = gdImageCreateFromTgaPtr(imgSize, (u8*) img);
+		gdImg = gdImageCreateFromTgaPtr(imgSize, (u8*) img);
 	}
 
 	if(gdImg == 0)

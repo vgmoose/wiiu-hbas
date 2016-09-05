@@ -26,6 +26,7 @@
 #include <thread>
 #include <sstream>
 
+
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
@@ -36,6 +37,16 @@ char * repoUrl = "192.168.1.103:8000";
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
 
+
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    log_printf("Here's the formatted string: %s", str.c_str());
+    return str;
+}
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
@@ -74,6 +85,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     button->button->setTrigger(&touchTrigger);
     button->button->setTrigger(&wpadTouchTrigger);
     button->button->setEffectGrow();
+//    button->button->setPosition(0, 0);
     //        button->button->setSoundClick(buttonClickSound);
 }
 
@@ -117,19 +129,18 @@ the curTabButtons list, which is what's actually rendered.
 void HomebrewWindow::filter()
 {
     scrollOffY = -120;
-    filterInProgress = true;
 
     // remove any existing buttons
     for (u32 x=0; x<curTabButtons.size(); x++)
     {
-        log_printf("filter: about to remove button %d", x);
+//        log_printf("filter: about to remove button %d", x);
         removeE(curTabButtons[x].button);  
     }
     
     // empty the current tab
     curTabButtons.clear();
     
-    for (int x=0; x<homebrewButtons.size(); x++)
+    for (u32 x=0; x<homebrewButtons.size(); x++)
     {
         if (homebrewButtons[x].typee == listingMode)
         {
@@ -137,14 +148,37 @@ void HomebrewWindow::filter()
         }
     }
     
-    for (int x=0; x<curTabButtons.size(); x++)
+    std::string output = "TOTAL: ";
+    for (u32 x=0; x<homebrewButtons.size(); x++)
     {
-        log_printf("filter: adding button %d, %s", x, curTabButtons[x].shortname.c_str());
-        append(curTabButtons[x].button);
-        log_printf("filter: added it");
+        output += "["+std::string(homebrewButtons[x].shortname)+"] ";
+//        output << homebrewButtons[x].typee;
+//        output << "/";
+//        output << homebrewButtons[x].status;
+//        output << "] ";
     }
     
-    filterInProgress = false;
+    log_printf(output.c_str());
+    
+    std::string output2 = "CURRENT: ";
+    for (u32 x=0; x<curTabButtons.size(); x++)
+    {
+        output2 += "["+std::string(curTabButtons[x].shortname)+"] ";
+//        output2 << curTabButtons[x].typee;
+//        output2 << "/";
+//        output2 << curTabButtons[x].status;
+//        output2 << "] ";
+    }
+    
+    log_printf(output2.c_str());
+    
+    for (u32 x=0; x<curTabButtons.size(); x++)
+    {
+//        log_printf("filter: adding button %d, %s", x, curTabButtons[x].shortname.c_str());
+        append(curTabButtons[x].button);
+//        log_printf("filter: added it");
+    }
+        
 }
 
 /**
@@ -167,7 +201,7 @@ void HomebrewWindow::refreshHomebrewApps()
     // remove any existing buttons
     for (u32 x=0; x<curTabButtons.size(); x++)
     {
-        log_printf("filter: about to remove button %d", x);
+//        log_printf("filter: about to remove button %d", x);
         removeE(curTabButtons[x].button);  
     }
     
@@ -310,7 +344,7 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // since we got this app from the net, mark it as a GET
         homebrewButtons[idx].status = GET;
-        homebrewButtons[idx].shortname = shortname;
+        homebrewButtons[idx].shortname = ReplaceAll(shortname, " ", "%20");
         homebrewButtons[idx].binary = binary;
         homebrewButtons[idx].version = version;
         
@@ -354,7 +388,10 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // if the icon is present, set it to the image
         if (!targetIcon.empty())
-            homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+            if (targetIcon.compare("missing.png") == 0)
+                homebrewButtons[idx].iconImgData = Resources::GetImageData("missing.png");
+            else
+                homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
 
         const char *cpName = name.c_str();
 //        const char *cpDescription = desc.c_str();
@@ -392,10 +429,10 @@ void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::str
         log_printf("findHomebrewIconAndSetImage: checking element %d", x);
         if (homebrewButtons[x].shortname == shortname)
         {
-            if (targetIcon.compare("missing.png"))
-                homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
-            else
+            if (targetIcon.compare("missing.png") == 0)
                 homebrewButtons[x].iconImgData = Resources::GetImageData("missing.png");
+            else
+                homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
             positionHomebrewButton(&homebrewButtons[x],  x);
             break;
 //            removeE(homebrewButtons[x].button);
@@ -437,7 +474,10 @@ void HomebrewWindow::populateIconCache()
         
         // download app icon
         std::string targetIcon;
-        std::string targetIconUrl = std::string(repoUrl)+"/apps/" + remoteAppButtons[x].shortname + "/icon.png";
+        // find the path on the server depending on our current tab
+        std::string tabPath = (remoteAppButtons[x].typee == RPX)? "games/" + remoteAppButtons[x].shortname + "/meta/iconTex.tga" : "apps/" + remoteAppButtons[x].shortname + "/icon.png";
+        
+        std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
         bool imageDownloadSuccessful = false;
         
         log_printf("populateIconCache: Downloading image for button %d", x);
@@ -480,7 +520,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     currentLeftPosition = 0;
     listOffset = 0;
     gotDirectorySuccess = false;
-		
+    screenLocked = false;
 	listingMode = HBL;
         
     char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
@@ -506,7 +546,6 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     }
 
         
-    filterInProgress = false;
     log_printf(repoUrl);
         
     progressWindow = new ProgressWindow("Downloading app directory...");
@@ -581,7 +620,7 @@ HomebrewWindow::~HomebrewWindow()
 
 void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode == HBL) // already hbl mode
+	if (listingMode == HBL || screenLocked) // already hbl mode
 		return;
 	
 	listingMode = HBL;
@@ -591,7 +630,7 @@ void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController 
 
 void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode == RPX) // already rpx mode
+	if (listingMode == RPX || screenLocked) // already rpx mode
 		return;
 	
 	listingMode = RPX;
@@ -609,6 +648,7 @@ void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
 
 void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 {
+    screenLocked = false;
     //! remove element from draw list and push to delete queue
     removeE(element);
     AsyncDeleter::pushForDelete(element);
@@ -652,6 +692,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
             log_printf("creating launchbox");
             append(launchBox);
             disableButtons = true;
+            screenLocked = true;
             break;
         }
     }
@@ -701,19 +742,16 @@ void HomebrewWindow::draw(CVideo *pVideo)
 //        bUpdatePositions = false;
 		globalUpdatePosition = false;
         
-        if (filterInProgress)
-            return;
-        
         int imageHeight = 210;
 
         for(u32 i = 0; i < curTabButtons.size(); i++)
         {
-            log_printf("draw: adding a button at pos %d", i);
+//            log_printf("draw: adding a button at pos %d", i);
             float fXOffset = ((i % 2)? 265 : -265);
             float fYOffset = scrollOffY + (imageHeight + 20.0f) * 1.5f - (imageHeight + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));    
             if (curTabButtons[i].button != 0)
                 curTabButtons[i].button->setPosition(currentLeftPosition + fXOffset, fYOffset);
-            log_printf("draw: added that button %d", i);
+//            log_printf("draw: added that button %d", i);
         }
 		
 		if (listingMode == 1)

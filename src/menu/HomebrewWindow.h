@@ -70,7 +70,7 @@ public:
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton> curTabButtons;
 
-    bool filterInProgress;
+    bool screenLocked;
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
