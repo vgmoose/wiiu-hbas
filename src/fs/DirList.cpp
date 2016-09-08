@@ -72,7 +72,7 @@ bool DirList::LoadPath(const std::string & folder, const char *filter, u32 flags
 	return InternalLoadPath(folderpath);
 }
 
-bool DirList::InternalLoadPath(std::string &folderpath)
+bool DirList::InternalLoadPath(std::string &folderpath, bool keepGoingDown)
 {
 	if(folderpath.size() < 3)
 		return false;
@@ -100,7 +100,8 @@ bool DirList::InternalLoadPath(std::string &folderpath)
 				if(length > 2 && folderpath[length-1] != '/')
 					folderpath += '/';
 				folderpath += filename;
-				InternalLoadPath(folderpath);
+                if (keepGoingDown)
+				    InternalLoadPath(folderpath, false);
 				folderpath.erase(length);
 			}
 
@@ -129,6 +130,12 @@ bool DirList::InternalLoadPath(std::string &folderpath)
 	closedir(dir);
 
 	return true;
+}
+
+bool DirList::InternalLoadPath(std::string &folderpath)
+{
+    // go down with 
+    return DirList::InternalLoadPath(folderpath, true);
 }
 
 void DirList::AddEntrie(const std::string &filepath, const char * filename, bool isDir)

@@ -10,7 +10,7 @@
 #define CORES_MAX_ADDRESS 0xE4000000
 #define CORES_ADDRESS_SIZE 0x04000000
 
-#define APP_VERSION "alpha-prerelease-nogit" //TODO gitdescribe?
+#define APP_VERSION "1.2" //TODO gitdescribe?
 
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
@@ -48,12 +48,12 @@ unsigned char exception_handler(void* contextIn) {
 	char crashMessage[128];
 	if (context[38] >= (int)CORES_BASE_ADDRESS) {
 		if (context[38] <= (int)CORES_MAX_ADDRESS) {
-			__os_snprintf(crashMessage, 128, "The emulation core has crashed. URetro %s", APP_VERSION);
+			__os_snprintf(crashMessage, 128, "The emulation core has crashed. HBAS %s", APP_VERSION);
 		} else {
 			__os_snprintf(crashMessage, 128, "Code branched to an unexpected location. URetro %s", APP_VERSION);
 		}
 	} else {
-		__os_snprintf(crashMessage, 128, "Unfortunately, URetro has crashed. URetro %s", APP_VERSION);
+		__os_snprintf(crashMessage, 128, "Unfortunately, HBAS has crashed. URetro %s", APP_VERSION);
 	}
 	
 	char buf[2048];

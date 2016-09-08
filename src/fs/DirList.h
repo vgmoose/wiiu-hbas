@@ -80,6 +80,7 @@ public:
 protected:
 	// Internal parser
 	bool InternalLoadPath(std::string &path);
+    bool InternalLoadPath(std::string &path, bool keepGoingDown);
 	//!Add a list entrie
 	void AddEntrie(const std::string &filepath, const char * filename, bool isDir);
 	//! Clear the list

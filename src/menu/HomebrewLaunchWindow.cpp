@@ -24,6 +24,15 @@
 #include "network/FileDownloader.h"
 #include <algorithm>
 
+std::string ReplaceAll2(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    log_printf("Here's the formatted string: %s", str.c_str());
+    return str;
+}
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
@@ -296,9 +305,21 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     std::string binaryTarget = homebrewWindowTarget->binaryTarget;
     std::string pathTarget = homebrewWindowTarget->pathTarget;
     
+    std::string iconPath = "/icon.png";
+    std::string codePath = "/" + binaryTarget;
+    
+    if (homebrewWindowTarget->listingMode == RPX) // also kinda hacky, the current window doesn't have much to do with the current tab (listingMode)
+    {
+        // this is only needed for the icon and rpx download for rpx apps
+        iconPath = "/meta/iconTex.tga";
+        codePath = "/code" + codePath;
+    }
+    
+    log_printf("asyncDownloadTargetedFiles: variables: repoUrl: %s, sdPath: %s, binary: %s, path: %s, icon: %s, code: %s", mRepoUrl.c_str(), sdPathTarget.c_str(), binaryTarget.c_str(), pathTarget.c_str(), iconPath.c_str(), codePath.c_str());
+    
     // download the elf to sd card, and update the progres bar description
-    progress->setTitle("Downloading " + sdPathTarget + "/" + binaryTarget + "...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/"+binaryTarget, sdPathTarget+"/"+binaryTarget, &updateProgress);
+    progress->setTitle("Downloading " + sdPathTarget+codePath + "...");
+    FileDownloader::getFile(mRepoUrl+pathTarget+codePath, sdPathTarget+codePath, &updateProgress);
     log_printf("asyncDownloadTargetedFiles: downloaded %s", binaryTarget.c_str());
     
     // download meta.xml to sd card, and update the progres bar description
@@ -308,8 +329,8 @@ log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
     
     // download the app image icon for this app. (If the icon download is interrupted,
     // HBL may crash when it tries to read it
-    progress->setTitle("Downloading " + sdPathTarget+"/icon.png...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/icon.png", sdPathTarget+"/icon.png", &updateProgress);
+    progress->setTitle("Downloading " + sdPathTarget+iconPath+"...");
+    FileDownloader::getFile(mRepoUrl+pathTarget+iconPath, sdPathTarget+iconPath, &updateProgress);
     log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
     
     // remove the progress bar
@@ -342,8 +363,8 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
 
     // setup the paths based on the selected button
     std::string path = "/"+tabPath+"/"+selectedButton->shortname;
-    std::string sdPath = "sd:/wiiu"+path;
-    
+    std::string sdPath = ReplaceAll2("sd:/wiiu"+path, "%20", " ");
+        
     // create a new directory on sd
     CreateSubfolder(sdPath.c_str());
     

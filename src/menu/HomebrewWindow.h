@@ -52,6 +52,7 @@ typedef struct
 
 extern void updateProgress(void *arg, u32 done, u32 total);
 extern ProgressWindow* getProgressWindow();
+
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 {
 public:
@@ -79,6 +80,7 @@ public:
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
     std::vector<std::string> cachedIcons;
+    void loadLocalApps(int mode);
     void populateIconCache();
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();

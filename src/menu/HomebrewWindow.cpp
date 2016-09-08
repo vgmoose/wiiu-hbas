@@ -31,8 +31,8 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 //char * repoUrl = "http://wiiubru.com/appstore";
-char * repoUrl = "192.168.1.103:8000";
-//char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
+//char * repoUrl = "192.168.1.103:8000";
+char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
 
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
@@ -182,6 +182,125 @@ void HomebrewWindow::filter()
 }
 
 /**
+This method fetches the local apps from either /wiiu/games or /wiiu/apps
+**/
+void HomebrewWindow::loadLocalApps(int mode)
+{
+    log_printf("loadLocalApps: begin");
+    // get the 4 different types of app backgrounds
+    GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
+    
+    log_printf("loadLocalApps: begin2");
+    // get a list of directories
+    DirList* dirList;
+    if (mode != RPX)
+        dirList = new DirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
+    else
+        dirList = new DirList("sd:/wiiu/games", NULL, DirList::Dirs);
+    
+    log_printf("loadLocalApps: directory is loaded, it has %d files", dirList->GetFilecount());
+    
+    // sort the dir list
+    dirList->SortList();
+    
+    log_printf("loadLocalApps: directory is sorted");
+
+    // load up local apps
+    for(int i = 0; i < dirList->GetFilecount(); i++)
+    {
+        //! skip hidden linux and mac files
+        if(dirList->GetFilename(i)[0] == '.' || dirList->GetFilename(i)[0] == '_')
+            continue;
+
+        std::string homebrewPath = dirList->GetFilepath(i);
+        
+        if (mode == RPX) // since PRX works off folders, append a / here
+            homebrewPath += "/";
+        
+        log_printf("Initial value: %s", homebrewPath.c_str());
+        size_t slashPos = homebrewPath.rfind('/');
+        if(slashPos != std::string::npos)
+            homebrewPath.erase(slashPos);
+        
+        log_printf("Loaded up %s, going to check for a meta", homebrewPath.c_str());
+        HomebrewXML metaXml;
+        bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
+//        if (!xmlReadSuccess)
+//            continue;
+        
+        log_printf("Continuing with it...");
+        
+        // make the homebrew list bigger if we're gonna process this
+        int idx = homebrewButtons.size();
+        homebrewButtons.resize(homebrewButtons.size() + 1);
+                
+        // file path
+        homebrewButtons[idx].execPath = dirList->GetFilepath(i);
+        homebrewButtons[idx].iconImgData = NULL;
+
+        u8 * iconData = NULL;
+        u32 iconDataSize = 0;
+        
+        homebrewButtons[idx].dirPath = homebrewPath;
+        
+        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
+        homebrewButtons[idx].shortname = ReplaceAll(homebrewPath.substr(14 + (mode-1)), " ", "%20"); // mode is 2 for RPX so this will +1 to get to "games" in teh case of rpx, hacky oops
+        
+        // since we got this app from the sd card, mark it local for now.
+        // if we see it later on the server, update its status appropriately to 
+        // update or installed
+        homebrewButtons[idx].status = LOCAL;
+        
+        homebrewButtons[idx].typee = mode;
+
+        std::string iconPath = "/icon.png";
+        if (mode == RPX)
+            iconPath = "/meta/iconTex.tga";
+        log_printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
+        LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
+
+        if(iconData != NULL)
+        {
+            homebrewButtons[idx].iconImgData = new GuiImageData(iconData, iconDataSize);
+            free(iconData);
+            iconData = NULL;
+        }
+
+      
+        const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx].execPath.c_str();
+//        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
+
+        if (mode == HBL)
+        {
+            if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
+                cpName += strlen("sd:/wiiu/apps/");
+        }
+        else
+            if(strncmp(cpName, "sd:/wiiu/games/", strlen("sd:/wiiu/games/")) == 0)
+                cpName += strlen("sd:/wiiu/games/");
+        
+        homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+        log_printf("refreshHomebrewApps: added local button %d", idx);
+        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
+        homebrewButtons[idx].version = xmlReadSuccess? metaXml.GetVersion() : "999";
+        
+        positionHomebrewButton(&homebrewButtons[idx], idx);
+        homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
+        
+        scrollOffY = -120;
+
+//        append(homebrewButtons[idx].button);
+		
+        localAppButtons.push_back(homebrewButtons[idx]);
+        log_printf("totally done with and added that");
+    }
+}
+
+/**
 This method updates local apps (and fetches server apps if they haven't been fetched yet)
 It refreshes the listing on the "home page" of the app store
 **/
@@ -190,9 +309,6 @@ void HomebrewWindow::refreshHomebrewApps()
     log_printf("refreshHomebrewApps: starting homebrew app refresh");
     // get the 4 different types of app backgrounds
     GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
-
-    // get a list of directories
-    DirList dirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
     
     // clear both arrays
     homebrewButtons.clear();
@@ -207,81 +323,8 @@ void HomebrewWindow::refreshHomebrewApps()
     
     curTabButtons.clear();
     
-    // sort the dir list
-    dirList.SortList();
-
-    // load up local apps
-    for(int i = 0; i < dirList.GetFilecount(); i++)
-    {
-        //! skip hidden linux and mac files
-        if(dirList.GetFilename(i)[0] == '.' || dirList.GetFilename(i)[0] == '_')
-            continue;
-        
-        int idx = homebrewButtons.size();
-        homebrewButtons.resize(homebrewButtons.size() + 1);
-                
-        // file path
-        homebrewButtons[idx].execPath = dirList.GetFilepath(i);
-        homebrewButtons[idx].iconImgData = NULL;
-
-        std::string homebrewPath = homebrewButtons[idx].execPath;
-        size_t slashPos = homebrewPath.rfind('/');
-        if(slashPos != std::string::npos)
-            homebrewPath.erase(slashPos);
-
-        u8 * iconData = NULL;
-        u32 iconDataSize = 0;
-        
-        homebrewButtons[idx].dirPath = homebrewPath;
-        
-        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
-        homebrewButtons[idx].shortname = homebrewPath.substr(14);
-        
-        // since we got this app from the sd card, mark it local for now.
-        // if we see it later on the server, update its status appropriately to 
-        // update or installed
-        homebrewButtons[idx].status = LOCAL;
-        
-        homebrewButtons[idx].typee = HBL;
-
-        // load the icon
-        LoadFileToMem((homebrewPath + "/icon.png").c_str(), &iconData, &iconDataSize);
-
-        if(iconData != NULL)
-        {
-            homebrewButtons[idx].iconImgData = new GuiImageData(iconData, iconDataSize);
-            free(iconData);
-            iconData = NULL;
-        }
-
-        HomebrewXML metaXml;
-
-        bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
-        
-        const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx].execPath.c_str();
-//        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
-
-        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
-            cpName += strlen("sd:/wiiu/apps/");
-        
-        homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].versionLabel = new GuiText(metaXml.GetVersion(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].coderLabel = new GuiText(metaXml.GetCoder(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].descriptionLabel = new GuiText(metaXml.GetShortDescription(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-        log_printf("refreshHomebrewApps: added local button %d", idx);
-        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
-        homebrewButtons[idx].version = metaXml.GetVersion();
-        
-        positionHomebrewButton(&homebrewButtons[idx], idx);
-        homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
-        
-        scrollOffY = -120;
-
-//        append(homebrewButtons[idx].button);
-		
-        localAppButtons.push_back(homebrewButtons[idx]);
-    }
+    loadLocalApps(HBL);
+    loadLocalApps(RPX);
             		
     // download app list from the repo
     std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
@@ -388,10 +431,12 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // if the icon is present, set it to the image
         if (!targetIcon.empty())
+        {
             if (targetIcon.compare("missing.png") == 0)
                 homebrewButtons[idx].iconImgData = Resources::GetImageData("missing.png");
             else
                 homebrewButtons[idx].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+        }
 
         const char *cpName = name.c_str();
 //        const char *cpDescription = desc.c_str();

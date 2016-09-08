@@ -49,6 +49,8 @@ public:
         
     GuiImageData * splashScreenImgData;
     GuiImage splashScreen;
+    
+    CThread * initialLoadThread;
 
     void appendTv(GuiElement *e)
     {
