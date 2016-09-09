@@ -56,7 +56,7 @@ MainWindow::MainWindow(int w, int h)
 
     for(int i = 0; i < 4; i++)
     {
-        std::string filename = strfmt("player%i_point.png", i+1);
+        std::string filename = strfmt("player1_point.png", i+1);
         pointerImgData[i] = Resources::GetImageData(filename.c_str());
         pointerImg[i] = new GuiImage(pointerImgData[i]);
         pointerImg[i]->setScale(1.5f);

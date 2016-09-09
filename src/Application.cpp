@@ -29,7 +29,6 @@ bool Application::exitApplication = false;
 
 Application::Application()
 	: CThread(CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 0, 0x20000)
-	, bgMusic(NULL)
 	, video(NULL)
     , mainWindow(NULL)
     , exitCode(EXIT_RELAUNCH_ON_LOAD)
@@ -43,11 +42,6 @@ Application::Application()
     //! load resources
     Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
 
-    //! create bgMusic
-    bgMusic = new GuiSound(Resources::GetFile("screampics.mp3"), Resources::GetFileSize("screampics.mp3"));
-    bgMusic->SetLoop(true);
-    bgMusic->Play();
-    bgMusic->SetVolume(50);
 
 	exitApplication = false;
 }
@@ -56,7 +50,6 @@ Application::~Application()
 {
     log_printf("Destroy music\n");
 
-    delete bgMusic;
 
     log_printf("Destroy controller\n");
 
