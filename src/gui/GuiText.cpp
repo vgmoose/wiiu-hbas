@@ -20,6 +20,7 @@
 
 FreeTypeGX * GuiText::presentFont = NULL;
 int GuiText::presetSize = 28;
+int GuiText::presetInternalRenderingScale = 2.0f; //Lets render the font at the doubled size. This make it even smoother!
 int GuiText::presetMaxWidth = 0xFFFF;
 int GuiText::presetAlignment = ALIGN_CENTER | ALIGN_MIDDLE;
 GX2ColorF32 GuiText::presetColor = (GX2ColorF32){ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -52,6 +53,7 @@ GuiText::GuiText()
 	blurGlowIntensity = 0.0f;
 	blurAlpha = 0.0f;
 	blurGlowColor = glm::vec4(0.0f);
+	internalRenderingScale = presetInternalRenderingScale;
 }
 
 GuiText::GuiText(const char * t, int s, const glm::vec4 & c)
@@ -74,6 +76,7 @@ GuiText::GuiText(const char * t, int s, const glm::vec4 & c)
 	blurGlowIntensity = 0.0f;
 	blurAlpha = 0.0f;
 	blurGlowColor = glm::vec4(0.0f);
+	internalRenderingScale = presetInternalRenderingScale;
 
 	if(t)
 	{
@@ -105,6 +108,7 @@ GuiText::GuiText(const wchar_t * t, int s, const glm::vec4 & c)
 	blurGlowIntensity = 0.0f;
 	blurAlpha = 0.0f;
 	blurGlowColor = glm::vec4(0.0f);
+	internalRenderingScale = presetInternalRenderingScale;
 
 	if(t)
 	{
@@ -141,6 +145,7 @@ GuiText::GuiText(const char * t)
 	blurGlowIntensity = 0.0f;
 	blurAlpha = 0.0f;
 	blurGlowColor = glm::vec4(0.0f);
+	internalRenderingScale = presetInternalRenderingScale;
 
 	if(t)
 	{
@@ -530,15 +535,22 @@ void GuiText::draw(CVideo *pVideo)
 
     color[3] = getAlpha();
     blurGlowColor[3] = blurAlpha * getAlpha();
-	int newSize = size * getScale();
+
+    float finalRenderingScale = 2.0f * internalRenderingScale;
+
+	int newSize = size * getScale() * finalRenderingScale;
+	int normal_size = size * getScale();
 
 	if(newSize != currentSize)
 	{
-		currentSize = newSize;
+		currentSize = normal_size;
 
 		if(text)
-			textWidth = font->getWidth(text, currentSize);
+			textWidth = font->getWidth(text, normal_size);
 	}
+
+	f32 x_pos = getCenterX() * finalRenderingScale;
+	f32 y_pos = getCenterY() * finalRenderingScale;
 
 	if(maxWidth > 0 && maxWidth <= textWidth)
 	{
@@ -552,11 +564,12 @@ void GuiText::draw(CVideo *pVideo)
                 textDynWidth.resize(textDyn.size());
 
                 for(u32 i = 0; i < textDynWidth.size(); i++)
-                    textDynWidth[i] = font->getWidth(textDyn[i], currentSize);
+                    textDynWidth[i] = font->getWidth(textDyn[i], newSize);
             }
 
+
 			if(textDyn.size() > 0)
-				font->drawText(pVideo, getCenterX(), getCenterY(), getDepth(), textDyn[textDyn.size()-1], currentSize, color, alignment, textDynWidth[textDyn.size()-1], defaultBlur, blurGlowIntensity, blurGlowColor);
+				font->drawText(pVideo, x_pos, y_pos, getDepth(), textDyn[textDyn.size()-1], newSize, color, alignment, textDynWidth[textDyn.size()-1], defaultBlur, blurGlowIntensity, blurGlowColor,finalRenderingScale);
 		}
 
 		else if(wrapMode == SCROLL_HORIZONTAL)
@@ -564,11 +577,12 @@ void GuiText::draw(CVideo *pVideo)
 			scrollText(pVideo->getFrameCount());
 
 			if(textDyn.size() > 0)
-				font->drawText(pVideo, getCenterX(), getCenterY(), getDepth(), textDyn[textDyn.size()-1], currentSize, color, alignment, maxWidth, defaultBlur, blurGlowIntensity, blurGlowColor);
+				font->drawText(pVideo, x_pos, y_pos, getDepth(), textDyn[textDyn.size()-1], newSize, color, alignment, maxWidth*finalRenderingScale, defaultBlur, blurGlowIntensity, blurGlowColor,finalRenderingScale);
+
 		}
 		else if(wrapMode == WRAP)
 		{
-			int lineheight = currentSize + 6;
+			int lineheight = newSize + 6;
 			int yoffset = 0;
 			int voffset = 0;
 
@@ -580,7 +594,7 @@ void GuiText::draw(CVideo *pVideo)
                 textDynWidth.resize(textDyn.size());
 
                 for(u32 i = 0; i < textDynWidth.size(); i++)
-                    textDynWidth[i] = font->getWidth(textDyn[i], currentSize);
+                    textDynWidth[i] = font->getWidth(textDyn[i], newSize);
             }
 
 			if(alignment & ALIGN_MIDDLE)
@@ -588,13 +602,14 @@ void GuiText::draw(CVideo *pVideo)
 
 			for(u32 i = 0; i < textDyn.size(); i++)
 			{
-				font->drawText(pVideo, getCenterX(), getCenterY() + voffset + yoffset, getDepth(), textDyn[i], currentSize, color, alignment, textDynWidth[i], defaultBlur, blurGlowIntensity, blurGlowColor);
+				font->drawText(pVideo, x_pos, y_pos + voffset + yoffset, getDepth(), textDyn[i], newSize, color, alignment, textDynWidth[i], defaultBlur, blurGlowIntensity, blurGlowColor,finalRenderingScale);
                 yoffset -= lineheight;
 			}
 		}
 	}
 	else
 	{
-		font->drawText(pVideo, getCenterX(), getCenterY(), getDepth(), text, currentSize, color, alignment, textWidth, defaultBlur, blurGlowIntensity, blurGlowColor);
+	    uint16_t newtextWidth = font->getWidth(text, newSize);
+		font->drawText(pVideo, x_pos, y_pos, getDepth(), text, newSize, color, alignment, newtextWidth, defaultBlur, blurGlowIntensity, blurGlowColor,finalRenderingScale);
 	}
 }

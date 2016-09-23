@@ -23,6 +23,7 @@
 #include "FreeTypeGX.h"
 #include "video/CVideo.h"
 #include "video/shaders/Texture2DShader.h"
+#include "utils/logger.h"
 
 using namespace std;
 
@@ -369,7 +370,7 @@ int16_t FreeTypeGX::getStyleOffsetHeight(int16_t format, uint16_t pixelSize)
  * @return The number of characters printed.
  */
 
-uint16_t FreeTypeGX::drawText(CVideo *video, int16_t x, int16_t y, int16_t z, const wchar_t *text, int16_t pixelSize, const glm::vec4 & color, uint16_t textStyle, uint16_t textWidth, const float &textBlur, const float &colorBlurIntensity, const glm::vec4 & blurColor)
+uint16_t FreeTypeGX::drawText(CVideo *video, int16_t x, int16_t y, int16_t z, const wchar_t *text, int16_t pixelSize, const glm::vec4 & color, uint16_t textStyle, uint16_t textWidth, const float &textBlur, const float & colorBlurIntensity, const glm::vec4 & blurColor, const float & internalRenderingScale)
 {
 	if (!text)
         return 0;
@@ -389,7 +390,6 @@ uint16_t FreeTypeGX::drawText(CVideo *video, int16_t x, int16_t y, int16_t z, co
 	}
 
 	int i = 0;
-
 	while (text[i])
 	{
 		ftgxCharData* glyphData = cacheGlyphData(text[i], pixelSize);
@@ -400,9 +400,9 @@ uint16_t FreeTypeGX::drawText(CVideo *video, int16_t x, int16_t y, int16_t z, co
 			{
 				FT_Get_Kerning(ftFace, fontData[pixelSize].ftgxCharMap[text[i - 1]].glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
 				x_pos += (pairDelta.x >> 6);
-			}
 
-			copyTextureToFramebuffer(video, glyphData->texture, x_pos + glyphData->renderOffsetX + x_offset, y + glyphData->renderOffsetY - y_offset, z, color, textBlur, colorBlurIntensity, blurColor);
+			}
+			copyTextureToFramebuffer(video, glyphData->texture,x_pos + glyphData->renderOffsetX + x_offset, y + glyphData->renderOffsetY - y_offset, z, color, textBlur, colorBlurIntensity, blurColor,internalRenderingScale);
 
 			x_pos += glyphData->glyphAdvanceX;
 			++printed;
@@ -547,13 +547,13 @@ void FreeTypeGX::getOffset(const wchar_t *text, int16_t pixelSize, uint16_t widt
  * @param screenY   The screen Y coordinate at which to output the rendered texture.
  * @param color Color to apply to the texture.
  */
-void FreeTypeGX::copyTextureToFramebuffer(CVideo *pVideo, GX2Texture *texture, int16_t x, int16_t y, int16_t z, const glm::vec4 & color, const float & defaultBlur, const float & blurIntensity, const glm::vec4 & blurColor)
+void FreeTypeGX::copyTextureToFramebuffer(CVideo *pVideo, GX2Texture *texture, int16_t x, int16_t y, int16_t z, const glm::vec4 & color, const float & defaultBlur, const float & blurIntensity, const glm::vec4 & blurColor, const float & internalRenderingScale)
 {
     static const f32 imageAngle = 0.0f;
-    static const f32 blurScale = 2.0f;
+    static const f32 blurScale = (2.0f/ (internalRenderingScale));
 
-    f32 offsetLeft = 2.0f * ((f32)x + 0.5f * (f32)texture->surface.width) * (f32)pVideo->getWidthScaleFactor();
-    f32 offsetTop = 2.0f * ((f32)y - 0.5f * (f32)texture->surface.height) * (f32)pVideo->getHeightScaleFactor();
+    f32 offsetLeft = blurScale * ((f32)x + 0.5f * (f32)texture->surface.width) * (f32)pVideo->getWidthScaleFactor();
+    f32 offsetTop = blurScale * ((f32)y -  0.5f * (f32)texture->surface.height) * (f32)pVideo->getHeightScaleFactor();
 
     f32 widthScale = blurScale * (f32)texture->surface.width * pVideo->getWidthScaleFactor();
     f32 heightScale = blurScale * (f32)texture->surface.height * pVideo->getHeightScaleFactor();
