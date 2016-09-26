@@ -325,13 +325,14 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     // download meta.xml to sd card, and update the progres bar description
     progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
     FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
-log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
+log_printf("asyncDownloadTargetedFiles: downloaded meta.xml");
     
     // download the app image icon for this app. (If the icon download is interrupted,
     // HBL may crash when it tries to read it
+    log_printf("Gonna get %s and put it in %s", (mRepoUrl+pathTarget+iconPath).c_str(), (sdPathTarget+iconPath).c_str());
     progress->setTitle("Downloading " + sdPathTarget+iconPath+"...");
     FileDownloader::getFile(mRepoUrl+pathTarget+iconPath, sdPathTarget+iconPath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: downloaded %s", "meta.xml");
+    log_printf("asyncDownloadTargetedFiles: downloaded the icon");
     
     // remove the progress bar
     homebrewWindowTarget->removeE(progress);
@@ -367,6 +368,13 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
         
     // create a new directory on sd
     CreateSubfolder(sdPath.c_str());
+    
+    // if it's an rpx file, there are two more directories to make: meta and code
+    if (selectedButton->typee == RPX)
+    {
+        CreateSubfolder((sdPath+"/code").c_str());
+        CreateSubfolder((sdPath+"/meta").c_str());
+    }
     
     // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 

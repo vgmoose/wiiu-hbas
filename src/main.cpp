@@ -27,7 +27,7 @@ extern "C" int Menu_Main(void)
     InitOSFunctionPointers();
     InitSocketFunctionPointers();
 
-    log_init("192.168.1.103");
+    log_init("192.168.1.104");
     log_print("Starting launcher\n");
 
     InitFSFunctionPointers();
