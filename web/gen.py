@@ -8,6 +8,9 @@ import xml.etree.ElementTree as ET
 import json
 import zipfile
 import cgi
+import datetime
+
+exedate = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 form = cgi.FieldStorage()
 
@@ -140,8 +143,10 @@ You are currently viewing the web front-end to the Homebrew App Store.
 </footer>
 """
 
-html = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
-html2 = style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
+lastupdate = "<div style='color: white;'>Updated on : %s</div>" % (exedate)
+
+html = lastupdate + style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
+html2 = lastupdate + style + "<table id='wiiubru' class='sortable'><thead><tr><th class='sorttable_nosort'>ICON</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> TITLE</th><th class='sorttable_nosort'>VERSION</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> AUTHOR</th><th style = 'cursor:pointer;' title = 'Click to sort.'><i class='fa fa-sort' aria-hidden='true'></i> DESCRIPTION</th><th class='sorttable_nosort'>DOWNLOAD</th><th class='sorttable_nosort'>SOURCE</th></tr></thead><tbody>\n"
 
 yaml = ""
 yaml2 = ""
