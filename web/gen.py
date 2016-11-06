@@ -157,6 +157,7 @@ except:
     pass
 
 d = {}
+d["apps"] = []
 
 dozipping = False
 
@@ -166,7 +167,7 @@ if "dozips" in form:
 else:
     print "Not generating new zip files, to do that go <a href='gen.py?dozips=1'>here</a> (takes a while)<br><br>"
 
-appsandgames = os.listdir("apps") + os.listdir("games")
+appsandgames = os.listdir("apps") # + os.listdir("games")
 gamepoint = len(os.listdir("apps"))
 
 count = 0
@@ -209,7 +210,7 @@ for app in appsandgames:
     if os.path.isfile(xmlfile):
         tree = ET.parse(xmlfile)
 
-        name = coder = version = long_desc = desc = source = permissions = "????"
+        name = coder = version = long_desc = desc = source = permissions = category = permissions = "????"
         try:
             name = tree.find("name").text
         except:
@@ -241,6 +242,16 @@ for app in appsandgames:
             version = tree.find("version").text
         except:
             pass
+        
+        try:
+            category = tree.find("category").text
+        except:
+            pass
+        
+        try:
+            permissiones = tree.find("permissions").text
+        except:
+            pass
 
     if typee == "hbl":
         icon = targdir + "/%s/icon.png" % app
@@ -256,8 +267,7 @@ for app in appsandgames:
     if source != "????":
         src_link = "<a href='%s' target='_blank'>Source</a>" % source
 
-    d[app] = {"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc,
-              "type": typee}
+    d["apps"].append({"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category})
 
     if typee == "hbl":
         yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
