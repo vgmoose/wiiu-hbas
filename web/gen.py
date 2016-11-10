@@ -97,7 +97,6 @@ search = """
 var $rows = $('#wiiubru tbody tr');
 $('#search').keyup(function() {
     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-
     $rows.show().filter(function() {
         var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
         return !~text.indexOf(val);
@@ -233,6 +232,9 @@ for app in appsandgames:
             pass
         try:
             long_desc = tree.find("long_description").text
+            json_long = long_desc
+            json_long = json_long.replace("\n", "\\n")
+            json_long = json_long.replace("\t", "\\t")
             long_desc = long_desc.replace("\n", "<br>")
             long_desc = long_desc.replace("'", "!")
         except:
@@ -267,7 +269,7 @@ for app in appsandgames:
     if source != "????":
         src_link = "<a href='%s' target='_blank'>Source</a>" % source
 
-    d["apps"].append({"name": name, "author": coder, "desc": desc, "url": src_link, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category})
+    d["apps"].append({"directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": json_long, "type": typee, "cat": category})
 
     if typee == "hbl":
         yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
