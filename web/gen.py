@@ -9,6 +9,8 @@ import json
 import zipfile
 import cgi
 import datetime
+import os.path
+import time
 
 exedate = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -46,6 +48,7 @@ style = """<!DOCTYPE html>
                  maxWidth: 700,
                  contentAsHTML: 'true'
             });
+if (location.hash != "") { $("#search").val(location.hash.replace(/#/, "")); $("#search").keyup(); }
         });
     </script>
 </head>
@@ -99,6 +102,7 @@ $('#search').keyup(function() {
     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
     $rows.show().filter(function() {
         var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        location.hash = val;
         return !~text.indexOf(val);
     }).hide();
 });
@@ -141,6 +145,16 @@ You are currently viewing the web front-end to the Homebrew App Store.
 </span>
 </footer>
 """
+
+otherAd = """<div align="center"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Wiiubru2 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-8148658375496745"
+     data-ad-slot="1135708500"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>"""
 
 lastupdate = "<div style='color: white;'>Updated on : %s</div>" % (exedate)
 
@@ -192,12 +206,14 @@ for app in appsandgames:
     long_desc = "???"
     version = '???'
     source = '????'
+    updated = '???'
 
     binary = None
 
     for file in os.listdir(targdir + "/%s" % app):
         if file.endswith(".elf"):
             binary = file
+            updated = time.ctime(os.path.getmtime(targdir + "/%s" % app))
         if file == "code":
             for file2 in os.listdir(targdir + "/%s/code" % app):
                 if file2.endswith(".rpx"):
@@ -269,7 +285,7 @@ for app in appsandgames:
     if source != "????":
         src_link = "<a href='%s' target='_blank'>Source</a>" % source
 
-    d["apps"].append({"directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": json_long, "type": typee, "cat": category})
+    d["apps"].append({"updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": json_long, "type": typee, "cat": category})
 
     if typee == "hbl":
         yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
@@ -290,6 +306,7 @@ html += "</tbody></table><br><br>"
 html2 += "</tbody></table><br><br>"
 html += search
 html2 += search
+html += otherAd
 html += footer
 html2 += footer
 html += "</body></html>"
