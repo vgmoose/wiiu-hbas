@@ -1,0 +1,104 @@
+{
+    "ignore": [
+        "TCPGecko"
+    ],
+    
+    "order": {
+        "type": "custom",
+        "reverse": false,
+        "custom_order": [
+            "homebrew_launcher",
+            "appstore"
+        ]
+    },
+    
+    "yamlfields": [
+        "name",
+        "author",
+        "desc",
+        "binary",
+        "version"
+    ],
+    
+    "jsonfields": [
+        "name",
+        "author",
+        "desc",
+        "url",
+        "binary",
+        "long_desc",
+        "icons"
+    ],
+    
+    "default_values": {
+        "force": true,
+        "apps": {
+            "homebrew_launcher": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/dimok789/homebrew_launcher",
+                        "(releases)": "https://github.com/dimok789/homebrew_launcher/releases/"
+                    }
+                }
+            },
+            "SDCafiine": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/Maschell/SDCafiine"
+                    }
+                }
+            },
+            "geckiine": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/OatmealDome/Geckiine",
+                        "GBAtemp": "https://gbatemp.net/threads/release-geckiine-tcpgecko-and-cafiine-combined.433057/"
+                    }
+                }
+            },
+            "nnupatcher": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/dibas/nnupatcher-hbl",
+                        "(releases)": "https://github.com/dibas/nnupatcher-hbl/releases/",
+                        "Original": "https://github.com/FIX94/nnu-patcher"
+                    }
+                }
+            },
+            "wupinstaller": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/dimok789/wupinstaller",
+                        "(releases)": "https://github.com/dimok789/wupinstaller/releases/",
+                        "Original": "http://www.wupinstaller.com/"
+                    }
+                }
+            },
+            "hidtovpad": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/Maschell/hid_to_vpad",
+                        "(releases)": "https://github.com/Maschell/hid_to_vpad/releases/"
+                    }
+                }
+            },
+            "ddd": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/dimok789/ddd",
+                        "(releases)": "https://github.com/dimok789/ddd/releases/"
+                    }
+                }
+            },
+            "saviine": {
+                "url": {
+                    "named": {
+                        "Github": "https://github.com/Maschell/saviine",
+                        "(releases)": "https://github.com/Maschell/saviine/releases/",
+                        "GBAtemp": "https://gbatemp.net/threads/release-saviine-wiiu-savedata-tool.399833/"
+                    }
+                }
+            }
+        }
+    }
+}

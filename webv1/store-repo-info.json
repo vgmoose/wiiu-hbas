@@ -1,0 +1,16 @@
+{
+    "appsdir": "apps",
+    "xtradir": "apps_extra",
+    "zipsdir": "zips",
+    
+    "ext_sd_root": "hbl",
+    "ext_icons": "icons",
+    "ext_hosting": "www",
+    "ext_pc_tools": "pc_tools",
+    
+    "appstoreconf": "store-repo-conf.json",
+    
+    "appstorepage": "appstore_beta.html",
+    "appstoreyaml": "directory_beta.yaml",
+    "appstorejson": "directory_beta.json"
+}
