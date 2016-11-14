@@ -31,22 +31,11 @@
 
 #define MAX_BUTTONS_ON_PAGE     4
 //char * repoUrl = "http://wiiubru.com/appstore";
-//char * repoUrl = "192.168.1.103:8000";
-char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
+char * repoUrl = "192.168.1.104:8000";
+//char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
 
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
-
-
-std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-    }
-    log_printf("Here's the formatted string: %s", str.c_str());
-    return str;
-}
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
@@ -96,13 +85,13 @@ int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string versi
         // if shortname matches
         if (!name.compare(homebrewButtons[x].shortname))
         {
+            log_printf("DETECTED A LOCAL APP HERE");
             homebrewButtons[x].status = INSTALLED;
             if (version.compare(homebrewButtons[x].version))
             {
                 // if version doesn't match
                 homebrewButtons[x].status = UPDATE;
             }
-//            removeE(homebrewButtons[x].button);
 
             return x;
         }
@@ -192,11 +181,7 @@ void HomebrewWindow::loadLocalApps(int mode)
     
     log_printf("loadLocalApps: begin2");
     // get a list of directories
-    DirList* dirList;
-    if (mode != RPX)
-        dirList = new DirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
-    else
-        dirList = new DirList("sd:/wiiu/games", NULL, DirList::Dirs);
+    DirList* dirList = new DirList("sd:/wiiu/apps", ".elf", DirList::Files | DirList::CheckSubfolders);
     
     log_printf("loadLocalApps: directory is loaded, it has %d files", dirList->GetFilecount());
     
@@ -213,9 +198,6 @@ void HomebrewWindow::loadLocalApps(int mode)
             continue;
 
         std::string homebrewPath = dirList->GetFilepath(i);
-        
-        if (mode == RPX) // since PRX works off folders, append a / here
-            homebrewPath += "/";
         
         log_printf("Initial value: %s", homebrewPath.c_str());
         size_t slashPos = homebrewPath.rfind('/');
@@ -237,6 +219,8 @@ void HomebrewWindow::loadLocalApps(int mode)
         // file path
         homebrewButtons[idx].execPath = dirList->GetFilepath(i);
         homebrewButtons[idx].iconImgData = NULL;
+        
+        homebrewButtons[idx].typee = HBL;
 
         u8 * iconData = NULL;
         u32 iconDataSize = 0;
@@ -244,18 +228,14 @@ void HomebrewWindow::loadLocalApps(int mode)
         homebrewButtons[idx].dirPath = homebrewPath;
         
         // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
-        homebrewButtons[idx].shortname = ReplaceAll(homebrewPath.substr(14 + (mode-1)), " ", "%20"); // mode is 2 for RPX so this will +1 to get to "games" in teh case of rpx, hacky oops
+        homebrewButtons[idx].shortname =homebrewPath.substr(14);
         
         // since we got this app from the sd card, mark it local for now.
         // if we see it later on the server, update its status appropriately to 
         // update or installed
         homebrewButtons[idx].status = LOCAL;
         
-        homebrewButtons[idx].typee = mode;
-
         std::string iconPath = "/icon.png";
-        if (mode == RPX)
-            iconPath = "/meta/iconTex.tga";
         log_printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
         LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
 
@@ -269,15 +249,8 @@ void HomebrewWindow::loadLocalApps(int mode)
       
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx].execPath.c_str();
 //        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
-
-        if (mode == HBL)
-        {
-            if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
-                cpName += strlen("sd:/wiiu/apps/");
-        }
-        else
-            if(strncmp(cpName, "sd:/wiiu/games/", strlen("sd:/wiiu/games/")) == 0)
-                cpName += strlen("sd:/wiiu/games/");
+        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
+            cpName += strlen("sd:/wiiu/apps/");
         
         homebrewButtons[idx].nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
         homebrewButtons[idx].versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, glm::vec4(0, 0, 0, 1));
@@ -324,7 +297,6 @@ void HomebrewWindow::refreshHomebrewApps()
     curTabButtons.clear();
     
     loadLocalApps(HBL);
-    loadLocalApps(RPX);
             		
     // download app list from the repo
     std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
@@ -349,7 +321,7 @@ void HomebrewWindow::refreshHomebrewApps()
         
         std::string shortname;
 
-        // very poor xml parsing, to be replaced with json in the future
+        // very poor yaml parsing, to be replaced with json in the future
         if (!std::getline(f, shortname)) break;
         shortname = shortname.substr(5);
         std::string name;    
@@ -370,6 +342,24 @@ void HomebrewWindow::refreshHomebrewApps()
         std::string typee;
         std::getline(f, typee);
         typee = typee.substr(2);
+                
+        // update status if already a local app
+        int addedIndex = checkIfUpdateOrInstalled(shortname, version, totalLocalApps);
+        
+        if (addedIndex >= 0)
+        {
+            // the logic in here checks if the current app already exists, and if so,
+            // updates the existing localApp entry rather than continuing to make a new one
+            homebrewButtons[addedIndex].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
+            homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
+            positionHomebrewButton( &homebrewButtons[addedIndex], addedIndex);
+            homebrewButtons[addedIndex].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
+            homebrewButtons[addedIndex].binary = binary;
+            homebrewButtons[addedIndex].version = version;
+//            append(homebrewButtons[addedIndex].button);
+            iterCount ++;
+            continue;
+        }
         
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
@@ -387,39 +377,19 @@ void HomebrewWindow::refreshHomebrewApps()
 
         // since we got this app from the net, mark it as a GET
         homebrewButtons[idx].status = GET;
-        homebrewButtons[idx].shortname = ReplaceAll(shortname, " ", "%20");
+        homebrewButtons[idx].shortname = shortname;
         homebrewButtons[idx].binary = binary;
         homebrewButtons[idx].version = version;
         
         // default to HBL type, set to RPX type if typee string matches
         homebrewButtons[idx].typee = HBL;
-        if (typee.compare("rpx") == 0)
-            homebrewButtons[idx].typee = RPX;
-        
-        // update status if already a local app
-        int addedIndex = checkIfUpdateOrInstalled(homebrewButtons[idx].shortname, homebrewButtons[idx].version, totalLocalApps);
         
         if (remoteAppButtons.size() <= iterCount)
         {
             // add this to the remote button array
             remoteAppButtons.push_back(homebrewButtons[idx]);
         }
-        
-        if (addedIndex >= 0)
-        {
-            // the logic in here checks if the current app already exists, and if so,
-            // updates the existing localApp entry rather than continuing to make a new one
-            homebrewButtons.pop_back();
-            homebrewButtons[addedIndex].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-            homebrewButtons[addedIndex].image = new GuiImage(appButtonImages[homebrewButtons[addedIndex].status]);
-//            append(homebrewButtons[addedIndex].button);
-            positionHomebrewButton(&homebrewButtons[addedIndex], addedIndex);
-            homebrewButtons[addedIndex].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
-            homebrewButtons[addedIndex].binary = binary;
-            homebrewButtons[addedIndex].version = version;
-            iterCount ++;
-            continue;
-        }
+
 
         // download app icon
         std::string targetIcon;
@@ -520,7 +490,7 @@ void HomebrewWindow::populateIconCache()
         // download app icon
         std::string targetIcon;
         // find the path on the server depending on our current tab
-        std::string tabPath = (remoteAppButtons[x].typee == RPX)? "games/" + remoteAppButtons[x].shortname + "/meta/iconTex.tga" : "apps/" + remoteAppButtons[x].shortname + "/icon.png";
+        std::string tabPath = "apps/" + remoteAppButtons[x].shortname + "/icon.png";
         
         std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
         bool imageDownloadSuccessful = false;

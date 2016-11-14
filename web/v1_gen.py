@@ -295,7 +295,7 @@ for app in appsandgames:
         html2 += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (
         long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
 
-    yaml2 += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version, typee)
+    yaml2 += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version, category)
 
     if dozipping:
         zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
@@ -326,9 +326,9 @@ directory = open("directory.yaml", "w+")
 directory.write(yaml)
 directory.close()
 
-#directory = open("directory12.yaml", "w+")
-#directory.write(yaml2)
-#directory.close()
+directory = open("directory12.yaml", "w+")
+directory.write(yaml2)
+directory.close()
 
 #print"<html><br> Update Complete !!!<br><br></html>"
 #print "<a href='hbl.html'>See the Results.</a>"
