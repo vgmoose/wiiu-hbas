@@ -78,7 +78,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     HomebrewXML metaXml;
     bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
         
-    std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";  
+    std::string tabPath = "apps";  
                         
     // if GET or UDPATE, fetch xml from server
     if (selectedButton->status == GET || selectedButton->status == UPDATE)
@@ -256,8 +256,7 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     std::string removePath = selectedButton->dirPath;
     
     // if the remove path is the whole directory, stop!
-    if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")) ||
-       !removePath.compare(std::string("sd:/wiiu/games")) || !removePath.compare(std::string("sd:/wiiu/games/")))
+    if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
         return;
     else
     {
@@ -308,13 +307,6 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     std::string iconPath = "/icon.png";
     std::string codePath = "/" + binaryTarget;
     
-    if (homebrewWindowTarget->listingMode == RPX) // also kinda hacky, the current window doesn't have much to do with the current tab (listingMode)
-    {
-        // this is only needed for the icon and rpx download for rpx apps
-        iconPath = "/meta/iconTex.tga";
-        codePath = "/code" + codePath;
-    }
-    
     log_printf("asyncDownloadTargetedFiles: variables: repoUrl: %s, sdPath: %s, binary: %s, path: %s, icon: %s, code: %s", mRepoUrl.c_str(), sdPathTarget.c_str(), binaryTarget.c_str(), pathTarget.c_str(), iconPath.c_str(), codePath.c_str());
     
     // download the elf to sd card, and update the progres bar description
@@ -360,7 +352,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
     
     // find the path on the server depending on our current tab
-    std::string tabPath = (selectedButton->typee == RPX)? "games" : "apps";
+    std::string tabPath = "apps";
 
     // setup the paths based on the selected button
     std::string path = "/"+tabPath+"/"+selectedButton->shortname;
@@ -368,14 +360,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
         
     // create a new directory on sd
     CreateSubfolder(sdPath.c_str());
-    
-    // if it's an rpx file, there are two more directories to make: meta and code
-    if (selectedButton->typee == RPX)
-    {
-        CreateSubfolder((sdPath+"/code").c_str());
-        CreateSubfolder((sdPath+"/meta").c_str());
-    }
-    
+
     // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();

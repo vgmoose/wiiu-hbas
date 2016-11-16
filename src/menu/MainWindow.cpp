@@ -73,7 +73,7 @@ MainWindow::MainWindow(int w, int h)
 void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
 {
     log_printf("NEW THREAD START: Icon async refresh");
-//    homebrewWindow->populateIconCache();
+    homebrewWindow->populateIconCache();
     log_printf("EXISTING THREAD END: Icon async refresh");
 }
 

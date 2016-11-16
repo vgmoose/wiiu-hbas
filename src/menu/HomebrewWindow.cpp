@@ -30,8 +30,8 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
-//char * repoUrl = "http://wiiubru.com/appstore";
-char * repoUrl = "192.168.1.104:8000";
+char * repoUrl = "http://wiiubru.com/appstore";
+//char * repoUrl = "192.168.1.104:8000";
 //char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
 
 ProgressWindow* progressWindow;
@@ -536,7 +536,6 @@ bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 void HomebrewWindow::populateIconCache()
 {
     log_printf("populateIconCache: start");
-    cachedIcons.clear();
     
     for (u32 x=0; x<remoteAppButtons.size(); x++)
     {
@@ -552,12 +551,15 @@ void HomebrewWindow::populateIconCache()
         log_printf("populateIconCache: Downloading image for button %d", x);
         imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, targetIcon);
         
-        if (!imageDownloadSuccessful)
-            targetIcon = "missing.png";
+        GuiImageData* iconImgData;
         
-        cachedIcons.push_back(targetIcon);
-        
-        findHomebrewIconAndSetImage(remoteAppButtons[x]->shortname, targetIcon);
+//        if (imageDownloadSuccessful)
+//            iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
+//        else
+//            iconImgData = Resources::GetImageData("missing.png");            
+//               
+//        if (remoteAppButtons[x]->iconImg)
+//            remoteAppButtons[x]->iconImg->setImageData(iconImgData);
         
         log_printf("populateIconCache: stop");
     }
