@@ -50,10 +50,10 @@ unsigned char exception_handler(void* contextIn) {
 		if (context[38] <= (int)CORES_MAX_ADDRESS) {
 			__os_snprintf(crashMessage, 128, "The emulation core has crashed. HBAS %s", APP_VERSION);
 		} else {
-			__os_snprintf(crashMessage, 128, "Code branched to an unexpected location. URetro %s", APP_VERSION);
+			__os_snprintf(crashMessage, 128, "Code branched to an unexpected location. HBAS %s", APP_VERSION);
 		}
 	} else {
-		__os_snprintf(crashMessage, 128, "Unfortunately, HBAS has crashed. URetro %s", APP_VERSION);
+		__os_snprintf(crashMessage, 128, "Unfortunately, HBAS has crashed. %s", APP_VERSION);
 	}
 	
 	char buf[2048];

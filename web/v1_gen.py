@@ -211,7 +211,7 @@ for app in appsandgames:
     binary = None
 
     for file in os.listdir(targdir + "/%s" % app):
-        if file.endswith(".elf"):
+        if file.endswith(".elf") or file.endswith(".rpx"):
             binary = file
             updated = time.ctime(os.path.getmtime(targdir + "/%s" % app))
         if file == "code":

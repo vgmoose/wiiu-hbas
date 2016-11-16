@@ -67,13 +67,17 @@ for app in apps:
 	# find a binary in this app folder
 	binary = None
 	for file in os.listdir(targdir + "/%s" % app):
-		if file.endswith(".elf"):
+		if file.endswith(".elf") or file.endswith(".rpx"):
 			binary = file
 			updated = time.ctime(os.path.getmtime(targdir + "/%s" % app))
 
 	# if there's no binary found, continue
 	if not binary:
 		continue
+
+	# make sure rpxes are categorized as such
+	if binary.endswith(".rpx"):
+		typee = "rpx"
 
 	# get fields out of xml
 	if os.path.isfile(xmlfile):

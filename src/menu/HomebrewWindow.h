@@ -63,13 +63,13 @@ public:
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     // all homebrew buttons
-    std::vector<homebrewButton> homebrewButtons;
+    std::vector<homebrewButton*> homebrewButtons;
     
-    std::vector<homebrewButton> localAppButtons;    // will be refreshed a lot
-    std::vector<homebrewButton> remoteAppButtons;   // will refreshed once
+    std::vector<homebrewButton*> localAppButtons;    // will be refreshed a lot
+    std::vector<homebrewButton*> remoteAppButtons;   // will refreshed once
     
     // separate vectors for the current tab (some combo off local and remote)
-    std::vector<homebrewButton> curTabButtons;
+    std::vector<homebrewButton*> curTabButtons;
 
     bool screenLocked;
     std::string fileContents;
@@ -84,6 +84,7 @@ public:
     void populateIconCache();
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
+    void addAll(std::vector<homebrewButton*>, int);
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
     void filter();
