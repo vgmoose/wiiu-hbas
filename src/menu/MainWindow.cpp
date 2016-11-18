@@ -162,6 +162,19 @@ void MainWindow::update(GuiController *controller)
         pointerValid[wpadIdx] = true;
     }
 	
+	// minus button toggles joysticks
+	if (controller->data.buttons_r & VPAD_BUTTON_MINUS)
+		joysticksDisabled = !joysticksDisabled;
+	
+	// get a random app
+	if (controller->data.buttons_r & VPAD_BUTTON_PLUS)
+	{
+		srand(OSGetTime());
+		int r = rand() % homebrewWindow->curTabButtons.size();
+		homebrewWindow->OnHomebrewButtonClick(homebrewWindow->curTabButtons[r]->button, controller, 0);
+	}
+    
+	
 	// L button forces a cache refresh
 	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_L)
 		homebrewWindow->invalidateCache = disableSplashScreenNextUpdate = true;
@@ -198,6 +211,9 @@ void MainWindow::update(GuiController *controller)
 
 	// get the differences
 	float ydif = -20*left.y + -20*right.y;
+	
+	if (joysticksDisabled)
+		ydif = 0;
         
 	// Handle D-pad movements as well
 	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;

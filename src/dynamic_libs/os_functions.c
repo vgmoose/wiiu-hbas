@@ -44,6 +44,7 @@ EXPORT_DECL(int, OSSetThreadPriority, void * thread, int priority);
 EXPORT_DECL(int, OSJoinThread, void * thread, int * ret_val);
 EXPORT_DECL(void, OSDetachThread, void * thread);
 EXPORT_DECL(void, OSSleepTicks, u64 ticks);
+EXPORT_DECL(int64_t, OSGetTime);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Mutex functions
@@ -121,6 +122,7 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, OSSetThreadPriority);
     OS_FIND_EXPORT(coreinit_handle, OSDetachThread);
     OS_FIND_EXPORT(coreinit_handle, OSSleepTicks);
+	OS_FIND_EXPORT(coreinit_handle, OSGetTime);
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! Mutex functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------

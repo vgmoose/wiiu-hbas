@@ -85,6 +85,7 @@ extern int (* OSJoinThread)(void * thread, int * ret_val);
 extern int (* OSSetThreadPriority)(void * thread, int priority);
 extern void (* OSDetachThread)(void * thread);
 extern void (* OSSleepTicks)(u64 ticks);
+extern int64_t (*OSGetTime)();
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Mutex functions

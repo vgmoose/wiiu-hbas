@@ -47,6 +47,7 @@ typedef struct
         std::string dirPath;
         std::string binary;
         std::string version;
+		std::string category;
         int typee;
     } homebrewButton;
 
@@ -78,7 +79,7 @@ public:
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
-	int listingMode; // 1 is hbl, 2 is rpx
+	int listingMode = 0; // 1 is hbl, 2 is rpx
     bool gotDirectorySuccess;
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
@@ -106,11 +107,12 @@ public:
 //    GuiTrigger *triggerTarget;
     GuiFrame * launchWindowTarget;
     std::string bufString;
+	    void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+
     
 private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
-    void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 	
 	void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 	void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);

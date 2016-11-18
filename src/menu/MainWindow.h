@@ -33,6 +33,7 @@ extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
 extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
 extern void globalRefreshHomebrewApps();
 
+
 class MainWindow : public sigslot::has_slots<>
 {
 public:
@@ -46,6 +47,8 @@ public:
     bool disableSplashScreenNextUpdate;
     GuiImageData * backgroundImg2Data;
     GuiImage backgroundImg2;
+	bool joysticksDisabled = false;
+
         
     GuiImageData * splashScreenImgData;
     GuiImage splashScreen;
