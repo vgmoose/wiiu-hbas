@@ -164,6 +164,8 @@ html2 = lastupdate + style + "<table id='wiiubru' class='sortable'><thead><tr><t
 yaml = ""
 yaml2 = ""
 
+whitelist = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "loadiine_gx2", "pacman", "mgba", "CHIP8", "saviine", "ftpiiu", "cfwbooter", "appstore", "geckiine", "u-paint", "Snes9x2010", "TCPgecko", "AocPatcher", "otp2sd", "hidtovpad", "SDcafiine", "wupymod", "ddd", "ourloader"]
+
 try:
     os.mkdir("zips")
 except:
@@ -288,7 +290,8 @@ for app in appsandgames:
     d["apps"].append({"updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": json_long, "type": typee, "cat": category})
 
     if typee == "hbl":
-        yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
+        if app in whitelist:
+            yaml += "app: %s\n- %s\n- %s\n- %s\n- %s\n- %s\n" % (app, name, coder, desc, binary, version)
         html += "<tr><td class='tooltip' title='%s'><img src='%s' class='image' alt='%s'></td><td style='text-transform: uppercase;'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (
         long_desc, icon, desc, name, version, coder, desc, dlhref, src_link)
     else:
@@ -321,6 +324,8 @@ jsonstring = json.dumps(d, indent=4, separators=(',', ': '))
 #index = open("rpx.html", "w+")
 #index.write(html2)
 #index.close()
+
+yaml = "app: .NOTICE\n- NOTICE\n- WiiuBru Team\n- A message about HBASs\n- NOTICE.elf\n- -1\n" + yaml
 
 directory = open("directory.yaml", "w+")
 directory.write(yaml)

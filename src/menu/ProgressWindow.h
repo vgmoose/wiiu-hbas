@@ -28,6 +28,7 @@ public:
     void setProgress(f32 percent);
     void setTitle(const std::string & title);
 private:
+    void draw(CVideo * v);
 
     GuiText titleText;
     GuiImageData *bgImageData;
@@ -37,6 +38,10 @@ private:
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
+
+    bool titleChanged;
+    std::string currentTitle;
+    CMutex titleMutex;
 };
 
 #endif //_PROGRESS_WINDOW_H_

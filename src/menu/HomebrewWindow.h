@@ -67,6 +67,9 @@ public:
     
     std::vector<homebrewButton*> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton*> remoteAppButtons;   // will refreshed once
+	
+	bool noIconMode = false;
+	bool invalidateCache = false;
     
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton*> curTabButtons;

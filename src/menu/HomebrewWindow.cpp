@@ -42,7 +42,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     log_printf("going into this big function");
     const float cfImageScale = 0.8f;
     
-    if (button->iconImg)
+    if (button->iconImgData)
     {
         button->iconImg = new GuiImage(button->iconImgData);
         button->iconImg->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
@@ -309,6 +309,8 @@ void HomebrewWindow::loadLocalApps(int mode)
         
         if (found) continue;
         
+        continue;
+        
         log_printf("Makinga localfile for this one");
         
         // make the homebrew list bigger if we're gonna process this
@@ -388,6 +390,17 @@ void HomebrewWindow::refreshHomebrewApps()
     remoteAppButtons.clear();
     homebrewButtons.clear();
     curTabButtons.clear();
+	
+	std::string cache;
+	
+	if (!noIconMode)
+	{
+		// create the icon cache folder
+		cache = "sd:/wiiu/apps/appstore/cache/";
+		CreateSubfolder(cache.c_str());
+	}
+    
+	int count = 0;
                 		
     // download app list from the repo
     std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
@@ -395,10 +408,22 @@ void HomebrewWindow::refreshHomebrewApps()
     {
         log_printf("refreshHomebrewApps: Downloading remote %s", targetUrl.c_str());
         gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
-        removeE(progressWindow);
+//        removeE(progressWindow);
         log_printf("refreshHomebrewApps: Updated directory");
-    }
+		
+		std::istringstream f2(fileContents);
+	
+		// get the total number of apps (lines divided by 7)
+		while (gotDirectorySuccess)
+		{
+			count ++;
+			std::string dummy;
+			if (!std::getline(f2, dummy)) break;
+		}
 
+		count /= 7;
+	}
+	
     std::istringstream f(fileContents);
     
     // totalLocalApps will represent how many apps aren't on the server
@@ -409,7 +434,12 @@ void HomebrewWindow::refreshHomebrewApps()
 
     while (gotDirectorySuccess)
     {
-        
+		char numstr[30];
+		sprintf(numstr, "Updating App info... (%d/%d)", iterCount, count);
+		
+        progressWindow->setTitle(numstr);
+		updateProgress(0, iterCount, count);
+
         log_printf("starting yaml parsing");
         std::string shortname;
 
@@ -477,12 +507,57 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx]->descriptionLabel = new GuiText(desc.c_str(), 28, glm::vec4(0, 0, 0, 1));
         log_printf("created some more attributes");
         
+        homebrewButtons[idx]->iconImgData = Resources::GetImageData("missing.png");
+
+        
         // add this to the remote button array
         remoteAppButtons.push_back(homebrewButtons[idx]);
+		
+		
         log_printf("added %s to the remoteApps vector", shortname.c_str());
-
         iterCount ++;
+		
+		// download the icon for this remote app if we aren't ignoring icons
+		if (!noIconMode)
+		{
+			int x = remoteAppButtons.size() - 1;
+
+			// set the download app icon location
+			const std::string dest = cache + remoteAppButtons[x]->shortname + ".png";
+
+			// find the path on the server depending on our current tab
+			std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
+
+			std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
+			bool imageDownloadSuccessful = false;
+									
+			// try to load an existing icon
+			u8 * iconData = NULL;
+        	u32 iconDataSize = 0;
+			
+			// if invalidating cache, skip loading to memory (leaving iconData null)
+			if (!invalidateCache)
+				LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+			
+			// check if the desired icon already exists in the cache, if not download it
+			if (iconData == NULL)
+				imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
+
+			if (imageDownloadSuccessful || iconData != NULL)
+			{
+				u8 * iconData = NULL;
+				u32 iconDataSize = 0;
+				LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+
+				GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
+
+				remoteAppButtons[x]->iconImgData = iconImgData;
+			}
+		}
+		
     }
+	
+	removeE(progressWindow);
 
     initialLoadInProgress = false;
     globalUpdatePosition = true;
@@ -535,34 +610,41 @@ bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 
 void HomebrewWindow::populateIconCache()
 {
-    log_printf("populateIconCache: start");
-    
-    for (u32 x=0; x<remoteAppButtons.size(); x++)
-    {
-        
-        // download app icon
-        std::string targetIcon;
-        // find the path on the server depending on our current tab
-        std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
-        
-        std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
-        bool imageDownloadSuccessful = false;
-        
-        log_printf("populateIconCache: Downloading image for button %d", x);
-        imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, targetIcon);
-        
-        GuiImageData* iconImgData;
-        
+//    log_printf("populateIconCache: start");
+//	
+//	// create the cache folder
+//	std::string cache =  "sd:/wiiu/apps/appstore/cache/";
+//	CreateSubfolder(cache.c_str());
+//    
+//    for (u32 x=0; x<remoteAppButtons.size(); x++)
+//    {
+//        
+//        // download app icon location
+//        const std::string dest = cache + remoteAppButtons[x]->shortname + ".png";
+//			
+//        // find the path on the server depending on our current tab
+//        std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
+//        
+//        std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
+//        bool imageDownloadSuccessful = false;
+//        
+//        log_printf("populateIconCache: Downloading image for button %d", x);
+//        imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
+//                
 //        if (imageDownloadSuccessful)
-//            iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
-//        else
-//            iconImgData = Resources::GetImageData("missing.png");            
-//               
-//        if (remoteAppButtons[x]->iconImg)
-//            remoteAppButtons[x]->iconImg->setImageData(iconImgData);
-        
-        log_printf("populateIconCache: stop");
-    }
+//        {
+//			u8 * iconData = NULL;
+//			u32 iconDataSize = 0;
+//			LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+//			
+//			GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
+//			
+//            remoteAppButtons[x]->iconImgData = iconImgData;
+//			remoteAppButtons[x]->iconImg->setImageData(iconImgData);
+//        }
+//        
+//        log_printf("populateIconCache: stop");
+//    }
 }
 
 HomebrewWindow::HomebrewWindow(int w, int h)
@@ -632,7 +714,6 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     append(&hblVersionText);
     append(hblRepoText);
 
-    append(progressWindow);
 	hblTabBtn.setImage(&hblTabImg);
 	rpxTabBtn.setImage(&rpxTabImg);
 		
@@ -661,8 +742,10 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 	hblTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
     rpxTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
 
-	append(&hblTabBtn);
-	append(&rpxTabBtn);
+//	append(&hblTabBtn);
+//	append(&rpxTabBtn);
+	
+	append(progressWindow);
         
 //    refreshHomebrewApps();
 }
@@ -671,12 +754,18 @@ HomebrewWindow::~HomebrewWindow()
 {
     for(u32 i = 0; i < homebrewButtons.size(); ++i)
     {
-        delete homebrewButtons[i]->image;
-        delete homebrewButtons[i]->nameLabel;
-        delete homebrewButtons[i]->descriptionLabel;
-        delete homebrewButtons[i]->button;
-        delete homebrewButtons[i]->iconImgData;
-        delete homebrewButtons[i]->iconImg;
+		if (homebrewButtons[i]->image != 0)
+        	delete homebrewButtons[i]->image;
+		if (homebrewButtons[i]->nameLabel != 0)
+			delete homebrewButtons[i]->nameLabel;
+		if (homebrewButtons[i]->descriptionLabel != 0)
+			delete homebrewButtons[i]->descriptionLabel;
+		if (homebrewButtons[i]->button != 0)
+        	delete homebrewButtons[i]->button;
+		if (homebrewButtons[i]->iconImgData != 0)
+			delete homebrewButtons[i]->iconImgData;
+		if (homebrewButtons[i]->iconImg != 0)
+			delete homebrewButtons[i]->iconImg;
     }
 
     Resources::RemoveSound(buttonClickSound);

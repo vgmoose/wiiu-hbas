@@ -24,16 +24,6 @@
 #include "network/FileDownloader.h"
 #include <algorithm>
 
-std::string ReplaceAll2(std::string str, const std::string& from, const std::string& to) {
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
-    }
-    log_printf("Here's the formatted string: %s", str.c_str());
-    return str;
-}
-
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
@@ -350,13 +340,10 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     backBtn.setState(GuiElement::STATE_DISABLED);
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
-    
-    // find the path on the server depending on our current tab
-    std::string tabPath = "apps";
 
     // setup the paths based on the selected button
-    std::string path = "/"+tabPath+"/"+selectedButton->shortname;
-    std::string sdPath = ReplaceAll2("sd:/wiiu"+path, "%20", " ");
+    std::string path = "/apps/"+selectedButton->shortname;
+    std::string sdPath = "sd:/wiiu"+path;
         
     // create a new directory on sd
     CreateSubfolder(sdPath.c_str());

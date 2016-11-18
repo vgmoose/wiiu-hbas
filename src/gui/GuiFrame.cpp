@@ -51,9 +51,16 @@ void GuiFrame::append(GuiElement* e)
 	if (e == NULL)
 		return;
 
-	removeE(e);
-	elements.push_back(e);
-	e->setParent(this);
+    e->setParent(this);
+
+    ListChangeElement elem;
+    elem.addElement = true;
+    elem.position = -1;
+    elem.element = e;
+
+    queueMutex.lock();
+    listChangeQueue.push(elem);
+    queueMutex.unlock();
 }
 
 void GuiFrame::insert(GuiElement* e, u32 index)
@@ -61,9 +68,16 @@ void GuiFrame::insert(GuiElement* e, u32 index)
 	if (e == NULL || (index >= elements.size()))
 		return;
 
-	removeE(e);
-	elements.insert(elements.begin()+index, e);
-	e->setParent(this);
+    e->setParent(this);
+
+    ListChangeElement elem;
+    elem.addElement = true;
+    elem.position = index;
+    elem.element = e;
+
+    queueMutex.lock();
+    listChangeQueue.push(elem);
+    queueMutex.unlock();
 }
 
 void GuiFrame::removeE(GuiElement* e)
@@ -71,14 +85,14 @@ void GuiFrame::removeE(GuiElement* e)
 	if (e == NULL)
 		return;
 
-	for (u32 i = 0; i < elements.size(); ++i)
-	{
-		if(e == elements[i])
-		{
-			elements.erase(elements.begin()+i);
-			break;
-		}
-	}
+    ListChangeElement elem;
+    elem.addElement = false;
+    elem.position = -1;
+    elem.element = e;
+
+    queueMutex.lock();
+    listChangeQueue.push(elem);
+    queueMutex.unlock();
 }
 
 void GuiFrame::removeAll()
@@ -185,18 +199,21 @@ void GuiFrame::draw(CVideo * v)
 
 void GuiFrame::updateEffects()
 {
-	if(!this->isVisible() && parentElement)
-		return;
+	if(this->isVisible() || parentElement)
+    {
+        GuiElement::updateEffects();
 
-    GuiElement::updateEffects();
+        //! render appended items next frame but allow stop of render if size is reached
+        u32 size = elements.size();
 
-	//! render appended items next frame but allow stop of render if size is reached
-	u32 size = elements.size();
+        for (u32 i = 0; i < size && i < elements.size(); ++i)
+        {
+            elements[i]->updateEffects();
+        }
+    }
 
-	for (u32 i = 0; i < size && i < elements.size(); ++i)
-	{
-		elements[i]->updateEffects();
-	}
+    //! at the end of main loop which this function represents append pending elements
+    updateElementList();
 }
 
 void GuiFrame::update(GuiController * c)
@@ -211,4 +228,40 @@ void GuiFrame::update(GuiController * c)
 	{
 		elements[i]->update(c);
 	}
+}
+
+void GuiFrame::updateElementList(void)
+{
+    if(listChangeQueue.empty() == false)
+    {
+        queueMutex.lock();
+        while(!listChangeQueue.empty())
+        {
+            ListChangeElement & listChange = listChangeQueue.front();
+
+            for (u32 i = 0; i < elements.size(); ++i)
+            {
+                if(listChange.element == elements[i])
+                {
+                    elements.erase(elements.begin()+i);
+                    break;
+                }
+            }
+
+            if(listChange.addElement)
+            {
+                if(listChange.position >= 0)
+                {
+                    elements.insert(elements.begin()+listChange.position, listChange.element);
+                }
+                else
+                {
+                    elements.push_back(listChange.element);
+                }
+            }
+            listChangeQueue.pop();
+        }
+        queueMutex.unlock();
+    }
+
 }

@@ -91,6 +91,17 @@ class GuiFrame : public GuiElement
 		bool dim;   //! Enable/disable dim of a window only
 		GuiFrame *parent; //!< Parent Window
 		std::vector<GuiElement*> elements; //!< Contains all elements within the GuiFrame
+
+		void updateElementList(void);
+
+		struct ListChangeElement
+		{
+		    bool addElement;
+		    int position;
+            GuiElement *element;
+		};
+		std::queue<ListChangeElement> listChangeQueue;
+		CMutex queueMutex;
 };
 
 #endif

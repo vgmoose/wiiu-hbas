@@ -7,8 +7,13 @@
 # in particiular, this script will generate homebrew zips,
 # icon zips, and a directory json
 
-import os, json, zipfile, datetime, time
+import os, json, zipfile, datetime, time, imghdr
 import xml.etree.ElementTree as ET
+
+print "Content-type: text/html\n\n"
+
+# list of featured apps, these will be moved to the top of the json file
+featured = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "loadiine_gx2", "retro_launcher", "pong", "pacman", "snake", "mgba", "CHIP8", "PokeMiniU", "saviine", "ftpiiu", "cfwbooter", "appstore", "geckiine", "u-paint", "hid_keyboard_monitor", "LiveSynthesisU", "keyboard_example", "Snes9x2010"]
 
 # This function zips the incoming path into the file in ziph
 def zipdir(path, ziph):
@@ -59,6 +64,13 @@ for app in apps:
 	
 	# get meta.xml file from HBL
 	xmlfile = targdir + "/%s/meta.xml" % app
+    
+	# get icon.png file from HBL
+	iconfile = targdir + "/%s/icon.png" % app
+   
+	if imghdr.what(iconfile) != "png":
+		print "Skipping %s as its icon.png isn't a png file" % app
+		continue
 
 	# create some default fields
 	name = coder = desc = long_desc = version = source = updated = category = src_link = "N/A"
@@ -101,7 +113,7 @@ for app in apps:
 	if app in cache and cache[app] == updated:
 		continue
 			
-	print "Compressing " + app + "..."
+	print "Compressing " + app + "...<br>"
 
 	# zip up this app
 	zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
@@ -110,6 +122,17 @@ for app in apps:
 
 # last updated date
 out["updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# move "featured" apps to the front if available
+apps = out["apps"]
+for app in featured[::-1]:
+	try:
+		for rapp in apps:
+			if rapp["directory"] == app:
+				apps.insert(0, apps.pop(apps.index(rapp)))
+				continue
+	except:
+		pass
 
 # json string formatting
 jsonstring = json.dumps(out, indent=4, separators=(',', ': '))
@@ -133,6 +156,6 @@ for cur in out["apps"]:	cache_out.write(cur["updated"]+"\t"+cur["directory"]+"\n
 cache_out.close()
 
 # print done and run legacy scripts
-print "Updated directory.json !!!"
-print "Running v1_gen.py for hbas 1.0..."
+print "Updated directory.json !!!<br>"
+print "Running v1_gen.py for hbas 1.0...<br>"
 os.system("python v1_gen.py")

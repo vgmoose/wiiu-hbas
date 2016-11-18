@@ -24,6 +24,8 @@ ProgressWindow::ProgressWindow(const std::string & title)
     , progressImageBlack(bgImage.getWidth(), bgImage.getHeight()/2, (GX2Color){0, 0, 0, 255})
     , progressImageColored(bgImage.getWidth(), bgImage.getHeight()/2, (GX2Color){0, 0, 0, 255})
 {
+    titleChanged = false;
+    currentTitle = title;
     width = bgImage.getWidth();
     height = bgImage.getHeight();
 
@@ -42,7 +44,7 @@ ProgressWindow::ProgressWindow(const std::string & title)
     titleText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     titleText.setPosition(50, 0);
     titleText.setBlurGlowColor(5.0f, glm::vec4(0.0, 0.0, 0.0f, 1.0f));
-    titleText.setText(title.c_str());
+    titleText.setText(currentTitle.c_str());
     append(&titleText);
 
     progressImageColored.setParent(&progressImageBlack);
@@ -58,10 +60,26 @@ ProgressWindow::~ProgressWindow()
 
 void ProgressWindow::setTitle(const std::string & title)
 {
-    titleText.setText(title.c_str());
+    titleMutex.lock();
+    currentTitle = title;
+    titleChanged = true;
+    titleMutex.unlock();
 }
 
 void ProgressWindow::setProgress(f32 percent)
 {
     progressImageColored.setSize(percent * 0.01f * progressImageBlack.getWidth(), progressImageColored.getHeight());
+}
+
+void ProgressWindow::draw(CVideo * v)
+{
+    if(titleChanged)
+    {
+        titleMutex.lock();
+        titleChanged = false;
+        titleText.setText(currentTitle.c_str());
+        titleMutex.unlock();
+    }
+
+    GuiFrame::draw(v);
 }

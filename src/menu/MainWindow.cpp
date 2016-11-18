@@ -73,7 +73,7 @@ MainWindow::MainWindow(int w, int h)
 void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
 {
     log_printf("NEW THREAD START: Icon async refresh");
-    homebrewWindow->populateIconCache();
+//    homebrewWindow->populateIconCache();
     log_printf("EXISTING THREAD END: Icon async refresh");
 }
 
@@ -161,6 +161,14 @@ void MainWindow::update(GuiController *controller)
         pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
         pointerValid[wpadIdx] = true;
     }
+	
+	// L button forces a cache refresh
+	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_L)
+		homebrewWindow->invalidateCache = disableSplashScreenNextUpdate = true;
+
+	// R button completely ignores icons
+	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_R)
+		homebrewWindow->noIconMode = disableSplashScreenNextUpdate = true;
     
     if (showingSplashScreen && controller->data.touched)
         disableSplashScreenNextUpdate = true;
