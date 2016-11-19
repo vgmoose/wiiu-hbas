@@ -7,7 +7,7 @@
 # in particiular, this script will generate homebrew zips,
 # icon zips, and a directory json
 
-import os, json, zipfile, datetime, time
+import os, json, zipfile, datetime, time, imghdr
 import xml.etree.ElementTree as ET
 
 print "Content-type: text/html\n\n"
@@ -64,6 +64,13 @@ for app in apps:
 	
 	# get meta.xml file from HBL
 	xmlfile = targdir + "/%s/meta.xml" % app
+	-    
+ -	# get icon.png file from HBL
+ -	iconfile = targdir + "/%s/icon.png" % app
+ -   
+ -	if imghdr.what(iconfile) != "png":
+ -		print "Skipping %s as its icon.png isn't a png file" % app
+ -		continue
 
 	# create some default fields
 	name = coder = desc = long_desc = version = source = updated = filesize = category = src_link = "N/A"
