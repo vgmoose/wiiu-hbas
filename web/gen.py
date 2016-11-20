@@ -26,12 +26,13 @@ try:
 				ziph.write(os.path.join(root, file))
 
 	# This function parses out several attributes from xml
-	def xml_read(incoming):
+	def xml_read(incoming, tree, app):
 		outgoing = []
 		for key in incoming:
 			try:
 				outgoing.append(tree.find(key).text)
 			except:
+				print "%s: Missing &lt;%s&gt; in meta.xml<br>" % (app, key)
 				outgoing.append("N/A")
 		return tuple(outgoing)
 
@@ -103,7 +104,7 @@ try:
 			tree = ET.parse(xmlfile)
 
 			# pull out those attributes
-			name, coder, desc, source, long_desc, version, category = xml_read(["name", "coder", "short_description", "url", "long_description", "version", "category"])
+			name, coder, desc, source, long_desc, version, category = xml_read(["name", "coder", "short_description", "url", "long_description", "version", "category"], tree, app)
 
 		# sanitize long_desc for json output
 		long_desc = long_desc.replace("\n", "\\n").replace("\t", "\\t")
