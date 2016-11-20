@@ -71,6 +71,7 @@ public:
 	
 	bool noIconMode = false;
 	bool invalidateCache = false;
+	bool isFiltering = false;
     
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton*> curTabButtons;
@@ -84,8 +85,9 @@ public:
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
     std::vector<std::string> cachedIcons;
+	void clearScreen();
+	void displayCategories();
     void loadLocalApps(int mode);
-    void populateIconCache();
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
     void addAll(std::vector<homebrewButton*>, int);
@@ -93,8 +95,6 @@ public:
     void refreshHomebrewAppIcons();
     void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
-    void findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon);
-    int checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps);
     std::string binaryTarget;
     std::string pathTarget;
     std::string sdPathTarget;

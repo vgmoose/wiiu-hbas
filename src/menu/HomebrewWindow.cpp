@@ -30,8 +30,8 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
-char * repoUrl = "http://wiiubru.com/appstore";
-//char * repoUrl = "192.168.1.104:8000";
+//char * repoUrl = "http://wiiubru.com/appstore";
+char * repoUrl = "192.168.1.104:8000";
 //char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
 
 ProgressWindow* progressWindow;
@@ -106,27 +106,6 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     //        button->button->setSoundClick(buttonClickSound);
 }
 
-int HomebrewWindow::checkIfUpdateOrInstalled(std::string name, std::string version, int totalLocalApps)
-{
-//    for (int x=0; x<totalLocalApps; x++)
-//    {
-//        // if shortname matches
-//        if (!name.compare(homebrewButtons[x]->shortname.c_str()))
-//        {
-//            log_printf("DETECTED A LOCAL APP HERE");
-//            homebrewButtons[x]->status = INSTALLED;
-//            if (version.compare(homebrewButtons[x]->version))
-//            {
-//                // if version doesn't match
-//                homebrewButtons[x]->status = UPDATE;
-//            }
-//
-//            return x;
-//        }
-//    }
-//    return -1;
-}
-
 ProgressWindow* getProgressWindow()
 {
     return progressWindow;
@@ -145,32 +124,23 @@ the curTabButtons list, which is what's actually rendered.
 **/
 void HomebrewWindow::filter()
 {
+	isFiltering = true;
     scrollOffY = -120;
-
-//    
-//    // empty the current tab
-//    curTabButtons.clear();
-    
-//    for (u32 x=0; x<homebrewButtons.size(); x++)
-//    {
-//        if (homebrewButtons[x]->typee == listingMode)
-//        {
-//            curTabButtons.push_back(homebrewButtons[x]);
-//        }
-//    }
     
     homebrewButtons.clear();
     
-    std::string output = "CURRENT: ";
-    for (u32 x=0; x<curTabButtons.size(); x++)
-    {
-        output += "["+std::string(curTabButtons[x]->shortname)+"] ";
-    }
+//    std::string output = "CURRENT: ";
+//    for (u32 x=0; x<curTabButtons.size(); x++)
+//    {
+//        output += "["+std::string(curTabButtons[x]->shortname)+"] ";
+//    }
 		
 //	std::random_shuffle(curTabButtons.begin(),curTabButtons.end());
     
-    for (u32 x=0; x<curTabButtons.size(); x++)
-    {
+
+	for (u32 x=0; x<curTabButtons.size(); x++)
+	{
+		// if it's 0, it's all apps
 		if (listingMode > 0)
 		{
 			// do category sorting
@@ -182,14 +152,19 @@ void HomebrewWindow::filter()
 				continue;
 			if (listingMode == 4 && curTabButtons[x]->category != "loader")
 				continue;
+			if (listingMode == 5 && curTabButtons[x]->category != "poc")
+				continue;
 		}
-//        log_printf("filter: adding button %d, %s", x, curTabButtons[x].shortname.c_str());
-        log_printf("%p", curTabButtons[x]->button);
-        append(curTabButtons[x]->button);
-        homebrewButtons.push_back(curTabButtons[x]);
+
+		log_printf("%p", curTabButtons[x]->button);
+		append(curTabButtons[x]->button);
+		homebrewButtons.push_back(curTabButtons[x]);
+
 //        log_printf("filter: added it");
 		globalUpdatePosition = true;
-    }
+	}
+	
+	isFiltering = false;
             
 }
 
@@ -230,17 +205,10 @@ This method fetches the local apps from either /wiiu/games or /wiiu/apps
 **/
 void HomebrewWindow::loadLocalApps(int mode)
 {
-    
-    // remove any existing buttons
-    for (u32 x=0; x<curTabButtons.size(); x++)
-    {
-//        log_printf("filter: about to remove button %d", x);
-        removeE(curTabButtons[x]->button);  
-    }
+	clearScreen();
     
     localAppButtons.clear();
     homebrewButtons.clear();
-    curTabButtons.clear();
     
     log_printf("loadLocalApps: begin");
     // get the 4 different types of app backgrounds
@@ -288,13 +256,17 @@ void HomebrewWindow::loadLocalApps(int mode)
         u32 iconDataSize = 0;
         
         log_printf("Continuing with it...");
+		LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
         
         int found = 0;
-        
+		if (!xmlReadSuccess) continue;
+		
+		std::string curAppString = homebrewPath.substr(14);
+		        
         // check if we already have this app in some as updated/installed
         for (unsigned int x=0; x<remoteAppButtons.size() && xmlReadSuccess; x++)
         {
-            if (remoteAppButtons[x]->shortname == homebrewPath.substr(14))
+            if (remoteAppButtons[x]->shortname == curAppString)
             {
                 if (remoteAppButtons[x]->version != metaXml.GetVersion())
                     remoteAppButtons[x]->status = UPDATE;
@@ -304,7 +276,6 @@ void HomebrewWindow::loadLocalApps(int mode)
                 log_printf("decided it's %d", remoteAppButtons[x]->status);
                 remoteAppButtons[x]->execPath = dirList->GetFilepath(i);
                 remoteAppButtons[x]->dirPath = homebrewPath;
-                LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
 
                 if(iconData != NULL)
                 {
@@ -325,61 +296,47 @@ void HomebrewWindow::loadLocalApps(int mode)
         log_printf("Makinga localfile for this one");
         
         // make the homebrew list bigger if we're gonna process this
-//        int idx = homebrewButtons.size();
-//        homebrewButtons.resize(homebrewButtons.size() + 1);
-//                
-//        // file path
-//        homebrewButtons[idx]->execPath = dirList->GetFilepath(i);
-//        homebrewButtons[idx]->iconImgData = NULL;
-//        
-//        homebrewButtons[idx]->typee = HBL;
-//        
-//        homebrewButtons[idx]->dirPath = homebrewPath;
-//        
+        int idx = homebrewButtons.size();
+        homebrewButtons.resize(homebrewButtons.size() + 1);
+		
+		homebrewButtons[idx] = new homebrewButton();
+                
+        // file path
+        homebrewButtons[idx]->execPath = dirList->GetFilepath(i);
+        homebrewButtons[idx]->iconImgData = NULL;        
+        homebrewButtons[idx]->typee = HBL;
+        homebrewButtons[idx]->dirPath = homebrewPath;
+
 //        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
-//        homebrewButtons[idx]->shortname =homebrewPath.substr(14);
+        homebrewButtons[idx]->shortname = curAppString;
+        homebrewButtons[idx]->status = LOCAL;
 //        
-//        // since we got this app from the sd card, mark it local for now.
-//        // if we see it later on the server, update its status appropriately to 
-//        // update or installed
-//        homebrewButtons[idx]->status = LOCAL;
-//        
-//        log_printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
-//        LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
+        log_printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
 //
-//        if(iconData != NULL)
-//        {
-//            homebrewButtons[idx]->iconImgData = new GuiImageData(iconData, iconDataSize);
-//            free(iconData);
-//            iconData = NULL;
-//        }
-//
-//      
-//        const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx]->execPath.c_str();
-////        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
-//        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
-//            cpName += strlen("sd:/wiiu/apps/");
-//        
-//        homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-//        homebrewButtons[idx]->versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, glm::vec4(0, 0, 0, 1));
-//        homebrewButtons[idx]->coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, glm::vec4(0, 0, 0, 1));
-//        homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, glm::vec4(0, 0, 0, 1));
-////        homebrewButtons[idx].button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-//        log_printf("refreshHomebrewApps: added local button %d", idx);
-////        homebrewButtons[idx].image = new GuiImage(appButtonImages[homebrewButtons[idx].status]);
-//        homebrewButtons[idx]->version = xmlReadSuccess? metaXml.GetVersion() : "999";
-//        
-////        positionHomebrewButton(&homebrewButtons[idx], idx);
-////        homebrewButtons[idx].button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
-//        
-//
-////        append(homebrewButtons[idx].button);
-//		
-//        localAppButtons.push_back(homebrewButtons[idx]);
-//        log_printf("totally done with and added that");
+        if(iconData != NULL)
+        {
+            homebrewButtons[idx]->iconImgData = new GuiImageData(iconData, iconDataSize);
+            free(iconData);
+            iconData = NULL;
+		}
+      
+        const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx]->execPath.c_str();
+        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
+        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
+            cpName += strlen("sd:/wiiu/apps/");
+        
+        homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, glm::vec4(0, 0, 0, 1));
+        log_printf("refreshHomebrewApps: added local button %d", idx);
+        homebrewButtons[idx]->version = xmlReadSuccess? metaXml.GetVersion() : "999";
+		
+        localAppButtons.push_back(homebrewButtons[idx]);
+        log_printf("totally done with and added that");
     }
     
-    // add everything to the current tab
+    // add everything to the current tab (this defines the order)
     addAll(remoteAppButtons, UPDATE);
     addAll(remoteAppButtons, INSTALLED);
     addAll(localAppButtons, LOCAL);
@@ -575,27 +532,6 @@ void HomebrewWindow::refreshHomebrewApps()
     
 }
 
-void HomebrewWindow::findHomebrewIconAndSetImage(std::string shortname, std::string targetIcon)
-{
-//    log_printf("findHomebrewIconAndSetImage: start");
-//    for (u32 x=0; x<homebrewButtons.size(); x++)
-//    {
-//        log_printf("findHomebrewIconAndSetImage: checking element %d", x);
-//        if (homebrewButtons[x].shortname == shortname)
-//        {
-//            if (targetIcon.compare("missing.png") == 0)
-//                homebrewButtons[x].iconImgData = Resources::GetImageData("missing.png");
-//            else
-//                homebrewButtons[x].iconImgData = new GuiImageData((u8*)targetIcon.c_str(), targetIcon.size());
-//            positionHomebrewButton(&homebrewButtons[x],  x);
-//            break;
-////            removeE(homebrewButtons[x].button);
-////            append(homebrewButtons[x].button);
-//        }
-//    }
-//    log_printf("findHomebrewIconAndSetImage: stop");
-}
-
 bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 {
     for (u32 x=0; x<localAppButtons.size(); x++)
@@ -607,54 +543,6 @@ bool HomebrewWindow::checkLocalAppExists(std::string shortname)
     }
     
     return false;
-}
-
-//void HomebrewWindow::fetchThisIcon(int x, std::string targetIconUrl)
-//{
-//        std::string targetIcon;        
-//        FileDownloader::getFile(targetIconUrl, targetIcon);
-//        cachedIcons.insert(cachedIcons.begin()+targetIcon);
-//        
-//        findHomebrewIconAndSetImage(remoteAppButtons[x].shortname, targetIcon);
-//}
-
-void HomebrewWindow::populateIconCache()
-{
-//    log_printf("populateIconCache: start");
-//	
-//	// create the cache folder
-//	std::string cache =  "sd:/wiiu/apps/appstore/cache/";
-//	CreateSubfolder(cache.c_str());
-//    
-//    for (u32 x=0; x<remoteAppButtons.size(); x++)
-//    {
-//        
-//        // download app icon location
-//        const std::string dest = cache + remoteAppButtons[x]->shortname + ".png";
-//			
-//        // find the path on the server depending on our current tab
-//        std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
-//        
-//        std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
-//        bool imageDownloadSuccessful = false;
-//        
-//        log_printf("populateIconCache: Downloading image for button %d", x);
-//        imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
-//                
-//        if (imageDownloadSuccessful)
-//        {
-//			u8 * iconData = NULL;
-//			u32 iconDataSize = 0;
-//			LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
-//			
-//			GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
-//			
-//            remoteAppButtons[x]->iconImgData = iconImgData;
-//			remoteAppButtons[x]->iconImg->setImageData(iconImgData);
-//        }
-//        
-//        log_printf("populateIconCache: stop");
-//    }
 }
 
 HomebrewWindow::HomebrewWindow(int w, int h)
@@ -724,36 +612,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     append(&hblVersionText);
     append(hblRepoText);
 
-	hblTabBtn.setImage(&hblTabImg);
-	rpxTabBtn.setImage(&rpxTabImg);
-		
-	hblTabBtn.setScale(0.6);
-	rpxTabBtn.setScale(0.6);
-		
-	hblTabBtn.setAlignment(ALIGN_LEFT);
-	rpxTabBtn.setAlignment(ALIGN_LEFT);
-		
-	hblTabBtn.setPosition(0 - 200, 85);
-	rpxTabBtn.setPosition(-20 - 200, -85);
-		
-	hblTabBtn.setEffectGrow();
-	rpxTabBtn.setEffectGrow();
-		
-    hblTabBtn.setTrigger(&touchTrigger);
-//    hblTabBtn.setTrigger(&wpadTouchTrigger);
-    hblTabBtn.setTrigger(&buttonLTrigger);
-    hblTabBtn.setSoundClick(buttonClickSound);
-				
-    rpxTabBtn.setTrigger(&touchTrigger);
-//    rpxTabBtn.setTrigger(&wpadTouchTrigger);
-    rpxTabBtn.setTrigger(&buttonRTrigger);
-    rpxTabBtn.setSoundClick(buttonClickSound);
-		
-	hblTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
-    rpxTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
-
-	append(&hblTabBtn);
-	append(&rpxTabBtn);
+//	append(&hblTabBtn);
+//	append(&rpxTabBtn);
 	
 	append(progressWindow);
         
@@ -787,25 +647,43 @@ HomebrewWindow::~HomebrewWindow()
 	Resources::RemoveImageData(rpxTabImgData);
 }
 
+void HomebrewWindow::clearScreen()
+{
+	// remove any existing buttons
+    for (u32 x=0; x<curTabButtons.size(); x++)
+    {
+//        log_printf("filter: about to remove button %d", x);
+        removeE(curTabButtons[x]->button);  
+    }
+	curTabButtons.clear();
+}
+
+void HomebrewWindow::displayCategories()
+{
+	clearScreen();
+//	GuiImageData* data = Resources::GetImageData("games.png");
+//	GuiButton* cats = new GuiButton(data.getWidth(), data.getHeight());
+}
+
 
 void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode < 1) // already hbl mode
+	if (listingMode < 1 || isFiltering) // already hbl mode
 		return;
 	
 	listingMode--;
-	loadLocalApps(0);
+	clearScreen();
     filter();
     globalUpdatePosition = true;
 }
 
 void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode > 3) // already rpx mode
+	if (listingMode > 3 || isFiltering) // already rpx mode
 		return;
 	
 	listingMode++;
-	loadLocalApps(0);
+	clearScreen();
     filter();
     globalUpdatePosition = true;
 }

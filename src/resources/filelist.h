@@ -1,7 +1,7 @@
 /****************************************************************************
  * Loadiine resource files.
  * This file is generated automatically.
- * Includes 25 files.
+ * Includes 30 files.
  *
  * NOTE:
  * Any manual modification of this file will be overwriten by the generation.
@@ -29,11 +29,20 @@ extern const u32 button_click_mp3_size;
 extern const u8 CLOSE_png[];
 extern const u32 CLOSE_png_size;
 
+extern const u8 concepts_png[];
+extern const u32 concepts_png_size;
+
 extern const u8 DELETE_BUTTON_png[];
 extern const u32 DELETE_BUTTON_png_size;
 
+extern const u8 emulators_png[];
+extern const u32 emulators_png_size;
+
 extern const u8 font_ttf[];
 extern const u32 font_ttf_size;
+
+extern const u8 games_png[];
+extern const u32 games_png_size;
 
 extern const u8 GET_png[];
 extern const u32 GET_png_size;
@@ -49,6 +58,9 @@ extern const u32 INSTALLED_png_size;
 
 extern const u8 launchMenuBox_png[];
 extern const u32 launchMenuBox_png_size;
+
+extern const u8 loaders_png[];
+extern const u32 loaders_png_size;
 
 extern const u8 LOCAL_png[];
 extern const u32 LOCAL_png_size;
@@ -89,6 +101,9 @@ extern const u32 splash_png_size;
 extern const u8 titlehbas2_png[];
 extern const u32 titlehbas2_png_size;
 
+extern const u8 tools_png[];
+extern const u32 tools_png_size;
+
 extern const u8 UPDATE_png[];
 extern const u32 UPDATE_png_size;
 
@@ -100,13 +115,17 @@ static RecourceFile RecourceList[] =
 	{"bg.png", bg_png, bg_png_size, NULL, 0},
 	{"button_click.mp3", button_click_mp3, button_click_mp3_size, NULL, 0},
 	{"CLOSE.png", CLOSE_png, CLOSE_png_size, NULL, 0},
+	{"concepts.png", concepts_png, concepts_png_size, NULL, 0},
 	{"DELETE_BUTTON.png", DELETE_BUTTON_png, DELETE_BUTTON_png_size, NULL, 0},
+	{"emulators.png", emulators_png, emulators_png_size, NULL, 0},
 	{"font.ttf", font_ttf, font_ttf_size, NULL, 0},
+	{"games.png", games_png, games_png_size, NULL, 0},
 	{"GET.png", GET_png, GET_png_size, NULL, 0},
 	{"GET_BUTTON.png", GET_BUTTON_png, GET_BUTTON_png_size, NULL, 0},
 	{"hbl_tab.png", hbl_tab_png, hbl_tab_png_size, NULL, 0},
 	{"INSTALLED.png", INSTALLED_png, INSTALLED_png_size, NULL, 0},
 	{"launchMenuBox.png", launchMenuBox_png, launchMenuBox_png_size, NULL, 0},
+	{"loaders.png", loaders_png, loaders_png_size, NULL, 0},
 	{"LOCAL.png", LOCAL_png, LOCAL_png_size, NULL, 0},
 	{"missing.png", missing_png, missing_png_size, NULL, 0},
 	{"missing_square.png", missing_square_png, missing_square_png_size, NULL, 0},
@@ -120,6 +139,7 @@ static RecourceFile RecourceList[] =
 	{"screampics.mp3", screampics_mp3, screampics_mp3_size, NULL, 0},
 	{"splash.png", splash_png, splash_png_size, NULL, 0},
 	{"titlehbas2.png", titlehbas2_png, titlehbas2_png_size, NULL, 0},
+	{"tools.png", tools_png, tools_png_size, NULL, 0},
 	{"UPDATE.png", UPDATE_png, UPDATE_png_size, NULL, 0},
 	{"UPDATE_BUTTON.png", UPDATE_BUTTON_png, UPDATE_BUTTON_png_size, NULL, 0},
 	{NULL, NULL, 0, NULL, 0}
