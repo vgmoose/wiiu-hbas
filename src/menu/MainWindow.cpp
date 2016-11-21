@@ -50,9 +50,11 @@ MainWindow::MainWindow(int w, int h)
     disableSplashScreenNextUpdate = false;
 //    splashScreenImgData = new GuiImageData(Resources::GetImageData("splash.png");
 //    splashScreen = new GuiImage(splashScreenImgData);
-                        
+		                        
     append(&splashScreen);
     showingSplashScreen = true;
+		
+//	srand(OSGetTime());
 
     for(int i = 0; i < 4; i++)
     {
@@ -81,11 +83,17 @@ void asyncRefreshHomebrewApps(CThread* thread, void* args)
 {
     log_printf("NEW THREAD START: Async refresh homebrew apps");
     homebrewWindow->refreshHomebrewApps();
+	
+	// display another loading message
+	// toDO: temporary until loadLocalApps is sped up
+	GuiText* loadingMsg = new GuiText("One Moment Please...", 40, glm::vec4(1, 1, 1, 1));
+	homebrewWindow->append(loadingMsg);
+	homebrewWindow->loadLocalApps(0);
+	homebrewWindow->removeE(loadingMsg);
 	homebrewWindow->displayCategories();
-    homebrewWindow->loadLocalApps(0);
-    // when refresh is done, start preloading the icon cache
-    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+	
+//    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+//    pThread->resumeThread();
     log_printf("EXISTING THREAD END: Async refresh homebrew apps");
 }
 
@@ -168,14 +176,14 @@ void MainWindow::update(GuiController *controller)
 	if (controller->data.buttons_r & VPAD_BUTTON_MINUS)
 		joysticksDisabled = !joysticksDisabled;
 	
-	// get a random app
-	if (controller->data.buttons_r & VPAD_BUTTON_PLUS)
-	{
-		srand(OSGetTime());
-		int r = rand() % homebrewWindow->curTabButtons.size();
-		homebrewWindow->OnHomebrewButtonClick(homebrewWindow->curTabButtons[r]->button, controller, 0);
-	}
-    
+//	// get a random app
+//	if (controller->data.buttons_r & VPAD_BUTTON_PLUS)
+//	{
+//		srand(OSGetTime());
+//		int r = rand() % homebrewWindow->curTabButtons.size();
+//		homebrewWindow->OnHomebrewButtonClick(homebrewWindow->curTabButtons[r]->button, controller, 0);
+//	}
+//    
 	
 	// L button forces a cache refresh
 	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_L)

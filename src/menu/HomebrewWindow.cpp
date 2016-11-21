@@ -30,8 +30,8 @@
 #define DEFAULT_WIILOAD_PORT        4299
 
 #define MAX_BUTTONS_ON_PAGE     4
-//char * repoUrl = "http://wiiubru.com/appstore";
-char * repoUrl = "192.168.1.104:8000";
+char * repoUrl = "http://wiiubru.com/appstore";
+//char * repoUrl = "192.168.1.104:8000";
 //char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
 
 ProgressWindow* progressWindow;
@@ -324,7 +324,7 @@ void HomebrewWindow::loadLocalApps(int mode)
 		}
       
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx]->execPath.c_str();
-        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
+//        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
             cpName += strlen("sd:/wiiu/apps/");
         
@@ -564,8 +564,6 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 	, randomTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
-    , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
-    , buttonRTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_R | GuiTrigger::BUTTON_RIGHT, true)
 {
 //    tcpReceiver.serverReceiveStart.connect(this, &HomebrewWindow::OnTcpReceiveStart);
 //    tcpReceiver.serverReceiveFinished.connect(this, &HomebrewWindow::OnTcpReceiveFinish);
@@ -615,8 +613,10 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     append(&hblVersionText);
     append(hblRepoText);
 		
-	header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
-	header2 = new GuiText("Select a Category", 40, glm::vec4(1, 1, 1, 1));
+//	header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
+	header = new GuiImage(Resources::GetImageData("title.png"));
+	header->setAlignment(ALIGN_TOP);
+	header2 = new GuiText("Select a Category", 30, glm::vec4(1, 1, 1, 1));
 	
 		
 	// for now, do this like this
@@ -630,8 +630,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 	backTabBtn.setAlignment(ALIGN_LEFT);
 	randomTabBtn.setAlignment(ALIGN_RIGHT);
 		
-	backTabBtn.setPosition(0, 85);
-	randomTabBtn.setPosition(0, -85);
+	backTabBtn.setPosition(0, 0);
+	randomTabBtn.setPosition(0, 0);
 		
 	backTabBtn.setEffectGrow();
 	randomTabBtn.setEffectGrow();
@@ -644,10 +644,6 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 		
 	backTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
     randomTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
-
-
-	append(&backTabBtn);
-	append(&randomTabBtn);
 	
 	append(progressWindow);
         
@@ -696,7 +692,7 @@ void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *co
 {
 	
 	// remove all category buttons
-	for (int x=0; x<all_cats.size(); x++)
+	for (unsigned int x=0; x<all_cats.size(); x++)
 	{
 		// detect which number category button was pressed
 		if (all_cats[x] == button)
@@ -708,6 +704,9 @@ void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *co
 	
 	removeE(header);
 	removeE(header2);
+	
+	append(&backTabBtn);
+	append(&randomTabBtn);
 	
 	loadLocalApps(0);
 	// change the category based on the click
@@ -741,18 +740,20 @@ void HomebrewWindow::displayCategories()
 	clearScreen();
 	all_cats.clear();
 	
-	header->setPosition(0, 260);
+	header->setPosition(0, 0);
 	append(header);
 	
 	header2->setPosition(0, -240);
 	append(header2);
+	
+	const char* vals[6] = {"all_gray.png", "games.png", "emulators.png", "tools.png", "loaders.png", "concepts.png"};
 				
-	appendCategoryButton("all_gray.png", 	-250, 	100);
-	appendCategoryButton("games.png",		0, 		100);
-	appendCategoryButton("emulators.png", 	250, 	100);
-	appendCategoryButton("tools.png", 		-250, 	-100);
-	appendCategoryButton("loaders.png", 	0,		-100);
-	appendCategoryButton("concepts.png",	250, 	-100);
+	appendCategoryButton((char*)vals[0], 	-250, 	100);
+	appendCategoryButton((char*)vals[1],	0, 		100);
+	appendCategoryButton((char*)vals[2], 	250, 	100);
+	appendCategoryButton((char*)vals[3], 	-250, 	-100);
+	appendCategoryButton((char*)vals[4], 	0,		-100);
+	appendCategoryButton((char*)vals[5],	250, 	-100);
 	
 	
 }
@@ -760,24 +761,37 @@ void HomebrewWindow::displayCategories()
 
 void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode < 1 || isFiltering) // already hbl mode
+	if (screenLocked)
+	{
+		if (launchBox)
+			// dismiss any active window
+			OnLaunchBoxCloseClick(launchBox);
 		return;
+	}
 	
-	listingMode--;
+	listingMode = -1;
 	clearScreen();
     filter();
+	
+	removeE(&backTabBtn);
+	removeE(&randomTabBtn);
+	
+	displayCategories();
     globalUpdatePosition = true;
 }
 
 void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (listingMode > 3 || isFiltering) // already rpx mode
-		return;
+	if (screenLocked)
+	{
+		if (launchBox)
+			// dismiss any active window
+			removeE(launchBox);
+	}
 	
-	listingMode++;
-	clearScreen();
-    filter();
-    globalUpdatePosition = true;
+	// click a random button within the displayed apps
+	int r = rand() % homebrewButtons.size();
+	OnHomebrewButtonClick(homebrewButtons[r]->button, controller, 0);
 }
 
 void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
@@ -790,6 +804,10 @@ void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
 void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 {
     screenLocked = false;
+	
+	backTabBtn.clearState(GuiElement::STATE_DISABLED);
+    randomTabBtn.clearState(GuiElement::STATE_DISABLED);
+	
     //! remove element from draw list and push to delete queue
     removeE(element);
     AsyncDeleter::pushForDelete(element);
@@ -806,6 +824,7 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
     element->setState(GuiElement::STATE_DISABLED);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewWindow::OnCloseEffectFinish);
+	launchBox = NULL;
 }
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -824,12 +843,13 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     {
         if(button == homebrewButtons[i]->button)
         {
-            HomebrewLaunchWindow * launchBox = new HomebrewLaunchWindow(*homebrewButtons[i], this);
-            launchBox->setEffect(EFFECT_FADE, 10, 255);
-            launchBox->setState(GuiElement::STATE_DISABLED);
-            launchBox->setPosition(0.0f, 30.0f);
-            launchBox->effectFinished.connect(this, &HomebrewWindow::OnOpenEffectFinish);
-            launchBox->backButtonClicked.connect(this, &HomebrewWindow::OnLaunchBoxCloseClick);
+            launchBox = new HomebrewLaunchWindow(*homebrewButtons[i], this);
+			HomebrewLaunchWindow* launchBox2 = (HomebrewLaunchWindow*)launchBox;
+            launchBox2->setEffect(EFFECT_FADE, 10, 255);
+            launchBox2->setState(GuiElement::STATE_DISABLED);
+            launchBox2->setPosition(0.0f, 30.0f);
+            launchBox2->effectFinished.connect(this, &HomebrewWindow::OnOpenEffectFinish);
+            launchBox2->backButtonClicked.connect(this, &HomebrewWindow::OnLaunchBoxCloseClick);
             log_printf("creating launchbox");
             append(launchBox);
             disableButtons = true;

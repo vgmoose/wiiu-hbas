@@ -10,7 +10,7 @@
 #define CORES_MAX_ADDRESS 0xE4000000
 #define CORES_ADDRESS_SIZE 0x04000000
 
-#define APP_VERSION "1.2" //TODO gitdescribe?
+#define APP_VERSION "1.5" //TODO gitdescribe?
 
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__

@@ -352,6 +352,9 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     ProgressWindow * progress = getProgressWindow(); 
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     homebrewWindowTarget->append(progress);
+	
+	homebrewWindow->backTabBtn.setState(GuiElement::STATE_DISABLED);
+    homebrewWindow->randomTabBtn.setState(GuiElement::STATE_DISABLED);
 
     // store information about the desired files to homebrewWindowTarget, so that
     // the thread can access it

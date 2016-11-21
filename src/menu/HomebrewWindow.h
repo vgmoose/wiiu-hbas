@@ -65,8 +65,28 @@ public:
     float lastScrollOffY = 0;
     // all homebrew buttons
     std::vector<homebrewButton*> homebrewButtons;
+	GuiFrame * launchBox;
+	
+	
+    GuiSound *buttonClickSound;
+    GuiImageData * installedButtonImgData;
+    GuiImageData * getButtonImgData;
+    GuiImageData * updateButtonImgData;
+    GuiImageData * localButtonImgData;
+	
+	    GuiText hblVersionText;
+    GuiText * hblRepoText;
+		
+	GuiImageData *hblTabImgData;
+    GuiImageData *rpxTabImgData;
+	GuiImage hblTabImg;
+    GuiImage rpxTabImg;
+
+	
+	GuiButton backTabBtn;
+    GuiButton randomTabBtn;
     
-	GuiText* header;
+	GuiImage* header;
 	GuiText* header2;
     std::vector<homebrewButton*> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton*> remoteAppButtons;   // will refreshed once
@@ -130,26 +150,10 @@ private:
     void OnTcpReceiveFinish(GuiElement *element, u32 ip, int result);
     
 
-    GuiSound *buttonClickSound;
-    GuiImageData * installedButtonImgData;
-    GuiImageData * getButtonImgData;
-    GuiImageData * updateButtonImgData;
-    GuiImageData * localButtonImgData;
 
-    GuiText hblVersionText;
-    GuiText * hblRepoText;
-	
-	GuiImageData *hblTabImgData;
-    GuiImageData *rpxTabImgData;
-	GuiImage hblTabImg;
-    GuiImage rpxTabImg;
-	GuiButton backTabBtn;
-    GuiButton randomTabBtn;
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;
-    GuiTrigger buttonLTrigger;
-    GuiTrigger buttonRTrigger;
     int listOffset;
     int currentLeftPosition;
     int targetLeftPosition;
