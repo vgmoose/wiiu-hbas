@@ -124,6 +124,9 @@ the curTabButtons list, which is what's actually rendered.
 **/
 void HomebrewWindow::filter()
 {
+	if (listingMode < 0)
+		return;
+	
 	isFiltering = true;
     scrollOffY = -120;
     
@@ -553,12 +556,12 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , updateButtonImgData(Resources::GetImageData("UPDATE.png"))
     , localButtonImgData(Resources::GetImageData("LOCAL.png"))
 	, hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
-	, hblTabImgData(Resources::GetImageData("hbl_tab.png"))
-	, rpxTabImgData(Resources::GetImageData("rpx_tab.png"))
+	, hblTabImgData(Resources::GetImageData("back_tab.png"))
+	, rpxTabImgData(Resources::GetImageData("random_tab.png"))
 	, hblTabImg(hblTabImgData)
 	, rpxTabImg(rpxTabImgData)
-	, hblTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
-	, rpxTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
+	, backTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
+	, randomTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , buttonLTrigger(GuiTrigger::CHANNEL_ALL, GuiTrigger::BUTTON_L | GuiTrigger::BUTTON_LEFT, true)
@@ -572,8 +575,9 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     listOffset = 0;
     gotDirectorySuccess = false;
     screenLocked = false;
-	listingMode = 0;
-        
+
+	listingMode = -1;
+		
     char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
         
      struct stat buffer;   
@@ -595,7 +599,6 @@ HomebrewWindow::HomebrewWindow(int w, int h)
             repoUrl = (char*)bufString.c_str();
         }
     }
-
         
     log_printf(repoUrl);
         
@@ -611,9 +614,40 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
     append(hblRepoText);
+		
+	header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
+	header2 = new GuiText("Select a Category", 40, glm::vec4(1, 1, 1, 1));
+	
+		
+	// for now, do this like this
+	// in the future, a method should handle guibuttons like this
+	backTabBtn.setImage(&hblTabImg);
+	randomTabBtn.setImage(&rpxTabImg);
+		
+	backTabBtn.setScale(0.6);
+	randomTabBtn.setScale(0.6);
+		
+	backTabBtn.setAlignment(ALIGN_LEFT);
+	randomTabBtn.setAlignment(ALIGN_RIGHT);
+		
+	backTabBtn.setPosition(0, 85);
+	randomTabBtn.setPosition(0, -85);
+		
+	backTabBtn.setEffectGrow();
+	randomTabBtn.setEffectGrow();
+		
+    backTabBtn.setTrigger(&touchTrigger);
+	randomTabBtn.setTrigger(&touchTrigger);
+		
+	backTabBtn.setSoundClick(buttonClickSound);
+	randomTabBtn.setSoundClick(buttonClickSound);
+		
+	backTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
+    randomTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
 
-//	append(&hblTabBtn);
-//	append(&rpxTabBtn);
+
+	append(&backTabBtn);
+	append(&randomTabBtn);
 	
 	append(progressWindow);
         
@@ -658,11 +692,69 @@ void HomebrewWindow::clearScreen()
 	curTabButtons.clear();
 }
 
+void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+{
+	
+	// remove all category buttons
+	for (int x=0; x<all_cats.size(); x++)
+	{
+		// detect which number category button was pressed
+		if (all_cats[x] == button)
+			listingMode = x;
+						
+		// remove them
+		removeE(all_cats[x]);
+	}
+	
+	removeE(header);
+	removeE(header2);
+	
+	loadLocalApps(0);
+	// change the category based on the click
+//	filter();
+}
+
+void HomebrewWindow::appendCategoryButton(char* name, int x, int y)
+{		
+	int idx = all_cats.size();
+	log_printf("CUR BUTTON: %d", idx);
+	all_cats.resize(idx+1);
+	
+	GuiImage* img = new GuiImage(Resources::GetImageData(name));
+		
+	all_cats[idx] = new GuiButton(img->getWidth(), img->getHeight());
+	all_cats[idx]->setImage(new GuiImage(Resources::GetImageData(name)));
+	all_cats[idx]->setPosition(x, y);
+	
+    all_cats[idx]->setSoundClick(buttonClickSound);
+    all_cats[idx]->setTrigger(&touchTrigger);
+    all_cats[idx]->setTrigger(&wpadTouchTrigger);
+	all_cats[idx]->setEffectGrow();
+	all_cats[idx]->clicked.connect(this, &HomebrewWindow::OnCategorySwitch);
+	
+
+	append(all_cats[idx]);
+}
+
 void HomebrewWindow::displayCategories()
 {
 	clearScreen();
-//	GuiImageData* data = Resources::GetImageData("games.png");
-//	GuiButton* cats = new GuiButton(data.getWidth(), data.getHeight());
+	all_cats.clear();
+	
+	header->setPosition(0, 260);
+	append(header);
+	
+	header2->setPosition(0, -240);
+	append(header2);
+				
+	appendCategoryButton("all_gray.png", 	-250, 	100);
+	appendCategoryButton("games.png",		0, 		100);
+	appendCategoryButton("emulators.png", 	250, 	100);
+	appendCategoryButton("tools.png", 		-250, 	-100);
+	appendCategoryButton("loaders.png", 	0,		-100);
+	appendCategoryButton("concepts.png",	250, 	-100);
+	
+	
 }
 
 
@@ -805,13 +897,13 @@ void HomebrewWindow::draw(CVideo *pVideo)
 		
 //		if (listingMode == 1)
 //		{
-//			hblTabBtn.setPosition(0, 85);
-//			rpxTabBtn.setPosition(-20, -85);
+//			backTabBtn.setPosition(0, 85);
+//			randomTabBtn.setPosition(-20, -85);
 //		}
 //		else if (listingMode == 2)
 //		{
-//			hblTabBtn.setPosition(-20, 85);
-//			rpxTabBtn.setPosition(0, -85);
+//			backTabBtn.setPosition(-20, 85);
+//			randomTabBtn.setPosition(0, -85);
 //		}
         lastScrollOffY = scrollOffY;
         

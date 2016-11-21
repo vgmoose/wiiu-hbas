@@ -44,7 +44,7 @@ Application::Application()
     Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
 
     //! create bgMusic
-    bgMusic = new GuiSound(Resources::GetFile("screampics.mp3"), Resources::GetFileSize("screampics.mp3"));
+    bgMusic = new GuiSound(Resources::GetFile("slimers.mp3"), Resources::GetFileSize("slimers.mp3"));
     bgMusic->SetLoop(true);
     bgMusic->Play();
     bgMusic->SetVolume(50);

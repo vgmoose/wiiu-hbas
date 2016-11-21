@@ -66,8 +66,12 @@ public:
     // all homebrew buttons
     std::vector<homebrewButton*> homebrewButtons;
     
+	GuiText* header;
+	GuiText* header2;
     std::vector<homebrewButton*> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton*> remoteAppButtons;   // will refreshed once
+	
+	std::vector<GuiButton*> all_cats;
 	
 	bool noIconMode = false;
 	bool invalidateCache = false;
@@ -80,7 +84,7 @@ public:
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
-	int listingMode = 0; // 1 is hbl, 2 is rpx
+	int listingMode = -1; // 1 is hbl, 2 is rpx
     bool gotDirectorySuccess;
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
@@ -93,6 +97,7 @@ public:
     void addAll(std::vector<homebrewButton*>, int);
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
+	void appendCategoryButton(char* name, int x, int y);
     void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
     std::string binaryTarget;
@@ -116,6 +121,8 @@ private:
 	
 	void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 	void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+	
+	void OnCategorySwitch(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 
 
     void OnCloseTcpReceiverFinish(GuiElement *element);
@@ -136,8 +143,8 @@ private:
     GuiImageData *rpxTabImgData;
 	GuiImage hblTabImg;
     GuiImage rpxTabImg;
-	GuiButton hblTabBtn;
-    GuiButton rpxTabBtn;
+	GuiButton backTabBtn;
+    GuiButton randomTabBtn;
 
     GuiTrigger touchTrigger;
     GuiTrigger wpadTouchTrigger;

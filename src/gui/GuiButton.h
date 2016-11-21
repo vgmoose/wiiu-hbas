@@ -93,10 +93,11 @@ class GuiButton : public GuiElement
 		sigslot::signal3<GuiButton *, const GuiController *, GuiTrigger *> clicked;
 		sigslot::signal3<GuiButton *, const GuiController *, GuiTrigger *> held;
 		sigslot::signal3<GuiButton *, const GuiController *, GuiTrigger *> released;
+	
+		GuiImage * image; //!< Button image (default)
 	protected:
         static const int iMaxGuiTriggers = 7;
 
-		GuiImage * image; //!< Button image (default)
 		GuiImage * imageOver; //!< Button image for STATE_SELECTED
 		GuiImage * imageHold; //!< Button image for STATE_HELD
 		GuiImage * imageClick; //!< Button image for STATE_CLICKED

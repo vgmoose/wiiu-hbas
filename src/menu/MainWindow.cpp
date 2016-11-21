@@ -81,6 +81,7 @@ void asyncRefreshHomebrewApps(CThread* thread, void* args)
 {
     log_printf("NEW THREAD START: Async refresh homebrew apps");
     homebrewWindow->refreshHomebrewApps();
+	homebrewWindow->displayCategories();
     homebrewWindow->loadLocalApps(0);
     // when refresh is done, start preloading the icon cache
     CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
@@ -98,7 +99,8 @@ void globalRefreshHomebrewApps()
 
 MainWindow::~MainWindow()
 {
-    removeE(homebrewWindow);
+	if (homebrewWindow)
+		removeE(homebrewWindow);
 //    removeE(&bgImageColor);
     if (showingSplashScreen)
         removeE(&splashScreen);
