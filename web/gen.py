@@ -45,6 +45,25 @@ try:
 	# the resulting json output
 	out = {}
 	out["apps"] = []
+	
+	stats = {}
+	# open up a stats file, if one is available
+	try:
+		report_file = open("stats/Report.csv")
+		target_app = ""
+		for line in report_file:
+			# we hit a line with stat data
+			if line.startswith("General Statistics for "):
+				# update the target app
+				target_app = line.split("/")[3]
+				stats[target_app] = 0
+				
+			# we hit a line with nonempty hit data
+			if line.startswith("Hits") and line.split(",")[1].rstrip() != "":
+				stats[target_app] += int(line.split(",")[1].rstrip())
+	except:
+		print("Encountered an error parsing stats/Report.csv<br>")
+		pass
 
 	# read lasts updated info from a "cache.txt" file
 	cache = {}
@@ -111,9 +130,14 @@ try:
 
 		# get icon path
 		icon = targdir + "/%s/icon.png" % app
+		
+		# try to load stats if available
+		cur_stats = 0
+		if app in stats:
+			cur_stats = stats[app]
 
 		# append to output json
-		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category})
+		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "hits": cur_stats})
 
 
 		# if there's no update according to the cache
