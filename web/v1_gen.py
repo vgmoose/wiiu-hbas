@@ -164,7 +164,7 @@ html2 = lastupdate + style + "<table id='wiiubru' class='sortable'><thead><tr><t
 yaml = ""
 yaml2 = ""
 
-whitelist = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "loadiine_gx2", "pacman", "mgba", "CHIP8", "saviine", "ftpiiu", "cfwbooter", "appstore", "geckiine", "u-paint", "Snes9x2010", "TCPgecko", "AocPatcher", "otp2sd", "hidtovpad", "SDcafiine", "wupymod", "ddd", "ourloader"]
+whitelist = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "mgba", "saviine", "ftpiiu", "cfwbooter", "appstore", "geckiine", "Snes9x2010", "AocPatcher", "otp2sd", "hidtovpad", "SDcafiine", "wupymod", "ourloader"]
 
 try:
     os.mkdir("zips")

@@ -86,9 +86,9 @@ try:
 		for file in os.listdir(targdir + "/%s" % app):
 			if file.endswith(".elf") or file.endswith(".rpx"):
 				binary = file
-				updated = time.ctime(os.path.getmtime(targdir + "/%s" % app))
-				# find filesize of binary
-				filesize = os.path.getsize(targdir + "/%s/%s" % (app,binary))
+				updated = time.strftime('%d/%m/%Y', time.gmtime(os.path.getmtime(targdir + "/%s" % app)))
+				# find filesize of binary in Kbs
+				filesize = os.path.getsize(targdir + "/%s/%s" % (app,binary))/1024
 
 		# if there's no binary found, continue
 		if not binary:
@@ -113,7 +113,7 @@ try:
 		icon = targdir + "/%s/icon.png" % app
 
 		# append to output json
-		out["apps"].append({"filesize": filesize, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category})
+		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category})
 
 
 		# if there's no update according to the cache
