@@ -55,7 +55,7 @@ try:
 			# we hit a line with stat data
 			if line.startswith("General Statistics for "):
 				# update the target app
-				target_app = line.split("/")[3]
+				target_app = line.split("/")[3].rstrip(",\r\n")
 				stats[target_app] = 0
 				
 			# we hit a line with nonempty hit data
@@ -132,12 +132,14 @@ try:
 		icon = targdir + "/%s/icon.png" % app
 		
 		# try to load stats if available
-		cur_stats = 0
+		cur_stats = cur_stats_web = 0
 		if app in stats:
 			cur_stats = stats[app]
+		if app+".zip" in stats:
+			cur_stats_web = stats[app+".zip"]
 
 		# append to output json
-		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "hits": cur_stats})
+		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "app_hits": cur_stats, "web_hits": cur_stats_web})
 
 
 		# if there's no update according to the cache
