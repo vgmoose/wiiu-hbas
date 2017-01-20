@@ -43,7 +43,7 @@ unsigned char exception_handler(void* contextIn) {
 	store[1] = (int)context[38];
 	
 
-	DisassemblePPCRange((void*)context[38]-0x18, (void*)context[38]+0x4, (void*)exception_disassembly_helper, 0, 0);
+	DisassemblePPCRange((void*)(context[38]-0x18), (void*)(context[38]+0x4), (void*)exception_disassembly_helper, 0, 0);
 
 	char buf[2048];
 		__os_snprintf(buf, 2048, "Unfortunately, Homebrew App Store %s has crashed...\n\nIf every porkchop were perfect,\nwe wouldn't have hot dogs.\n\nIf the problem persists, try holding while starting:\n  L button: Clear icon cache\n  R button: Disable icons\nor report the issue on github.\n\nEnjoy your day :>", APP_VERSION);

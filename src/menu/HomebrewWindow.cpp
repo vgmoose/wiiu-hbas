@@ -60,7 +60,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     if (button->coderLabel)
     {
         button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        button->coderLabel->setMaxWidth(170, GuiText::SCROLL_HORIZONTAL);
+        button->coderLabel->setMaxWidth(160, GuiText::SCROLL_HORIZONTAL);
         button->coderLabel->setPosition(300, 20);
         log_printf("did coder things");
     }
@@ -68,7 +68,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     if (button->versionLabel)
     {
         button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        button->versionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+        button->versionLabel->setMaxWidth(160, GuiText::SCROLL_HORIZONTAL);
         button->versionLabel->setPosition(300, -15);
         log_printf("did version things");
     }

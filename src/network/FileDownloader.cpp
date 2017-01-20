@@ -35,6 +35,7 @@ static int curlProgressCallback(void *clientp, double dltotal, double dlnow, dou
 
 bool FileDownloader::getFile(const std::string & downloadUrl, std::string & fileBuffer, ProgressCallback callback, void *arg)
 {
+    log_printf("Downloading %s to buffer", downloadUrl.c_str());
     curl_private_data_t private_data;
     private_data.progressCallback = callback;
     private_data.progressArg = arg;
@@ -58,6 +59,7 @@ bool FileDownloader::getFile(const std::string & downloadUrl, std::string & file
 
 bool FileDownloader::getFile(const std::string & downloadUrl, const std::string & outputPath, ProgressCallback callback, void *arg)
 {
+    log_printf("Downloading %s to %s", downloadUrl.c_str(), outputPath.c_str());
     curl_private_data_t private_data;
     private_data.progressCallback = callback;
     private_data.progressArg = arg;
@@ -85,6 +87,35 @@ bool FileDownloader::getFile(const std::string & downloadUrl, const std::string 
     return result;
 }
 
+// It's the same function, but it has a different name to avoid function confusion with the function before
+bool FileDownloader::getFileToSd(const std::string & downloadUrl, const std::string & outputPath, ProgressCallback callback, void *arg)
+{
+    curl_private_data_t private_data;
+    private_data.progressCallback = callback;
+    private_data.progressArg = arg;
+    private_data.buffer = 0;
+    private_data.filesize = 0;
+    private_data.file = new CFile(outputPath.c_str(), CFile::WriteOnly);
+
+    if(!private_data.file->isOpen())
+    {
+        delete private_data.file;
+        log_printf("Can not write to file %s\n", outputPath.c_str());
+        return false;
+    }
+
+    bool result = internalGetFile(downloadUrl, &private_data);
+
+    private_data.file->close();
+    delete private_data.file;
+    
+    if (!result)
+    {
+        // clean up downloaded file, we don't want to store it with a bad result
+        remove(outputPath.c_str());
+    }
+    return result;
+}
 
 bool FileDownloader::internalGetFile(const std::string & downloadUrl, curl_private_data_t * private_data)
 {
