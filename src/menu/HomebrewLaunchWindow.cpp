@@ -22,6 +22,7 @@
 #include "Application.h"
 #include "dynamic_libs/sys_functions.h"
 #include "network/FileDownloader.h"
+#include "utils/Zip.h"
 #include <algorithm>
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
@@ -279,50 +280,64 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
     log_printf("asyncDownloadTargetedFiles: start");
 
+    /*
+        Download files from
+        http://wiiubru.com/appstore/zips/ *app short name*.zip
+        to the temp folder, then extract the files to sd:/wiiu and delete the temp zip file
+    */
+	
     // Set the progress bar to 0%
     ProgressWindow * progress = getProgressWindow(); 
     progress->setProgress(0);
-    
-    // get the homebrew window, which holds variables we need access to
+	
+    // Get the homebrew window, which holds variables we need access to
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
-    
-    // convert the repo url into a std::string
-    std::string mRepoUrl = std::string(repoUrl);
-    
-    // three previously stored variables that are used belong to know which files to download
-    std::string sdPathTarget = homebrewWindowTarget->sdPathTarget;
-    std::string binaryTarget = homebrewWindowTarget->binaryTarget;
-    std::string pathTarget = homebrewWindowTarget->pathTarget;
-    
-    std::string iconPath = "/icon.png";
-    std::string codePath = "/" + binaryTarget;
-    
-    log_printf("asyncDownloadTargetedFiles: variables: repoUrl: %s, sdPath: %s, binary: %s, path: %s, icon: %s, code: %s", mRepoUrl.c_str(), sdPathTarget.c_str(), binaryTarget.c_str(), pathTarget.c_str(), iconPath.c_str(), codePath.c_str());
-    
-    // download the elf to sd card, and update the progres bar description
-    progress->setTitle("Downloading " + sdPathTarget+codePath + "...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+codePath, sdPathTarget+codePath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: downloaded %s", binaryTarget.c_str());
-    
-    // download meta.xml to sd card, and update the progres bar description
-    progress->setTitle("Downloading " + sdPathTarget+"/meta.xml...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+"/meta.xml", sdPathTarget+"/meta.xml", &updateProgress);
-log_printf("asyncDownloadTargetedFiles: downloaded meta.xml");
-    
-    // download the app image icon for this app. (If the icon download is interrupted,
-    // HBL may crash when it tries to read it
-    log_printf("Gonna get %s and put it in %s", (mRepoUrl+pathTarget+iconPath).c_str(), (sdPathTarget+iconPath).c_str());
-    progress->setTitle("Downloading " + sdPathTarget+iconPath+"...");
-    FileDownloader::getFile(mRepoUrl+pathTarget+iconPath, sdPathTarget+iconPath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: downloaded the icon");
-    
+    std::string appShortName = homebrewWindowTarget->appShortName;
+
+    std::string mRepoUrl     = std::string(repoUrl);
+	
+    std::string tmpFilePath    = "sd:/hbas_zips";	// Temporary path for zip files
+    std::string HomebrewSdRoot = "sd:/wiiu";		// The path where the zip file will be extracted
+
+    CreateSubfolder(tmpFilePath.c_str());		// Make sure temp folder is here 
+	
+    // Generate zip filename, url and path
+    std::string zipFileName = appShortName + ".zip";
+    std::string zibUrl      = mRepoUrl + "/zips/" + zipFileName;
+    std::string zipPath     = tmpFilePath  +  "/" + zipFileName;
+	
+    log_printf("asyncDownloadTargetedFiles: Homebrew ZIP Variables:");
+    log_printf("asyncDownloadTargetedFiles: zipFileName = %s", zipFileName.c_str());
+    log_printf("asyncDownloadTargetedFiles: zipUrl      = %s", zibUrl.c_str());
+    log_printf("asyncDownloadTargetedFiles: zipPath     = %s", zipPath.c_str());
+
+    // Download the zip file to the temp folder
+    progress->setTitle("Downloading " + zipFileName + "..."); //Set title to "Downloading *example.zip*..."
+    FileDownloader::getFileToSd(zibUrl, zipPath, &updateProgress);
+    log_printf("asyncDownloadTargetedFiles: Downloaded %s; trying to extract zip file...", zipFileName.c_str());
+	
+    //progress->setProgress(0);
+    progress->setTitle("Extracting Homebrew's Zip File...");
+
+    // The zip file has been downloaded; now extract it to the root of the sdcard
+    UnZip * ExtractAppZip = new UnZip(zipPath.c_str());
+    ExtractAppZip->ExtractAll(HomebrewSdRoot.c_str());
+    log_printf("asyncDownloadTargetedFiles: Extraction of zip file completed!");
+    delete ExtractAppZip;
+
+    // Now delete the zip file
+    std::remove(zipPath.c_str());
+    log_printf("asyncDownloadTargetedFiles: zip file removed");
+	
+    //Done!
+	
     // remove the progress bar
     homebrewWindowTarget->removeE(progress);
     
     // really hacky way to dismiss this window
     homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget);
 
-    // refresh main directory (crashes at the moment)
+    // refresh main directory
     globalRefreshHomebrewApps();
     log_printf("asyncDownloadTargetedFiles: stop");
 }
@@ -341,27 +356,18 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
 
-    // setup the paths based on the selected button
-    std::string path = "/apps/"+selectedButton->shortname;
-    std::string sdPath = "sd:/wiiu"+path;
-        
-    // create a new directory on sd
-    CreateSubfolder(sdPath.c_str());
-
     // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     homebrewWindowTarget->append(progress);
 	
-	homebrewWindow->backTabBtn.setState(GuiElement::STATE_DISABLED);
+    homebrewWindow->backTabBtn.setState(GuiElement::STATE_DISABLED);
     homebrewWindow->randomTabBtn.setState(GuiElement::STATE_DISABLED);
 
-    // store information about the desired files to homebrewWindowTarget, so that
+    // store information about the desired file to homebrewWindowTarget, so that
     // the thread can access it
-    homebrewWindowTarget->sdPathTarget = sdPath;
-    homebrewWindowTarget->pathTarget = path;
-    homebrewWindowTarget->binaryTarget = selectedButton->binary;
-    
+    homebrewWindowTarget->appShortName = selectedButton->shortname;
+	
     // targets to store to dismiss the window later
 //    homebrewWindowTarget->controllerTarget = controller;
 //    homebrewWindowTarget->buttonTarget = button;

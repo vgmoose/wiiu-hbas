@@ -120,9 +120,7 @@ public:
 	void appendCategoryButton(char* name, int x, int y);
     void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
-    std::string binaryTarget;
-    std::string pathTarget;
-    std::string sdPathTarget;
+    std::string appShortName;
     
     void OnLaunchBoxCloseClick(GuiElement *element);
     
