@@ -13,11 +13,23 @@ import xml.etree.ElementTree as ET
 
 print "Content-type: text/html\n\n"
 
+chan_zips = []
+
+try:
+	# get list of zip files for channels
+	file_list = os.listdir("chan_zips")
+
+	for czip in file_list:
+		# strip the .zip ending, and add it to the chan_zips array
+		chan_zips.append(czip.rstrip(".zip"))
+except:
+	pass
+
 # try and catch ANY error so web has output
 try:
 
 	# list of featured apps, these will be moved to the top of the json file
-	featured = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "loadiine_gx2", "retro_launcher", "pong", "pacman", "snake", "mgba", "CHIP8", "PokeMiniU", "saviine", "ftpiiu", "cfwbooter", "appstore", "geckiine", "u-paint", "hid_keyboard_monitor", "LiveSynthesisU", "keyboard_example", "Snes9x2010"]
+	featured = ["asturoids", "spacegame", "flappy_bird", "homebrew_launcher", "loadiine_gx2", "retro_launcher", "pong", "pacman", "snake", "mgba_libretro", "snes9x2010_libretro",  "gambatte_libretro", "CHIP8", "quicknes_libretro", "mame2003_libretro", "genesis_plus_gx_libretro", "appstore", "cfwbooter", "mocha", "haxchi", "hidtovpad", "geckiine", "wuphax", "saviine", "ftpiiu", "wudump", "u-paint", "cbhc", "hid_keyboard_monitor", "LiveSynthesisU", "keyboard_example"]
 
 	# This function zips the incoming path into the file in ziph
 	def zipdir(path, ziph):
@@ -92,13 +104,13 @@ try:
 		# get icon.png file from HBL
 		iconfile = targdir + "/%s/icon.png" % app
 
-		if imghdr.what(iconfile) != "png":
-			print "Skipping %s as its icon.png isn't a png file" % app
+		if not os.path.exists(iconfile) or imghdr.what(iconfile) != "png":
+			print "Skipping %s as its icon.png isn't a png file or doesn't exist" % app
 			continue
 
 		# create some default fields
 		name = coder = desc = long_desc = version = source = updated = filesize = category = src_link = "N/A"
-		typee = "hbl"
+		typee = "elf"
 
 		# find a binary in this app folder
 		binary = None
@@ -138,8 +150,13 @@ try:
 		if app+".zip" in stats:
 			cur_stats_web = stats[app+".zip"]
 
+		hasChannel = "_"
+		# does this app have a channel?
+		if app in chan_zips:
+			hasChannel = "Channel"
+
 		# append to output json
-		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "app_hits": cur_stats, "web_hits": cur_stats_web})
+		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "app_hits": cur_stats, "web_hits": cur_stats_web, "channel": hasChannel})
 
 
 		# if there's no update according to the cache
