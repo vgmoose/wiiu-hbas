@@ -25,6 +25,15 @@ try:
 except:
 	pass
 
+def cgiprint(inp):
+	# print and flush, to update web right away
+	print(inp)
+	sys.stdout.flush()
+	
+def run(cmd):
+	# run a unix command, and suppress the output
+	return os.system(cmd + " 2> /dev/null")
+
 # try and catch ANY error so web has output
 try:
 
@@ -35,18 +44,22 @@ try:
 	def zipdir(path, ziph):
 		for root, dirs, files in os.walk(path):
 			for file in files:
-				ziph.write(os.path.join(root, file))
+				ppath = os.path.join(root, file)
+				ziph.write(ppath, ppath.lstrip("sdroot/"))
 
 	# This function parses out several attributes from xml
 	def xml_read(incoming, tree, app):
-		outgoing = []
-		for key in incoming:
-			try:
-				outgoing.append(tree.find(key).text)
-			except:
-				print "%s: Missing &lt;%s&gt; in meta.xml<br>" % (app, key)
-				outgoing.append("N/A")
-		return tuple(outgoing)
+		try:
+			outgoing = []
+			for key in incoming:
+				try:
+					outgoing.append(tree.find(key).text)
+				except:
+					cgiprint("%s: Missing &lt;%s&gt; in meta.xml<br>" % (app, key))
+					outgoing.append("N/A")
+			return tuple(outgoing)
+		except:
+			return False
 
 	# create the zips directory
 	try:
@@ -74,19 +87,7 @@ try:
 			if line.startswith("Hits") and line.split(",")[1].rstrip() != "":
 				stats[target_app] += int(line.split(",")[1].rstrip())
 	except:
-		print("Encountered an error parsing stats/Report.csv<br>")
-		pass
-
-	# read lasts updated info from a "cache.txt" file
-	cache = {}
-	try:
-		contents = open("cache.txt", "r")
-		for line in contents:
-			line = line.replace("\n", "").split("\t")
-			name = line[1]
-			updated = line[0]
-			cache[name] = updated
-	except:
+		cgiprint("Encountered an error parsing stats/Report.csv<br>")
 		pass
 
 	apps = os.listdir("apps")
@@ -105,7 +106,7 @@ try:
 		iconfile = targdir + "/%s/icon.png" % app
 
 		if not os.path.exists(iconfile) or imghdr.what(iconfile) != "png":
-			print "Skipping %s as its icon.png isn't a png file or doesn't exist" % app
+			cgiprint("Skipping %s as its icon.png isn't a png file or doesn't exist<br>" % app)
 			continue
 
 		# create some default fields
@@ -135,7 +136,15 @@ try:
 			tree = ET.parse(xmlfile)
 
 			# pull out those attributes
-			name, coder, desc, source, long_desc, version, category = xml_read(["name", "coder", "short_description", "url", "long_description", "version", "category"], tree, app)
+			resp = xml_read(["name", "coder", "short_description", "url", "long_description", "version", "category"], tree, app)
+			
+			# skip app if invalid response from meta parsing
+			if not resp:
+				cgiprint("Error in meta.xml for %s, skipping...<br>" % app)
+				continue
+				
+			# set attributes
+			name, coder, desc, source, long_desc, version, category = resp
 
 		# sanitize long_desc for json output
 		long_desc = long_desc.replace("\n", "\\n").replace("\t", "\\t")
@@ -158,17 +167,36 @@ try:
 		# append to output json
 		out["apps"].append({"filesize": filesize, "version": version, "updated": updated, "directory": app, "name": name, "author": coder, "desc": desc, "url": source, "binary": binary, "long_desc": long_desc, "type": typee, "cat": category, "app_hits": cur_stats, "web_hits": cur_stats_web, "channel": hasChannel})
 
-
-		# if there's no update according to the cache
-		if app in cache and cache[app] == updated:
+		# if the .deletetoupdate file exists, don't compress
+		# also if the zip doesn't exist already
+		if os.path.exists("apps/%s/.deletetoupdate" % app) and os.path.exists("zips/%s.zip" % app):
 			continue
+		
+		cgiprint("Compressing " + app + "...<br>")
+		
+		# move the app to a staging directory, to create a good structue
+		# with which to zip it with
+		# using unix commands cause python has weird syntax for this
+		run("rm -rf sdroot")
+		run("mkdir -p sdroot/wiiu/apps")
+		
+		# copy over the app folder
+		run("cp -rf apps/%s sdroot/wiiu/apps" % app)
+		
+		# remove some junk files
+		run("find sdroot -name .deletetoupdate -delete -o -name .DS_Store -delete")
+		
+		# move the other sd files into place (if they exist)
+		run("mv sdroot/wiiu/apps/%s/sd/* sdroot" % app)
+		run("rmdir sdroot/wiiu/apps/%s/sd" % app)
 
-		print "Compressing " + app + "...<br>"
-
-		# zip up this app
+		# zip up this whole sdroot package
 		zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
-		zipdir(targdir + "/%s" % app, zipf)
+		zipdir("sdroot/", zipf)
 		zipf.close()
+		
+		# create the .deletetoupdate file
+		open("apps/%s/.deletetoupdate" % app, 'a').close()
 
 	# last updated date
 	out["updated"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -200,15 +228,10 @@ try:
 		ziph.write("apps/"+cur["directory"]+"/icon.png", cur["directory"]+".png")
 	ziph.close()
 
-	# write out the update times to a cache file
-	cache_out = open("cache.txt", "w")
-	for cur in out["apps"]:	cache_out.write(cur["updated"]+"\t"+cur["directory"]+"\n")
-	cache_out.close()
-
 	# print done and run legacy scripts
-	print "Updated directory.json !!!<br>"
+	cgiprint("Updated directory.json !!!<br>")
 	
-	print "Running v1_gen.py for hbas 1.0...<br>"
+	cgiprint("Running v1_gen.py for hbas 1.0...<br>")
 	os.system("python v1_gen.py")
 
 except Exception, err:
