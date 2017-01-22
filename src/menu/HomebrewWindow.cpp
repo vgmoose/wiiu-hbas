@@ -218,7 +218,7 @@ void HomebrewWindow::loadLocalApps(int mode)
     // get the 4 different types of app backgrounds
 //    GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
     
-    log_printf("loadLocalApps: begin2");
+    // log_printf("loadLocalApps: begin2");
     // get a list of directories
     DirList* dirList = new DirList("sd:/wiiu/apps", ".elf,.rpx", DirList::Files | DirList::CheckSubfolders);
     
@@ -244,11 +244,17 @@ void HomebrewWindow::loadLocalApps(int mode)
             continue;
 
         std::string homebrewPath = dirList->GetFilepath(i);
-        
+
         log_printf("Initial value: %s", homebrewPath.c_str());
         size_t slashPos = homebrewPath.rfind('/');
         if(slashPos != std::string::npos)
             homebrewPath.erase(slashPos);
+
+        if(homebrewPath == "sd:/wiiu/apps") {
+            // This cause (a lot of) problems
+            log_printf("Skipping app with bad path to prevent errors");
+            continue;
+        }
         
         log_printf("Loaded up %s, going to check for a meta", homebrewPath.c_str());
         HomebrewXML metaXml;
@@ -262,10 +268,13 @@ void HomebrewWindow::loadLocalApps(int mode)
         log_printf("Continuing with it...");
         LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
         
+        log_printf("Loaded icon");
+
         int found = 0;
         if (!xmlReadSuccess) continue;
         
         std::string curAppString = homebrewPath.substr(14);
+        if (curAppString == "") continue;
                 
         // check if we already have this app in some as updated/installed
         for (unsigned int x=0; x<remoteAppButtons.size() && xmlReadSuccess; x++)
@@ -297,7 +306,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         
         scrollOffY = -120;
                 
-        log_printf("Makinga localfile for this one");
+        log_printf("Making a localfile for this one");
         
         // make the homebrew list bigger if we're gonna process this
         int idx = homebrewButtons.size();
