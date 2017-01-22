@@ -193,7 +193,8 @@ void GuiFrame::draw(CVideo * v)
 
 	for (u32 i = 0; i < size && i < elements.size(); ++i)
 	{
-		elements[i]->draw(v);
+		if(abs(elements[i]->getOffsetY())<480.000000f)
+			elements[i]->draw(v);
 	}
 }
 

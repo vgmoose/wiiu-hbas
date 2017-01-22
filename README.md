@@ -1,4 +1,4 @@
-**The 1.0 version of HBAS [is released!](http://github.com/vgmoose/hbas/releases)** See [the post here](https://gbatemp.net/threads/release-homebrew-app-store-for-wiiu.433275) for more info.
+**The 1.5 version of HBAS [is released!](http://github.com/vgmoose/hbas/releases)** See [the post here](https://gbatemp.net/threads/release-homebrew-app-store-for-wiiu.433275) for more info.
 
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
 
@@ -28,6 +28,9 @@ Code
 - dimok - lots of code, and the main framework used here is copied from [Homebrew Launcher](https://gbatemp.net/threads/homebrew-launcher-for-wiiu.416905/)
 - pwsincd - writing and optimizing web template code
 - brienj - extremely helpful debugging
+- rw-r-r_0644 - fix some framerate issues and  downloading enhancements
+- quarktheawesome - the lovely exception handler
+- zarklord1 - wii u zip folder extraction library
 - marionumber1 - for begrudgingly being a 5.5 enabler
 
 Resources
@@ -38,7 +41,6 @@ Resources
 Misc Support
 
 - quarktheawesome
-- rw-r-r-0644
 - ryuutseku85
 - creepermario
 - datalogger
