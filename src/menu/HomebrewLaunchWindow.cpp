@@ -297,7 +297,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     std::string mRepoUrl     = std::string(repoUrl);
 	
     std::string tmpFilePath    = "sd:/hbas_zips";	// Temporary path for zip files
-    std::string HomebrewSdRoot = "sd:/wiiu";		// The path where the zip file will be extracted
+    std::string HomebrewSdRoot = "sd:";			// The path where the zip file will be extracted
 
     CreateSubfolder(tmpFilePath.c_str());		// Make sure temp folder is here 
 	
