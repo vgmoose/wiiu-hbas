@@ -23,6 +23,7 @@
 #include "utils/HomebrewXML.h"
 #include "HomebrewLaunchWindow.h"
 #include "network/FileDownloader.h"
+#include "network/ConnectionTest.h"
 #include <thread>
 #include <sstream>
 
@@ -124,10 +125,10 @@ the curTabButtons list, which is what's actually rendered.
 **/
 void HomebrewWindow::filter()
 {
-	if (listingMode < 0)
-		return;
-	
-	isFiltering = true;
+    if (listingMode < 0)
+        return;
+    
+    isFiltering = true;
     scrollOffY = -120;
     
     homebrewButtons.clear();
@@ -137,37 +138,37 @@ void HomebrewWindow::filter()
 //    {
 //        output += "["+std::string(curTabButtons[x]->shortname)+"] ";
 //    }
-		
-//	std::random_shuffle(curTabButtons.begin(),curTabButtons.end());
+        
+//    std::random_shuffle(curTabButtons.begin(),curTabButtons.end());
     
 
-	for (u32 x=0; x<curTabButtons.size(); x++)
-	{
-		// if it's 0, it's all apps
-		if (listingMode > 0)
-		{
-			// do category sorting
-			if (listingMode == 1 && curTabButtons[x]->category != "game")
-				continue;
-			if (listingMode == 2 && curTabButtons[x]->category != "emu")
-				continue;
-			if (listingMode == 3 && curTabButtons[x]->category != "tool")
-				continue;
-			if (listingMode == 4 && curTabButtons[x]->category != "loader")
-				continue;
-			if (listingMode == 5 && curTabButtons[x]->category != "poc")
-				continue;
-		}
+    for (u32 x=0; x<curTabButtons.size(); x++)
+    {
+        // if it's 0, it's all apps
+        if (listingMode > 0)
+        {
+            // do category sorting
+            if (listingMode == 1 && curTabButtons[x]->category != "game")
+                continue;
+            if (listingMode == 2 && curTabButtons[x]->category != "emu")
+                continue;
+            if (listingMode == 3 && curTabButtons[x]->category != "tool")
+                continue;
+            if (listingMode == 4 && curTabButtons[x]->category != "loader")
+                continue;
+            if (listingMode == 5 && curTabButtons[x]->category != "poc")
+                continue;
+        }
 
-		log_printf("%p", curTabButtons[x]->button);
-		append(curTabButtons[x]->button);
-		homebrewButtons.push_back(curTabButtons[x]);
+        log_printf("%p", curTabButtons[x]->button);
+        append(curTabButtons[x]->button);
+        homebrewButtons.push_back(curTabButtons[x]);
 
 //        log_printf("filter: added it");
-		globalUpdatePosition = true;
-	}
-	
-	isFiltering = false;
+        globalUpdatePosition = true;
+    }
+    
+    isFiltering = false;
             
 }
 
@@ -208,7 +209,7 @@ This method fetches the local apps from either /wiiu/games or /wiiu/apps
 **/
 void HomebrewWindow::loadLocalApps(int mode)
 {
-	clearScreen();
+    clearScreen();
     
     localAppButtons.clear();
     homebrewButtons.clear();
@@ -259,13 +260,13 @@ void HomebrewWindow::loadLocalApps(int mode)
         u32 iconDataSize = 0;
         
         log_printf("Continuing with it...");
-		LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
+        LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
         
         int found = 0;
-		if (!xmlReadSuccess) continue;
-		
-		std::string curAppString = homebrewPath.substr(14);
-		        
+        if (!xmlReadSuccess) continue;
+        
+        std::string curAppString = homebrewPath.substr(14);
+                
         // check if we already have this app in some as updated/installed
         for (unsigned int x=0; x<remoteAppButtons.size() && xmlReadSuccess; x++)
         {
@@ -293,16 +294,16 @@ void HomebrewWindow::loadLocalApps(int mode)
         }
         
         if (found) continue;
-		
-		scrollOffY = -120;
+        
+        scrollOffY = -120;
                 
         log_printf("Makinga localfile for this one");
         
         // make the homebrew list bigger if we're gonna process this
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
-		
-		homebrewButtons[idx] = new homebrewButton();
+        
+        homebrewButtons[idx] = new homebrewButton();
                 
         // file path
         homebrewButtons[idx]->execPath = dirList->GetFilepath(i);
@@ -321,7 +322,7 @@ void HomebrewWindow::loadLocalApps(int mode)
             homebrewButtons[idx]->iconImgData = new GuiImageData(iconData, iconDataSize);
             free(iconData);
             iconData = NULL;
-		}
+        }
       
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx]->execPath.c_str();
 //        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
@@ -334,7 +335,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, glm::vec4(0, 0, 0, 1));
         log_printf("refreshHomebrewApps: added local button %d", idx);
         homebrewButtons[idx]->version = xmlReadSuccess? metaXml.GetVersion() : "999";
-		
+        
         localAppButtons.push_back(homebrewButtons[idx]);
         log_printf("totally done with and added that");
     }
@@ -360,18 +361,18 @@ void HomebrewWindow::refreshHomebrewApps()
     remoteAppButtons.clear();
     homebrewButtons.clear();
     curTabButtons.clear();
-	
-	std::string cache;
-	
-	if (!noIconMode)
-	{
-		// create the icon cache folder
-		cache = "sd:/wiiu/apps/appstore/cache/";
-		CreateSubfolder(cache.c_str());
-	}
     
-	int count = 0;
-                		
+    std::string cache;
+    
+    if (!noIconMode)
+    {
+        // create the icon cache folder
+        cache = "sd:/wiiu/apps/appstore/cache/";
+        CreateSubfolder(cache.c_str());
+    }
+    
+    int count = 0;
+                        
     // download app list from the repo
     std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
     if (!gotDirectorySuccess)
@@ -380,20 +381,20 @@ void HomebrewWindow::refreshHomebrewApps()
         gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
 //        removeE(progressWindow);
         log_printf("refreshHomebrewApps: Updated directory");
-		
-		std::istringstream f2(fileContents);
-	
-		// get the total number of apps (lines divided by 7)
-		while (gotDirectorySuccess)
-		{
-			count ++;
-			std::string dummy;
-			if (!std::getline(f2, dummy)) break;
-		}
+        
+        std::istringstream f2(fileContents);
+    
+        // get the total number of apps (lines divided by 7)
+        while (gotDirectorySuccess)
+        {
+            count ++;
+            std::string dummy;
+            if (!std::getline(f2, dummy)) break;
+        }
 
-		count /= 7;
-	}
-	
+        count /= 7;
+    }
+    
     std::istringstream f(fileContents);
     
     // totalLocalApps will represent how many apps aren't on the server
@@ -404,11 +405,11 @@ void HomebrewWindow::refreshHomebrewApps()
 
     while (gotDirectorySuccess)
     {
-		char numstr[30];
-		sprintf(numstr, "Updating App info... (%d/%d)", iterCount, count);
-		
+        char numstr[30];
+        sprintf(numstr, "Updating App info... (%d/%d)", iterCount, count);
+        
         progressWindow->setTitle(numstr);
-		updateProgress(0, iterCount, count);
+        updateProgress(0, iterCount, count);
 
         log_printf("starting yaml parsing");
         std::string shortname;
@@ -482,52 +483,52 @@ void HomebrewWindow::refreshHomebrewApps()
         
         // add this to the remote button array
         remoteAppButtons.push_back(homebrewButtons[idx]);
-		
-		
+        
+        
         log_printf("added %s to the remoteApps vector", shortname.c_str());
         iterCount ++;
-		
-		// download the icon for this remote app if we aren't ignoring icons
-		if (!noIconMode)
-		{
-			int x = remoteAppButtons.size() - 1;
+        
+        // download the icon for this remote app if we aren't ignoring icons
+        if (!noIconMode)
+        {
+            int x = remoteAppButtons.size() - 1;
 
-			// set the download app icon location
-			const std::string dest = cache + remoteAppButtons[x]->shortname + ".png";
+            // set the download app icon location
+            const std::string dest = cache + remoteAppButtons[x]->shortname + ".png";
 
-			// find the path on the server depending on our current tab
-			std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
+            // find the path on the server depending on our current tab
+            std::string tabPath = "apps/" + remoteAppButtons[x]->shortname + "/icon.png";
 
-			std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
-			bool imageDownloadSuccessful = false;
-									
-			// try to load an existing icon
-			u8 * iconData = NULL;
-        	u32 iconDataSize = 0;
-			
-			// if invalidating cache, skip loading to memory (leaving iconData null)
-			if (!invalidateCache)
-				LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
-			
-			// check if the desired icon already exists in the cache, if not download it
-			if (iconData == NULL)
-				imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
+            std::string targetIconUrl = std::string(repoUrl)+"/"+tabPath;
+            bool imageDownloadSuccessful = false;
+                                    
+            // try to load an existing icon
+            u8 * iconData = NULL;
+            u32 iconDataSize = 0;
+            
+            // if invalidating cache, skip loading to memory (leaving iconData null)
+            if (!invalidateCache)
+                LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+            
+            // check if the desired icon already exists in the cache, if not download it
+            if (iconData == NULL)
+                imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
 
-			if (imageDownloadSuccessful || iconData != NULL)
-			{
-				u8 * iconData = NULL;
-				u32 iconDataSize = 0;
-				LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+            if (imageDownloadSuccessful || iconData != NULL)
+            {
+                u8 * iconData = NULL;
+                u32 iconDataSize = 0;
+                LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
 
-				GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
+                GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
 
-				remoteAppButtons[x]->iconImgData = iconImgData;
-			}
-		}
-		
+                remoteAppButtons[x]->iconImgData = iconImgData;
+            }
+        }
+        
     }
-	
-	removeE(progressWindow);
+    
+    removeE(progressWindow);
 
     initialLoadInProgress = false;
     globalUpdatePosition = true;
@@ -555,13 +556,13 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     , getButtonImgData(Resources::GetImageData("GET.png"))
     , updateButtonImgData(Resources::GetImageData("UPDATE.png"))
     , localButtonImgData(Resources::GetImageData("LOCAL.png"))
-	, hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
-	, hblTabImgData(Resources::GetImageData("back_tab.png"))
-	, rpxTabImgData(Resources::GetImageData("random_tab.png"))
-	, hblTabImg(hblTabImgData)
-	, rpxTabImg(rpxTabImgData)
-	, backTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
-	, randomTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
+    , hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
+    , hblTabImgData(Resources::GetImageData("back_tab.png"))
+    , rpxTabImgData(Resources::GetImageData("random_tab.png"))
+    , hblTabImg(hblTabImgData)
+    , rpxTabImg(rpxTabImgData)
+    , backTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
+    , randomTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
 {
@@ -574,8 +575,8 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     gotDirectorySuccess = false;
     screenLocked = false;
 
-	listingMode = -1;
-		
+    listingMode = -1;
+        
     char* localRepoUrl = "sd:/wiiu/apps/appstore/repository.txt";
         
      struct stat buffer;   
@@ -599,11 +600,17 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     }
         
     log_printf(repoUrl);
+    
+    ConnectionTest * repoConnection = new ConnectionTest(std::string(repoUrl));
+    internet_connection = repoConnection->Test();
         
     progressWindow = new ProgressWindow("Downloading app directory...");
-    std::string qualifiedName = " "+std::string(repoUrl);
-        
-    hblRepoText = new GuiText(qualifiedName.c_str(), 32, glm::vec4(1.0f));
+    std::string qualifiedName = " " + std::string(repoUrl);
+
+    if (internet_connection)
+        hblRepoText = new GuiText(qualifiedName.c_str(), 32, glm::vec4(1.0f));
+    else
+        hblRepoText = new GuiText(" (!) OFFLINE", 32, glm::vec4(1, 1, 0, 1));
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
     hblRepoText->setAlignment(ALIGN_BOTTOM | ALIGN_LEFT);
@@ -612,40 +619,40 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     progressWindow->setPosition(0, 30.0f);
     append(&hblVersionText);
     append(hblRepoText);
-		
-//	header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
-	header = new GuiImage(Resources::GetImageData("title.png"));
-	header->setAlignment(ALIGN_TOP);
-	header2 = new GuiText("Select a Category", 30, glm::vec4(1, 1, 1, 1));
-	
-		
-	// for now, do this like this
-	// in the future, a method should handle guibuttons like this
-	backTabBtn.setImage(&hblTabImg);
-	randomTabBtn.setImage(&rpxTabImg);
-		
-	backTabBtn.setScale(0.6);
-	randomTabBtn.setScale(0.6);
-		
-	backTabBtn.setAlignment(ALIGN_LEFT);
-	randomTabBtn.setAlignment(ALIGN_RIGHT);
-		
-	backTabBtn.setPosition(0, 0);
-	randomTabBtn.setPosition(0, 0);
-		
-	backTabBtn.setEffectGrow();
-	randomTabBtn.setEffectGrow();
-		
+        
+//    header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
+    header = new GuiImage(Resources::GetImageData("title.png"));
+    header->setAlignment(ALIGN_TOP);
+    header2 = new GuiText("Select a Category", 30, glm::vec4(1, 1, 1, 1));
+    
+        
+    // for now, do this like this
+    // in the future, a method should handle guibuttons like this
+    backTabBtn.setImage(&hblTabImg);
+    randomTabBtn.setImage(&rpxTabImg);
+        
+    backTabBtn.setScale(0.6);
+    randomTabBtn.setScale(0.6);
+        
+    backTabBtn.setAlignment(ALIGN_LEFT);
+    randomTabBtn.setAlignment(ALIGN_RIGHT);
+        
+    backTabBtn.setPosition(0, 0);
+    randomTabBtn.setPosition(0, 0);
+        
+    backTabBtn.setEffectGrow();
+    randomTabBtn.setEffectGrow();
+        
     backTabBtn.setTrigger(&touchTrigger);
-	randomTabBtn.setTrigger(&touchTrigger);
-		
-	backTabBtn.setSoundClick(buttonClickSound);
-	randomTabBtn.setSoundClick(buttonClickSound);
-		
-	backTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
+    randomTabBtn.setTrigger(&touchTrigger);
+        
+    backTabBtn.setSoundClick(buttonClickSound);
+    randomTabBtn.setSoundClick(buttonClickSound);
+        
+    backTabBtn.clicked.connect(this, &HomebrewWindow::OnHBLTabButtonClick);
     randomTabBtn.clicked.connect(this, &HomebrewWindow::OnRPXTabButtonClick);
-	
-	append(progressWindow);
+    
+    append(progressWindow);
         
 //    refreshHomebrewApps();
 }
@@ -654,18 +661,18 @@ HomebrewWindow::~HomebrewWindow()
 {
     for(u32 i = 0; i < homebrewButtons.size(); ++i)
     {
-		if (homebrewButtons[i]->image != 0)
-        	delete homebrewButtons[i]->image;
-		if (homebrewButtons[i]->nameLabel != 0)
-			delete homebrewButtons[i]->nameLabel;
-		if (homebrewButtons[i]->descriptionLabel != 0)
-			delete homebrewButtons[i]->descriptionLabel;
-		if (homebrewButtons[i]->button != 0)
-        	delete homebrewButtons[i]->button;
-		if (homebrewButtons[i]->iconImgData != 0)
-			delete homebrewButtons[i]->iconImgData;
-		if (homebrewButtons[i]->iconImg != 0)
-			delete homebrewButtons[i]->iconImg;
+        if (homebrewButtons[i]->image != 0)
+            delete homebrewButtons[i]->image;
+        if (homebrewButtons[i]->nameLabel != 0)
+            delete homebrewButtons[i]->nameLabel;
+        if (homebrewButtons[i]->descriptionLabel != 0)
+            delete homebrewButtons[i]->descriptionLabel;
+        if (homebrewButtons[i]->button != 0)
+            delete homebrewButtons[i]->button;
+        if (homebrewButtons[i]->iconImgData != 0)
+            delete homebrewButtons[i]->iconImgData;
+        if (homebrewButtons[i]->iconImg != 0)
+            delete homebrewButtons[i]->iconImg;
     }
 
     Resources::RemoveSound(buttonClickSound);
@@ -673,125 +680,132 @@ HomebrewWindow::~HomebrewWindow()
     Resources::RemoveImageData(getButtonImgData);
     Resources::RemoveImageData(updateButtonImgData);
     Resources::RemoveImageData(localButtonImgData);
-	Resources::RemoveImageData(hblTabImgData);
-	Resources::RemoveImageData(rpxTabImgData);
+    Resources::RemoveImageData(hblTabImgData);
+    Resources::RemoveImageData(rpxTabImgData);
 }
 
 void HomebrewWindow::clearScreen()
 {
-	// remove any existing buttons
+    // remove any existing buttons
     for (u32 x=0; x<curTabButtons.size(); x++)
     {
 //        log_printf("filter: about to remove button %d", x);
         removeE(curTabButtons[x]->button);  
     }
-	curTabButtons.clear();
+    curTabButtons.clear();
 }
 
 void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	
-	// remove all category buttons
-	for (unsigned int x=0; x<all_cats.size(); x++)
-	{
-		// detect which number category button was pressed
-		if (all_cats[x] == button)
-			listingMode = x;
-						
-		// remove them
-		removeE(all_cats[x]);
-	}
-	
-	removeE(header);
-	removeE(header2);
-	
-	append(&backTabBtn);
-	append(&randomTabBtn);
-	
-	loadLocalApps(0);
-	// change the category based on the click
-//	filter();
+    
+    // remove all category buttons
+    for (unsigned int x=0; x<all_cats.size(); x++)
+    {
+        // detect which number category button was pressed
+        if (all_cats[x] == button)
+            listingMode = x;
+                        
+        // remove them
+        removeE(all_cats[x]);
+    }
+    
+    removeE(header);
+    removeE(header2);
+    
+    append(&backTabBtn);
+
+    if (internet_connection)
+        append(&randomTabBtn);
+    
+    loadLocalApps(0);
+    // change the category based on the click
+//    filter();
 }
 
 void HomebrewWindow::appendCategoryButton(char* name, int x, int y)
-{		
-	int idx = all_cats.size();
-	log_printf("CUR BUTTON: %d", idx);
-	all_cats.resize(idx+1);
-	
-	GuiImage* img = new GuiImage(Resources::GetImageData(name));
-		
-	all_cats[idx] = new GuiButton(img->getWidth(), img->getHeight());
-	all_cats[idx]->setImage(new GuiImage(Resources::GetImageData(name)));
-	all_cats[idx]->setPosition(x, y);
-	
+{        
+    int idx = all_cats.size();
+    log_printf("CUR BUTTON: %d", idx);
+    all_cats.resize(idx+1);
+    
+    GuiImage* img = new GuiImage(Resources::GetImageData(name));
+        
+    all_cats[idx] = new GuiButton(img->getWidth(), img->getHeight());
+    all_cats[idx]->setImage(new GuiImage(Resources::GetImageData(name)));
+    all_cats[idx]->setPosition(x, y);
+    
     all_cats[idx]->setSoundClick(buttonClickSound);
     all_cats[idx]->setTrigger(&touchTrigger);
     all_cats[idx]->setTrigger(&wpadTouchTrigger);
-	all_cats[idx]->setEffectGrow();
-	all_cats[idx]->clicked.connect(this, &HomebrewWindow::OnCategorySwitch);
-	
+    all_cats[idx]->setEffectGrow();
+    all_cats[idx]->clicked.connect(this, &HomebrewWindow::OnCategorySwitch);
+    
 
-	append(all_cats[idx]);
+    append(all_cats[idx]);
 }
 
 void HomebrewWindow::displayCategories()
 {
-	clearScreen();
-	all_cats.clear();
-	
-	header->setPosition(0, 0);
-	append(header);
-	
-	header2->setPosition(0, -240);
-	append(header2);
-	
-	const char* vals[6] = {"all_gray.png", "games.png", "emulators.png", "tools.png", "loaders.png", "concepts.png"};
-				
-	appendCategoryButton((char*)vals[0], 	-250, 	100);
-	appendCategoryButton((char*)vals[1],	0, 		100);
-	appendCategoryButton((char*)vals[2], 	250, 	100);
-	appendCategoryButton((char*)vals[3], 	-250, 	-100);
-	appendCategoryButton((char*)vals[4], 	0,		-100);
-	appendCategoryButton((char*)vals[5],	250, 	-100);
-	
-	
+    clearScreen();
+    all_cats.clear();
+    
+    header->setPosition(0, 0);
+    append(header);
+    
+    header2->setPosition(0, -240);
+    append(header2);
+    
+    const char* vals[6] = {"all_gray.png", "games.png", "emulators.png", "tools.png", "loaders.png", "concepts.png"};
+    
+    if (internet_connection) {
+        appendCategoryButton((char*)vals[0], -250,  100);
+        appendCategoryButton((char*)vals[1],    0,  100);
+        appendCategoryButton((char*)vals[2],  250,  100);
+        appendCategoryButton((char*)vals[3], -250, -100);
+        appendCategoryButton((char*)vals[4],    0, -100);
+        appendCategoryButton((char*)vals[5],  250, -100);
+    } else {
+        // When there's no internet the app is unable to detect categories so all the categories apart from "all apps" would be empty
+        appendCategoryButton("all_gray.png",    0,    0);
+    }
 }
 
 
 void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (screenLocked)
-	{
-		if (launchBox)
-			// dismiss any active window
-			OnLaunchBoxCloseClick(launchBox);
-		return;
-	}
-	
-	listingMode = -1;
-	clearScreen();
+    if (screenLocked)
+    {
+        if (launchBox)
+            // dismiss any active window
+            OnLaunchBoxCloseClick(launchBox);
+        return;
+    }
+    
+    listingMode = -1;
+    clearScreen();
     filter();
-	
-	removeE(&backTabBtn);
-	removeE(&randomTabBtn);
-	
-	displayCategories();
+    
+    removeE(&backTabBtn);
+
+    if (internet_connection)
+        removeE(&randomTabBtn);
+    
+    displayCategories();
     globalUpdatePosition = true;
 }
 
 void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	if (screenLocked)
-	{
-		if (launchBox)
-			// dismiss any active window
-			removeE(launchBox);
-	}
-	
-	// click a random button within the displayed apps
-	int r = rand() % homebrewButtons.size();
-	OnHomebrewButtonClick(homebrewButtons[r]->button, controller, 0);
+    if (screenLocked)
+    {
+        if (launchBox)
+            // dismiss any active window
+            removeE(launchBox);
+    }
+    
+    // click a random button within the displayed apps
+    int r = rand() % homebrewButtons.size();
+    OnHomebrewButtonClick(homebrewButtons[r]->button, controller, 0);
 }
 
 void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
@@ -804,10 +818,10 @@ void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
 void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 {
     screenLocked = false;
-	
-	backTabBtn.clearState(GuiElement::STATE_DISABLED);
+    
+    backTabBtn.clearState(GuiElement::STATE_DISABLED);
     randomTabBtn.clearState(GuiElement::STATE_DISABLED);
-	
+    
     //! remove element from draw list and push to delete queue
     removeE(element);
     AsyncDeleter::pushForDelete(element);
@@ -824,7 +838,7 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
     element->setState(GuiElement::STATE_DISABLED);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewWindow::OnCloseEffectFinish);
-	launchBox = NULL;
+    launchBox = NULL;
 }
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
@@ -832,7 +846,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     log_printf("clicked a homebrew button");
     if (getHasScrolled() || initialLoadInProgress) {
         return;
-    }		
+    }        
     
     thisHomebrewWindow = this;
         
@@ -844,7 +858,7 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
         if(button == homebrewButtons[i]->button)
         {
             launchBox = new HomebrewLaunchWindow(*homebrewButtons[i], this);
-			HomebrewLaunchWindow* launchBox2 = (HomebrewLaunchWindow*)launchBox;
+            HomebrewLaunchWindow* launchBox2 = (HomebrewLaunchWindow*)launchBox;
             launchBox2->setEffect(EFFECT_FADE, 10, 255);
             launchBox2->setState(GuiElement::STATE_DISABLED);
             launchBox2->setPosition(0.0f, 30.0f);
@@ -901,7 +915,7 @@ void HomebrewWindow::draw(CVideo *pVideo)
         
         log_printf("draw: updating positions...");
 //        bUpdatePositions = false;
-		globalUpdatePosition = false;
+        globalUpdatePosition = false;
         
         int imageHeight = 210;
 
@@ -914,23 +928,23 @@ void HomebrewWindow::draw(CVideo *pVideo)
                 homebrewButtons[i]->button->setPosition(currentLeftPosition + fXOffset, fYOffset);
 //            log_printf("draw: added that button %d", i);
         }
-		
-//		if (listingMode == 1)
-//		{
-//			backTabBtn.setPosition(0, 85);
-//			randomTabBtn.setPosition(-20, -85);
-//		}
-//		else if (listingMode == 2)
-//		{
-//			backTabBtn.setPosition(-20, 85);
-//			randomTabBtn.setPosition(0, -85);
-//		}
+        
+//        if (listingMode == 1)
+//        {
+//            backTabBtn.setPosition(0, 85);
+//            randomTabBtn.setPosition(-20, -85);
+//        }
+//        else if (listingMode == 2)
+//        {
+//            backTabBtn.setPosition(-20, 85);
+//            randomTabBtn.setPosition(0, -85);
+//        }
         lastScrollOffY = scrollOffY;
         
         log_printf("draw: done drawing");
     }
-	
-	
+    
+    
 
     GuiFrame::draw(pVideo);
     
