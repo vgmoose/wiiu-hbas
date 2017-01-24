@@ -121,6 +121,7 @@ public:
     void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
     std::string appShortName;
+    std::string appBinary;
     
     void OnLaunchBoxCloseClick(GuiElement *element);
     
