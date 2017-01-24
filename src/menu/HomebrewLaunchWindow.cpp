@@ -293,6 +293,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     // Get the homebrew window, which holds variables we need access to
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     std::string appShortName = homebrewWindowTarget->appShortName;
+    std::string appBinary = homebrewWindowTarget->appBinary;
 
     std::string mRepoUrl     = std::string(repoUrl);
 	
@@ -328,7 +329,17 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     // Now delete the zip file
     std::remove(zipPath.c_str());
     log_printf("asyncDownloadTargetedFiles: zip file removed");
-	
+
+    // Search for old elf/rpx files when the new app extension is different
+    std::string deleteExtension = (appBinary.substr(appBinary.length() - 4) == ".elf") ? ".rpx" : ".elf";
+    log_printf("asyncDownloadTargetedFiles: Searching for old %s files...", deleteExtension.c_str());
+    DirList* appOldFilesList = new DirList("sd:/wiiu/apps/" + appShortName, deleteExtension.c_str(), DirList::Files);
+    for(int i = 0; i < appOldFilesList->GetFilecount(); i++) {
+        std::string deleteOldFile = appOldFilesList->GetFilepath(i);
+        log_printf("asyncDownloadTargetedFiles: Deleting old file %s...", deleteOldFile.c_str());
+        std::remove(deleteOldFile.c_str());
+    }
+
     //Done!
 	
     // remove the progress bar
@@ -367,7 +378,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     // store information about the desired file to homebrewWindowTarget, so that
     // the thread can access it
     homebrewWindowTarget->appShortName = selectedButton->shortname;
-	
+    homebrewWindowTarget->appBinary    = selectedButton->binary;
     // targets to store to dismiss the window later
 //    homebrewWindowTarget->controllerTarget = controller;
 //    homebrewWindowTarget->buttonTarget = button;
