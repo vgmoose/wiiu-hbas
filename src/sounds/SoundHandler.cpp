@@ -31,7 +31,6 @@
 #include "SoundHandler.hpp"
 #include "WavDecoder.hpp"
 #include "Mp3Decoder.hpp"
-#include "OggDecoder.hpp"
 
 SoundHandler * SoundHandler::handlerInstance = NULL;
 
@@ -166,11 +165,7 @@ SoundDecoder * SoundHandler::GetSoundDecoder(const char * filepath)
 	f.read((u8 *) &magic, 4);
 	f.close();
 
-	if(magic == 0x4f676753) // 'OggS'
-	{
-	    return new OggDecoder(filepath);
-	}
-	else if(magic == 0x52494646) // 'RIFF'
+	if(magic == 0x52494646) // 'RIFF'
 	{
 		return new WavDecoder(filepath);
 	}
@@ -198,11 +193,7 @@ SoundDecoder * SoundHandler::GetSoundDecoder(const u8 * sound, int length)
 
 	u32 * magic = (u32 *) check;
 
-	if(magic[0] == 0x4f676753) // 'OggS'
-	{
-	    return new OggDecoder(sound, length);
-	}
-	else if(magic[0] == 0x52494646) // 'RIFF'
+	if(magic[0] == 0x52494646) // 'RIFF'
 	{
 		return new WavDecoder(sound, length);
 	}
