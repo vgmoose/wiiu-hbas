@@ -32,24 +32,24 @@
 extern ProgressWindow * progressWindow;
 
 typedef struct
-    {
-        std::string execPath;
-        GuiImage *image;
-        GuiButton *button;
-        GuiText *nameLabel;
-        GuiText *versionLabel;
-        GuiText *coderLabel;
-        GuiText *descriptionLabel;
-        GuiImageData *iconImgData;
-        GuiImage *iconImg;
-        std::string shortname;
-        int status;
-        std::string dirPath;
-        std::string binary;
-        std::string version;
-		std::string category;
-        int typee;
-    } homebrewButton;
+{
+    std::string execPath;
+    GuiImage *image;
+    GuiButton *button;
+    GuiText *nameLabel;
+    GuiText *versionLabel;
+    GuiText *coderLabel;
+    GuiText *descriptionLabel;
+    GuiImageData *iconImgData;
+    GuiImage *iconImg;
+    std::string shortname;
+    int status;
+    std::string dirPath;
+    std::string binary;
+    std::string version;
+    std::string category;
+    int typee;
+} homebrewButton;
 
 extern void updateProgress(void *arg, u32 done, u32 total);
 extern ProgressWindow* getProgressWindow();
@@ -59,43 +59,43 @@ class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 public:
     HomebrewWindow(int w, int h);
     virtual ~HomebrewWindow();
-	static void do_download(CThread *thread, void *arg);
+    static void do_download(CThread *thread, void *arg);
     void draw(CVideo *pVideo);
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     // all homebrew buttons
     std::vector<homebrewButton*> homebrewButtons;
-	GuiFrame * launchBox;
-	
-	
+    GuiFrame * launchBox;
+    
+    
     GuiSound *buttonClickSound;
     GuiImageData * installedButtonImgData;
     GuiImageData * getButtonImgData;
     GuiImageData * updateButtonImgData;
     GuiImageData * localButtonImgData;
-	
-	    GuiText hblVersionText;
+    
+    GuiText hblVersionText;
     GuiText * hblRepoText;
-		
-	GuiImageData *hblTabImgData;
+        
+    GuiImageData *hblTabImgData;
     GuiImageData *rpxTabImgData;
-	GuiImage hblTabImg;
+    GuiImage hblTabImg;
     GuiImage rpxTabImg;
 
-	
-	GuiButton backTabBtn;
+    
+    GuiButton backTabBtn;
     GuiButton randomTabBtn;
     
-	GuiImage* header;
-	GuiText* header2;
+    GuiImage* header;
+    GuiText* header2;
     std::vector<homebrewButton*> localAppButtons;    // will be refreshed a lot
     std::vector<homebrewButton*> remoteAppButtons;   // will refreshed once
-	
-	std::vector<GuiButton*> all_cats;
-	
-	bool noIconMode = false;
-	bool invalidateCache = false;
-	bool isFiltering = false;
+    
+    std::vector<GuiButton*> all_cats;
+    
+    bool noIconMode = false;
+    bool invalidateCache = false;
+    bool isFiltering = false;
     
     // separate vectors for the current tab (some combo off local and remote)
     std::vector<homebrewButton*> curTabButtons;
@@ -104,23 +104,24 @@ public:
     std::string fileContents;
     bool checkLocalAppExists(std::string shortname);
     int totalLocalApps;
-	int listingMode = -1; // 1 is hbl, 2 is rpx
+    int listingMode = -1; // 1 is hbl, 2 is rpx
     bool gotDirectorySuccess;
     bool initialLoadInProgress = true;
     bool globalUpdatePosition = false;
     std::vector<std::string> cachedIcons;
-	void clearScreen();
-	void displayCategories();
+    void clearScreen();
+    void displayCategories();
     void loadLocalApps(int mode);
     void positionHomebrewButton(homebrewButton*, int);
     void refreshHomebrewApps();
     void addAll(std::vector<homebrewButton*>, int);
     void refreshLocalApps();
     void refreshHomebrewAppIcons();
-	void appendCategoryButton(char* name, int x, int y);
+    void appendCategoryButton(char* name, int x, int y);
     void filter();
     void fetchThisIcon(int x, std::string targetIconUrl);
     std::string appShortName;
+    std::string appBinary;
     
     void OnLaunchBoxCloseClick(GuiElement *element);
     
@@ -130,17 +131,18 @@ public:
 //    GuiTrigger *triggerTarget;
     GuiFrame * launchWindowTarget;
     std::string bufString;
-	    void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+    void OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 
+    bool internet_connection = true;
     
 private:
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
-	
-	void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-	void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-	
-	void OnCategorySwitch(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+    
+    void OnHBLTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+    void OnRPXTabButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
+    
+    void OnCategorySwitch(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
 
 
     void OnCloseTcpReceiverFinish(GuiElement *element);
