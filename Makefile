@@ -61,9 +61,9 @@ INCLUDES	:=  src
 # options for code generation
 #---------------------------------------------------------------------------------
 CFLAGS	:=  -std=gnu11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
-		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
+		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)  -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int -D_GNU_SOURCE -D__wiiu__
 CXXFLAGS := -std=gnu++11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
-		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing -Wno-write-strings $(INCLUDE)
+		    -O3  -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing -Wno-write-strings $(INCLUDE)  -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int -D_GNU_SOURCE -D__wiiu__
 ASFLAGS	:= -mregnames
 LDFLAGS	:= -nostartfiles -Wl,-Map,$(notdir $@).map,-wrap,malloc,-wrap,free,-wrap,memalign,-wrap,calloc,-wrap,realloc,-wrap,malloc_usable_size,-wrap,_malloc_r,-wrap,_free_r,-wrap,_realloc_r,-wrap,_calloc_r,-wrap,_memalign_r,-wrap,_malloc_usable_size_r,-wrap,valloc,-wrap,_valloc_r,-wrap,_pvalloc_r,--gc-sections
 
@@ -73,7 +73,7 @@ MAKEFLAGS += --no-print-directory
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lgcc -lgd -lpng -lz -lfreetype -lmad -lvorbisidec -lzip
+LIBS	:= -lgcc -lgd -lpng -lz -lfreetype -lmad -lzip
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
