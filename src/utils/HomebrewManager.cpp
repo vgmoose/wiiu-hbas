@@ -51,8 +51,33 @@ void HomebrewManager::Delete()
 {
 	log_printf("-> HomebrewManager::Delete");
 	
-	//! Open the Manifest
+	//! (try to) Open the Manifest
 	std::string ManifestPath = "sd:/wiiu/apps/hbas/.manifest/" + ShortName + ".install";
+	
+	struct stat sbuff;
+	if (stat(ManifestPath.c_str(), &sbuff) != 0) //! There's no manifest
+	{
+		
+		//! Use the normal delete method
+		log_printf("No manifest file found, using default delete");
+		
+		std::string removePath = "sd:/wiiu/apps/" + ShortName;
+		log_printf("Deleting folder %s", removePath.c_str());
+		
+		if (removePath.length() < 15) // Do not delete "sd:/wiiu/apps/"
+			return;
+		
+		//! Remove the files in the directory
+		DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
+		for (int x = 0; x < dirList.GetFilecount(); x++)
+			remove(dirList.GetFilepath(x));
+		
+		//! Remove the directory
+		rmdir(removePath.c_str());
+		return;
+	}
+	
+	//! Open the manifest normally
 	CFile * ManifestFile = new CFile(ManifestPath, CFile::ReadOnly);
 	char * Manifest_cstr = (char *)malloc(ManifestFile->size());
 	ManifestFile->read((u8*)Manifest_cstr, ManifestFile->size());	
