@@ -113,23 +113,23 @@ void UnZip::Close() {
 	unzClose(fileToUnzip);
 }
 
-int UnZip::ExtractFile(const char * internalPath,const char * path) {
-	log_printf("Extracting %s to $s");
-	int code = unzLocateFile(fileToUnzip,internalPath,0);
+int UnZip::ExtractFile(const char * internalPath, const char * path)
+{
+	log_printf("Extracting %s to: %s", internalPath, path);
+	
+	int code = unzLocateFile(fileToUnzip, internalPath, 0);
 	if(code == UNZ_END_OF_LIST_OF_FILE) 
 		return -1;
 	
 	unz_file_info_s * fileInfo = GetFileInfo();
-	
-	std::string fullPath(path);
-	fullPath + GetFileName(fileInfo);
-	log_printf("Extracting %s to: %s\n",internalPath,fullPath.c_str());
-	code = Extract(fullPath.c_str(),fileInfo);
+	code = Extract(path, fileInfo);
 	free(fileInfo);
+	
 	return code;
 }
 
-int UnZip::ExtractDir(const char * internalDir,const char * externalDir) {
+int UnZip::ExtractDir(const char * internalDir, const char * externalDir)
+{
 	int i = 0;
 	for(;;) {
 		int code;

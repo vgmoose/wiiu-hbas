@@ -23,6 +23,7 @@
 #include "dynamic_libs/sys_functions.h"
 #include "network/FileDownloader.h"
 #include "utils/Zip.h"
+#include "utils/HomebrewManager.h"
 #include <algorithm>
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
@@ -244,26 +245,14 @@ void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::stri
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    std::string removePath = selectedButton->dirPath;
+	//! Delete
+	HomebrewManager * DeleteHomebrew = new HomebrewManager(selectedButton->shortname);
+	DeleteHomebrew->Delete();
+	delete DeleteHomebrew;
     
-    // if the remove path is the whole directory, stop!
-    if (!removePath.compare(std::string("sd:/wiiu/apps")) || !removePath.compare(std::string("sd:/wiiu/apps/")))
-        return;
-    else
-    {
-        // remove the files in the directory
-        DirList dirList(removePath, 0, DirList::Files | DirList::CheckSubfolders);
-        for (int x=0; x<dirList.GetFilecount(); x++)
-            remove(dirList.GetFilepath(x));
-        
-        // now remove the directory
-        rmdir(removePath.c_str());
-    }
-    
-    // close the window
-    OnBackButtonClick(button, controller, trigger);
-    
-    // refresh main directory (crashes at the moment)
+    OnBackButtonClick(button, controller, trigger); // Close the window
+
+    //! refresh main directory
     globalRefreshHomebrewApps();
 
 }
@@ -279,76 +268,22 @@ instance of HomebrewWindow, which was set up at start.
 static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 {
     log_printf("asyncDownloadTargetedFiles: start");
-
-    /*
-        Download files from
-        http://wiiubru.com/appstore/zips/ *app short name*.zip
-        to the temp folder, then extract the files to sd:/wiiu and delete the temp zip file
-    */
-	
-    // Set the progress bar to 0%
     ProgressWindow * progress = getProgressWindow(); 
-    progress->setProgress(0);
 	
-    // Get the homebrew window, which holds variables we need access to
+    //! Get the homebrew window, which holds variables we need access to
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     std::string appShortName = homebrewWindowTarget->appShortName;
-    std::string appBinary = homebrewWindowTarget->appBinary;
-
-    std::string mRepoUrl     = std::string(repoUrl);
 	
-    std::string tmpFilePath    = "sd:/hbas_zips";	// Temporary path for zip files
-    std::string HomebrewSdRoot = "sd:";			// The path where the zip file will be extracted
-
-    CreateSubfolder(tmpFilePath.c_str());		// Make sure temp folder is here 
+	//! Install
+	HomebrewManager * InstallHomebrew = new HomebrewManager(appShortName, progress);
+	InstallHomebrew->Install();
+	delete InstallHomebrew;
 	
-    // Generate zip filename, url and path
-    std::string zipFileName = appShortName + ".zip";
-    std::string zibUrl      = mRepoUrl + "/zips/" + zipFileName;
-    std::string zipPath     = tmpFilePath  +  "/" + zipFileName;
 	
-    log_printf("asyncDownloadTargetedFiles: Homebrew ZIP Variables:");
-    log_printf("asyncDownloadTargetedFiles: zipFileName = %s", zipFileName.c_str());
-    log_printf("asyncDownloadTargetedFiles: zipUrl      = %s", zibUrl.c_str());
-    log_printf("asyncDownloadTargetedFiles: zipPath     = %s", zipPath.c_str());
+    homebrewWindowTarget->removeE(progress); // Remove the progress bar
+    homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget); // Really hacky way to dismiss this window
 
-    // Download the zip file to the temp folder
-    progress->setTitle("Downloading " + zipFileName + "..."); //Set title to "Downloading *example.zip*..."
-    FileDownloader::getFileToSd(zibUrl, zipPath, &updateProgress);
-    log_printf("asyncDownloadTargetedFiles: Downloaded %s; trying to extract zip file...", zipFileName.c_str());
-	
-    //progress->setProgress(0);
-    progress->setTitle("Extracting Homebrew's Zip File...");
-
-    // The zip file has been downloaded; now extract it to the root of the sdcard
-    UnZip * ExtractAppZip = new UnZip(zipPath.c_str());
-    ExtractAppZip->ExtractAll(HomebrewSdRoot.c_str());
-    log_printf("asyncDownloadTargetedFiles: Extraction of zip file completed!");
-    delete ExtractAppZip;
-
-    // Now delete the zip file
-    std::remove(zipPath.c_str());
-    log_printf("asyncDownloadTargetedFiles: zip file removed");
-
-    // Search for old elf/rpx files when the new app extension is different
-    std::string deleteExtension = (appBinary.substr(appBinary.length() - 4) == ".elf") ? ".rpx" : ".elf";
-    log_printf("asyncDownloadTargetedFiles: Searching for old %s files...", deleteExtension.c_str());
-    DirList* appOldFilesList = new DirList("sd:/wiiu/apps/" + appShortName, deleteExtension.c_str(), DirList::Files);
-    for(int i = 0; i < appOldFilesList->GetFilecount(); i++) {
-        std::string deleteOldFile = appOldFilesList->GetFilepath(i);
-        log_printf("asyncDownloadTargetedFiles: Deleting old file %s...", deleteOldFile.c_str());
-        std::remove(deleteOldFile.c_str());
-    }
-
-    //Done!
-	
-    // remove the progress bar
-    homebrewWindowTarget->removeE(progress);
-    
-    // really hacky way to dismiss this window
-    homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget);
-
-    // refresh main directory
+    //! refresh main directory
     globalRefreshHomebrewApps();
     log_printf("asyncDownloadTargetedFiles: stop");
 }
