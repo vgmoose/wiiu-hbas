@@ -52,7 +52,7 @@ void HomebrewManager::Delete()
 	log_printf("-> HomebrewManager::Delete");
 	
 	//! (try to) Open the Manifest
-	std::string ManifestPath = "sd:/wiiu/apps/hbas/.manifest/" + ShortName + ".install";
+	std::string ManifestPath = "sd:/wiiu/apps/appstore/.manifest/" + ShortName + ".install";
 	
 	struct stat sbuff;
 	if (stat(ManifestPath.c_str(), &sbuff) != 0) //! There's no manifest
@@ -174,8 +174,8 @@ void HomebrewManager::installZip(std::string & ZipPath)
 	UnZip * HomebrewZip = new UnZip(ZipPath.c_str());
 	
 	//! First extract the Manifest	
-	std::string ManifestPathInternal = "wiiu/apps/hbas/.manifest/" + ShortName + ".install";
-	std::string ManifestPath = "sd:/" + ManifestPathInternal;
+	std::string ManifestPathInternal = ShortName + ".install";
+	std::string ManifestPath = "sd:/""wiiu/apps/appstore/.manifest/" + ManifestPathInternal;
 	HomebrewZip->ExtractFile(ManifestPathInternal.c_str(), ManifestPath.c_str());
 	
 	//! Open the Manifest

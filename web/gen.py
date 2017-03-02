@@ -34,6 +34,46 @@ def run(cmd):
 	# run a unix command, and suppress the output
 	return os.system(cmd + " 2> /dev/null")
 
+def gen_manifest(sdroot):
+	# generate a app.install file for the given folder path
+	data = []
+	for root, dirs, files in os.walk(sdroot):
+		for f in files:
+			data.append(["U", (root+os.sep+f).lstrip("sdroot/")])
+
+	return data
+
+# this method merges a generated manifest with an overriding manually created one
+def merge_manifest(data, installpath):
+	ovpaths = []
+	
+	# create string data from the data and ovdata lists
+	output = ""
+
+	# if an override file exists, fill ovdata
+	if os.path.exists(installpath):
+		# load the contents of the override file
+		ovfile = open(installpath, "r")
+		for line in ovfile:
+			data2 = line.rstrip("\n").split()
+			if len(data) > 1:
+				typee = data2[0].rstrip(":")
+				path = data2[1]
+
+				# overrides go first into the string
+				output += typee + ": " + path + "\n"
+
+				# only keep track of the path for overriding 
+				ovpaths.append(path)
+
+
+	for d in data:
+		# generated go only if an override doesn't already exist
+		if d[1] not in ovpaths:
+			output += d[0] + ": " + d[1] + "\n"
+
+	return output
+	
 # try and catch ANY error so web has output
 try:
 
@@ -184,17 +224,28 @@ try:
 		run("cp -rf apps/%s sdroot/wiiu/apps" % app)
 		
 		# remove some junk files
-		run("find sdroot -name .deletetoupdate -delete -o -name .DS_Store -delete")
+		run("find sdroot -name .deletetoupdate -delete -o -name .DS_Store -delete -o -name app.install -delete")
 		
 		# move the other sd files into place (if they exist)
 		run("mv sdroot/wiiu/apps/%s/sd/* sdroot" % app)
 		run("rmdir sdroot/wiiu/apps/%s/sd" % app)
 
+		# create a manifest file for the default (G) files
+		generated_manifest = gen_manifest("sdroot")
+
+		# merge generated manifest with original one, if it exists
+		manifest = merge_manifest(generated_manifest, "apps/%s/app.install" % app)
+
+		# write to file
+		mani = open("sdroot/%s.install" % app, "w")
+		mani.write(manifest)
+		mani.close()
+
 		# zip up this whole sdroot package
 		zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
 		zipdir("sdroot/", zipf)
 		zipf.close()
-		
+
 		# create the .deletetoupdate file
 		open("apps/%s/.deletetoupdate" % app, 'a').close()
 
