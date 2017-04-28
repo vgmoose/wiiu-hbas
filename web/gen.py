@@ -187,8 +187,8 @@ try:
 		run("find sdroot -name .deletetoupdate -delete -o -name .DS_Store -delete")
 		
 		# move the other sd files into place (if they exist)
-		run("mv sdroot/wiiu/apps/%s/sd/* sdroot" % app)
-		run("rmdir sdroot/wiiu/apps/%s/sd" % app)
+		run("rsync -a sdroot/wiiu/apps/%s/sd/* sdroot" % app)
+		run("rm -rf sdroot/wiiu/apps/%s/sd" % app)
 
 		# zip up this whole sdroot package
 		zipf = zipfile.ZipFile("zips/%s.zip" % app, 'w', zipfile.ZIP_DEFLATED)
