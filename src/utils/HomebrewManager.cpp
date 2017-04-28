@@ -52,7 +52,7 @@ void HomebrewManager::Delete()
 	log_printf("-> HomebrewManager::Delete");
 	
 	//! (try to) Open the Manifest
-	std::string ManifestPath = "sd:/wiiu/apps/hbas/.manifest/" + ShortName + ".install";
+	std::string ManifestPath = "sd:/wiiu/apps/appstore/.manifest/" + ShortName + ".install";
 	
 	struct stat sbuff;
 	if (stat(ManifestPath.c_str(), &sbuff) != 0) //! There's no manifest
@@ -149,11 +149,15 @@ std::string HomebrewManager::downloadZip()
     log_printf("zipPath     = %s", zipPath.c_str());
 
     //! Download the zip file to the temp folder
-    Progress->setTitle("Downloading " + zipFileName + "...");
 	if(UseProgressBar)
+	{
+		Progress->setTitle("Downloading " + zipFileName + "...");
 		FileDownloader::getFileToSd(zibUrl, zipPath, &updateProgress);
-    else
+    }
+	else
+	{
 		FileDownloader::getFileToSd(zibUrl, zipPath);
+	}
 	
 	log_printf("Downloaded %s", zipFileName.c_str());
 	
@@ -163,14 +167,15 @@ std::string HomebrewManager::downloadZip()
 void HomebrewManager::installZip(std::string & ZipPath)
 {
 	log_printf("-> HomebrewManager::installZip");
-	Progress->setTitle("Installing Homebrew to SDCard...");
+	if(UseProgressBar)
+		Progress->setTitle("Installing Homebrew to SDCard...");
 	
 	//! Open the Zip file
 	UnZip * HomebrewZip = new UnZip(ZipPath.c_str());
 	
 	//! First extract the Manifest	
-	std::string ManifestPathInternal = "wiiu/apps/hbas/.manifest/" + ShortName + ".install";
-	std::string ManifestPath = "sd:/" + ManifestPathInternal;
+	std::string ManifestPathInternal = ShortName + ".install";
+	std::string ManifestPath = "sd:/""wiiu/apps/appstore/.manifest/" + ManifestPathInternal;
 	HomebrewZip->ExtractFile(ManifestPathInternal.c_str(), ManifestPath.c_str());
 	
 	//! Open the Manifest
@@ -212,4 +217,15 @@ void HomebrewManager::installZip(std::string & ZipPath)
 				break;
 		}
 	}
+	
+	//! Close the manifest
+	Manifest.str("");
+	free(Manifest_cstr);
+	ManifestFile->close();
+	
+	//! Close the Zip file
+	delete HomebrewZip;
+	
+	//! Delete the Zip file
+	std::remove(ZipPath.c_str());
 }
