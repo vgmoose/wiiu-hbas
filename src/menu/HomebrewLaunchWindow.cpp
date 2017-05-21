@@ -253,15 +253,6 @@ void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
     backBtn.clearState(GuiElement::STATE_DISABLED);
     loadBtn.clearState(GuiElement::STATE_DISABLED);
 }
-/*
-void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result)
-{
-    element->setState(GuiElement::STATE_DISABLED);
-    element->setEffect(EFFECT_FADE, -10, 0);
-    element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
-}
-
-*/
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
@@ -276,7 +267,6 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     globalRefreshHomebrewApps();
 
 }
-
 
 /**
 This method is invoked after green is pressed, and is in a separate thread
