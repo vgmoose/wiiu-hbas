@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "HomebrewLaunchWindow.h"
+#include "HomebrewLoader.h"
 #include "common/common.h"
 #include "fs/DirList.h"
 #include "fs/fs_utils.h"
@@ -35,6 +36,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     , updateButtonImgData(Resources::GetImageData("UPDATE_BUTTON.png"))
     , deleteButtonImgData(Resources::GetImageData("DELETE_BUTTON.png"))
     , reinstallButtonImgData(Resources::GetImageData("REINSTALL_BUTTON.png"))
+    , openButtonImgData(Resources::GetImageData("OPEN_BUTTON.png"))
     , closeButtonImgData(Resources::GetImageData("CLOSE.png"))
     , iconImage(thisButton.iconImgData)
     , titleText((char*)NULL, 42, glm::vec4(0,0,0, 1))
@@ -45,11 +47,13 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     , delImg(deleteButtonImgData)
     , updateImg(updateButtonImgData)
     , reinstallImg(reinstallButtonImgData)
+    , openImg(openButtonImgData)
     , backImg(closeButtonImgData)
     , loadBtn(loadImg.getWidth(), loadImg.getHeight())
     , delBtn(loadImg.getWidth(), loadImg.getHeight())
     , updateBtn(updateImg.getWidth(), updateImg.getHeight())
     , reinstallBtn(reinstallImg.getWidth(), reinstallImg.getHeight())
+    , openBtn(openImg.getWidth(), openImg.getHeight())
     , backBtn(backImg.getWidth(), backImg.getHeight())
     , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
@@ -164,7 +168,8 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     if (thisButton.status == INSTALLED)
     {
         scaleFactor = 1.0f;
-        reinstallImg.setScale(scaleFactor);
+        
+		reinstallImg.setScale(scaleFactor);
         reinstallBtn.setSize(scaleFactor * reinstallImg.getWidth(), scaleFactor * reinstallImg.getHeight());
         reinstallBtn.setImage(&reinstallImg);
         reinstallBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
@@ -175,7 +180,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         reinstallBtn.setSoundClick(buttonClickSound);
         reinstallBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&reinstallBtn);
-    }
+	}
         
     if (thisButton.status != GET)
     {
@@ -192,7 +197,19 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         delBtn.setSoundClick(buttonClickSound);
         delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
         append(&delBtn);
-    }
+ 
+		openImg.setScale(scaleFactor);
+        openBtn.setSize(scaleFactor * openImg.getWidth(), scaleFactor * openImg.getHeight());
+        openBtn.setImage(&openImg);
+        openBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
+        openBtn.setPosition(65, 110 + actionButtonYOff);
+        openBtn.setTrigger(&touchTrigger);
+        openBtn.setTrigger(&wpadTouchTrigger);
+        openBtn.setEffectGrow();
+        openBtn.setSoundClick(buttonClickSound);
+        openBtn.clicked.connect(this, &HomebrewLaunchWindow::OnOpenButtonClick);
+        append(&openBtn);
+   }
 
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
@@ -216,7 +233,8 @@ HomebrewLaunchWindow::~HomebrewLaunchWindow()
     Resources::RemoveImageData(updateButtonImgData);
     Resources::RemoveImageData(deleteButtonImgData);
     Resources::RemoveImageData(reinstallButtonImgData);
-    Resources::RemoveImageData(closeButtonImgData);
+	Resources::RemoveImageData(openButtonImgData);
+	Resources::RemoveImageData(closeButtonImgData);
 }
 
 void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)
@@ -235,13 +253,15 @@ void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
     backBtn.clearState(GuiElement::STATE_DISABLED);
     loadBtn.clearState(GuiElement::STATE_DISABLED);
 }
-
+/*
 void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result)
 {
     element->setState(GuiElement::STATE_DISABLED);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
 }
+
+*/
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
@@ -256,6 +276,7 @@ void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiContr
     globalRefreshHomebrewApps();
 
 }
+
 
 /**
 This method is invoked after green is pressed, and is in a separate thread
@@ -288,6 +309,18 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     log_printf("asyncDownloadTargetedFiles: stop");
 }
 
+void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result)
+{
+    element->setState(GuiElement::STATE_DISABLED);
+    element->setEffect(EFFECT_FADE, -10, 0);
+    element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
+
+    if(result > 0)
+    {
+        Application::instance()->quit(EXIT_SUCCESS);
+    }
+}
+
 /**
 This method is called when the green GET button is pushed. It is on the main thread, and
 spawns another thread to handle the downloading in the background.
@@ -301,7 +334,7 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     backBtn.setState(GuiElement::STATE_DISABLED);
     updateBtn.setState(GuiElement::STATE_DISABLED);
     reinstallBtn.setState(GuiElement::STATE_DISABLED);
-
+    openBtn.setState(GuiElement::STATE_DISABLED);
     // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
@@ -326,3 +359,23 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
     pThread->resumeThread();
     
 }
+
+void HomebrewLaunchWindow::OnOpenButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
+{
+    log_printf("OnLoadButtonClick: Load button clicked");
+    // disable the buttons
+    delBtn.setState(GuiElement::STATE_DISABLED);
+    loadBtn.setState(GuiElement::STATE_DISABLED);
+    backBtn.setState(GuiElement::STATE_DISABLED);
+    updateBtn.setState(GuiElement::STATE_DISABLED);
+    reinstallBtn.setState(GuiElement::STATE_DISABLED);
+    openBtn.setState(GuiElement::STATE_DISABLED);
+
+    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(selectedButton->execPath);
+    loader->setEffect(EFFECT_FADE, 15, 255);
+    loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
+    append(loader);
+}
+
+
+    
