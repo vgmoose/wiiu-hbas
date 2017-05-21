@@ -168,8 +168,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     if (thisButton.status == INSTALLED)
     {
         scaleFactor = 1.0f;
-        
-		reinstallImg.setScale(scaleFactor);
+        reinstallImg.setScale(scaleFactor);
         reinstallBtn.setSize(scaleFactor * reinstallImg.getWidth(), scaleFactor * reinstallImg.getHeight());
         reinstallBtn.setImage(&reinstallImg);
         reinstallBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
@@ -180,11 +179,11 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         reinstallBtn.setSoundClick(buttonClickSound);
         reinstallBtn.clicked.connect(this, &HomebrewLaunchWindow::OnLoadButtonClick);
         append(&reinstallBtn);
-	}
+    }
         
     if (thisButton.status != GET)
     {
-		scaleFactor = 1.0f;
+	scaleFactor = 1.0f;
         delImg.setScale(scaleFactor);
         delBtn.setSize(scaleFactor * loadImg.getWidth(), scaleFactor * delImg.getHeight());
         delBtn.setImage(&delImg);
@@ -198,7 +197,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         delBtn.clicked.connect(this, &HomebrewLaunchWindow::OnDeleteButtonClick);
         append(&delBtn);
  
-		openImg.setScale(scaleFactor);
+	openImg.setScale(scaleFactor);
         openBtn.setSize(scaleFactor * openImg.getWidth(), scaleFactor * openImg.getHeight());
         openBtn.setImage(&openImg);
         openBtn.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
@@ -209,7 +208,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
         openBtn.setSoundClick(buttonClickSound);
         openBtn.clicked.connect(this, &HomebrewLaunchWindow::OnOpenButtonClick);
         append(&openBtn);
-   }
+    }
 
     backImg.setScale(scaleFactor);
     backBtn.setSize(scaleFactor * backImg.getWidth(), scaleFactor * backImg.getHeight());
@@ -233,8 +232,8 @@ HomebrewLaunchWindow::~HomebrewLaunchWindow()
     Resources::RemoveImageData(updateButtonImgData);
     Resources::RemoveImageData(deleteButtonImgData);
     Resources::RemoveImageData(reinstallButtonImgData);
-	Resources::RemoveImageData(openButtonImgData);
-	Resources::RemoveImageData(closeButtonImgData);
+    Resources::RemoveImageData(openButtonImgData);
+    Resources::RemoveImageData(closeButtonImgData);
 }
 
 void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)
@@ -256,7 +255,7 @@ void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-	//! Delete
+	//! Delete 
 	HomebrewManager * DeleteHomebrew = new HomebrewManager(selectedButton->shortname);
 	DeleteHomebrew->Delete();
 	delete DeleteHomebrew;
