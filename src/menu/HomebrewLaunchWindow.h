@@ -56,7 +56,7 @@ private:
     GuiImageData *updateButtonImgData;
     GuiImageData *deleteButtonImgData;
     GuiImageData *reinstallButtonImgData;
-	GuiImageData *openButtonImgData;
+    GuiImageData *openButtonImgData;
     GuiImageData *closeButtonImgData;
     GuiImage iconImage;
 
@@ -71,14 +71,14 @@ private:
     GuiImage delImg;
     GuiImage updateImg;
     GuiImage reinstallImg;
-	GuiImage openImg;
+    GuiImage openImg;
     GuiImage backImg;
     
     GuiButton loadBtn;
     GuiButton delBtn;
     GuiButton updateBtn;
     GuiButton reinstallBtn;
-	GuiButton openBtn;
+    GuiButton openBtn;
     GuiButton backBtn;
 	
 
