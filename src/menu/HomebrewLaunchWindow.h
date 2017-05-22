@@ -42,7 +42,7 @@ private:
 
     void OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
     void OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
-
+    void OnOpenButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger);
     void OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result);
     void OnOpenEffectFinish(GuiElement *element);
     void OnCloseEffectFinish(GuiElement *element);
@@ -56,6 +56,7 @@ private:
     GuiImageData *updateButtonImgData;
     GuiImageData *deleteButtonImgData;
     GuiImageData *reinstallButtonImgData;
+    GuiImageData *openButtonImgData;
     GuiImageData *closeButtonImgData;
     GuiImage iconImage;
 
@@ -70,12 +71,14 @@ private:
     GuiImage delImg;
     GuiImage updateImg;
     GuiImage reinstallImg;
+    GuiImage openImg;
     GuiImage backImg;
     
     GuiButton loadBtn;
     GuiButton delBtn;
     GuiButton updateBtn;
     GuiButton reinstallBtn;
+    GuiButton openBtn;
     GuiButton backBtn;
 	
 

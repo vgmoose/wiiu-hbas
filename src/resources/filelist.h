@@ -1,7 +1,7 @@
 /****************************************************************************
  * Loadiine resource files.
  * This file is generated automatically.
- * Includes 30 files.
+ * Includes 31 files.
  *
  * NOTE:
  * Any manual modification of this file will be overwriten by the generation.
@@ -50,11 +50,11 @@ extern const u32 font_ttf_size;
 extern const u8 games_png[];
 extern const u32 games_png_size;
 
-extern const u8 GET_png[];
-extern const u32 GET_png_size;
-
 extern const u8 GET_BUTTON_png[];
 extern const u32 GET_BUTTON_png_size;
+
+extern const u8 GET_png[];
+extern const u32 GET_png_size;
 
 extern const u8 INSTALLED_png[];
 extern const u32 INSTALLED_png_size;
@@ -70,6 +70,9 @@ extern const u32 LOCAL_png_size;
 
 extern const u8 missing_png[];
 extern const u32 missing_png_size;
+
+extern const u8 OPEN_BUTTON_png[];
+extern const u32 OPEN_BUTTON_png_size;
 
 extern const u8 player1_point_png[];
 extern const u32 player1_point_png_size;
@@ -104,11 +107,11 @@ extern const u32 title_png_size;
 extern const u8 tools_png[];
 extern const u32 tools_png_size;
 
-extern const u8 UPDATE_png[];
-extern const u32 UPDATE_png_size;
-
 extern const u8 UPDATE_BUTTON_png[];
 extern const u32 UPDATE_BUTTON_png_size;
+
+extern const u8 UPDATE_png[];
+extern const u32 UPDATE_png_size;
 
 static RecourceFile RecourceList[] =
 {
@@ -122,13 +125,14 @@ static RecourceFile RecourceList[] =
 	{"emulators.png", emulators_png, emulators_png_size, NULL, 0},
 	{"font.ttf", font_ttf, font_ttf_size, NULL, 0},
 	{"games.png", games_png, games_png_size, NULL, 0},
-	{"GET.png", GET_png, GET_png_size, NULL, 0},
 	{"GET_BUTTON.png", GET_BUTTON_png, GET_BUTTON_png_size, NULL, 0},
+	{"GET.png", GET_png, GET_png_size, NULL, 0},
 	{"INSTALLED.png", INSTALLED_png, INSTALLED_png_size, NULL, 0},
 	{"launchMenuBox.png", launchMenuBox_png, launchMenuBox_png_size, NULL, 0},
 	{"loaders.png", loaders_png, loaders_png_size, NULL, 0},
 	{"LOCAL.png", LOCAL_png, LOCAL_png_size, NULL, 0},
 	{"missing.png", missing_png, missing_png_size, NULL, 0},
+	{"OPEN_BUTTON.png", OPEN_BUTTON_png, OPEN_BUTTON_png_size, NULL, 0},
 	{"player1_point.png", player1_point_png, player1_point_png_size, NULL, 0},
 	{"player2_point.png", player2_point_png, player2_point_png_size, NULL, 0},
 	{"player3_point.png", player3_point_png, player3_point_png_size, NULL, 0},
@@ -140,8 +144,8 @@ static RecourceFile RecourceList[] =
 	{"splash.png", splash_png, splash_png_size, NULL, 0},
 	{"title.png", title_png, title_png_size, NULL, 0},
 	{"tools.png", tools_png, tools_png_size, NULL, 0},
-	{"UPDATE.png", UPDATE_png, UPDATE_png_size, NULL, 0},
 	{"UPDATE_BUTTON.png", UPDATE_BUTTON_png, UPDATE_BUTTON_png_size, NULL, 0},
+	{"UPDATE.png", UPDATE_png, UPDATE_png_size, NULL, 0},
 	{NULL, NULL, 0, NULL, 0}
 };
 
