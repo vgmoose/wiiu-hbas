@@ -179,11 +179,12 @@ int UnZip::ExtractAll(const char * dirToExtract) {
 		
 		unz_file_info_s * fileInfo = GetFileInfo();
 		std::string fileName(dirToExtract);
-		fileName += '/';
+		if (fileName.back() != '/')
+			fileName += '/';
 		fileName += GetFullFileName(fileInfo);
 		if(fileInfo->uncompressed_size != 0 && fileInfo->compression_method != 0) {
 			//file
-			log_printf("Extracting %s to: %s\n",GetFullFileName(fileInfo).c_str(),fileName.c_str());
+			log_printf("Extracting %s to: %s",GetFullFileName(fileInfo).c_str(), fileName.c_str());
 			Extract(fileName.c_str(),fileInfo);
 		}
 		free(fileInfo);
