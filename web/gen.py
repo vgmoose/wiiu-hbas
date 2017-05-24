@@ -85,7 +85,7 @@ try:
 		for root, dirs, files in os.walk(path):
 			for file in files:
 				ppath = os.path.join(root, file)
-				ziph.write(ppath, ppath.lstrip("sdroot/"))
+				ziph.write(ppath, ppath.remove("sdroot/"))
 
 	# This function parses out several attributes from xml
 	def xml_read(incoming, tree, app):
