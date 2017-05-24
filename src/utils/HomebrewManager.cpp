@@ -180,47 +180,60 @@ void HomebrewManager::installZip(std::string & ZipPath)
 	
 	//! Open the Manifest
 	CFile * ManifestFile = new CFile(ManifestPath, CFile::ReadOnly);
-	char * Manifest_cstr = (char *)malloc(ManifestFile->size());
-	ManifestFile->read((u8*)Manifest_cstr, ManifestFile->size());	
-	std::stringstream Manifest(Manifest_cstr);
 	
-	//! Parse the manifest
-	log_printf("Parsing the Manifest");
-	
-	std::string CurrentLine;
-	while(std::getline(Manifest, CurrentLine))
-	{		
-		char Mode = CurrentLine.at(0);
-		std::string Path = CurrentLine.substr(3);
-		std::string ExtractPath = "sd:/" + Path;
+	//! Make sure the manifest is present and not empty
+	if (ManifestFile->size() > 0)
+	{
+		//! Parse the manifest
+		log_printf("Parsing the manifest");
 		
-		switch(Mode)
-		{
-			case 'E':
-				//! Simply Extract, with no checks or anything, won't be deleted upon removal
-				log_printf("%s : EXTRACT", Path.c_str());
-				HomebrewZip->ExtractFile(Path.c_str(), ExtractPath.c_str());
-				break;
-			case 'U':
-				log_printf("%s : UPDATE", Path.c_str());
-				HomebrewZip->ExtractFile(Path.c_str(), ExtractPath.c_str());
-				break;
-			case 'G':
-				log_printf("%s : GET", Path.c_str());
-				struct stat sbuff;
-				if (stat(ExtractPath.c_str(), &sbuff) != 0) //! File doesn't exist, extract
+		char * Manifest_cstr = (char *)malloc(ManifestFile->size());
+		ManifestFile->read((u8*)Manifest_cstr, ManifestFile->size());	
+		std::stringstream Manifest(Manifest_cstr);
+		
+		std::string CurrentLine;
+		while(std::getline(Manifest, CurrentLine))
+		{		
+			char Mode = CurrentLine.at(0);
+			std::string Path = CurrentLine.substr(3);
+			std::string ExtractPath = "sd:/" + Path;
+			
+			switch(Mode)
+			{
+				case 'E':
+					//! Simply Extract, with no checks or anything, won't be deleted upon removal
+					log_printf("%s : EXTRACT", Path.c_str());
 					HomebrewZip->ExtractFile(Path.c_str(), ExtractPath.c_str());
-				else
-					log_printf("File already exists, skipping...");
-				break;
-			default:
-				break;
+					break;
+				case 'U':
+					log_printf("%s : UPDATE", Path.c_str());
+					HomebrewZip->ExtractFile(Path.c_str(), ExtractPath.c_str());
+					break;
+				case 'G':
+					log_printf("%s : GET", Path.c_str());
+					struct stat sbuff;
+					if (stat(ExtractPath.c_str(), &sbuff) != 0) //! File doesn't exist, extract
+						HomebrewZip->ExtractFile(Path.c_str(), ExtractPath.c_str());
+					else
+						log_printf("File already exists, skipping...");
+					break;
+				default:
+					log_printf("%s : NOP", Path.c_str());
+					break;
+			}
 		}
+		
+		//! Close the manifest
+		Manifest.str("");
+		free(Manifest_cstr);
+	}
+	else
+	{
+		//! Extract the whole zip
+		log_printf("No manifest found: extracting the Zip");
+		HomebrewZip->ExtractAll("sd:/");
 	}
 	
-	//! Close the manifest
-	Manifest.str("");
-	free(Manifest_cstr);
 	ManifestFile->close();
 	
 	//! Close the Zip file
