@@ -74,6 +74,9 @@ extern const u32 missing_png_size;
 extern const u8 OPEN_BUTTON_png[];
 extern const u32 OPEN_BUTTON_png_size;
 
+extern const u8 player0_point_png[];
+extern const u32 player0_point_png_size;
+
 extern const u8 player1_point_png[];
 extern const u32 player1_point_png_size;
 
@@ -133,6 +136,7 @@ static RecourceFile RecourceList[] =
 	{"LOCAL.png", LOCAL_png, LOCAL_png_size, NULL, 0},
 	{"missing.png", missing_png, missing_png_size, NULL, 0},
 	{"OPEN_BUTTON.png", OPEN_BUTTON_png, OPEN_BUTTON_png_size, NULL, 0},
+    {"player0_point.png", player0_point_png, player0_point_png_size, NULL, 0},
 	{"player1_point.png", player1_point_png, player1_point_png_size, NULL, 0},
 	{"player2_point.png", player2_point_png, player2_point_png_size, NULL, 0},
 	{"player3_point.png", player3_point_png, player3_point_png_size, NULL, 0},

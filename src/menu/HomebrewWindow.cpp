@@ -654,6 +654,9 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         
     backTabBtn.setTrigger(&touchTrigger);
     randomTabBtn.setTrigger(&touchTrigger);
+    
+    backTabBtn.setTrigger(&wpadTouchTrigger);
+    randomTabBtn.setTrigger(&wpadTouchTrigger);
         
     backTabBtn.setSoundClick(buttonClickSound);
     randomTabBtn.setSoundClick(buttonClickSound);
