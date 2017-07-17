@@ -122,22 +122,25 @@ public:
             data.buttons_r = remapWiiMoteButtons(kpadData.btns_r);
             data.buttons_h = remapWiiMoteButtons(kpadData.btns_h);
             data.buttons_d = remapWiiMoteButtons(kpadData.btns_d);
+			
+			data.lstick.x = kpadData.nunchuck.stick_x;
+			data.lstick.y = kpadData.nunchuck.stick_y;
         }
         else
         {
-            if(kpadData.btns_h & WPAD_BUTTON_LEFT)
+            if(kpadData.classic.btns_h & WPAD_CLASSIC_BUTTON_LEFT)
             {
                 if(data.x > -(width / 2)) data.x -= 10;
             }
-            if(kpadData.btns_h & WPAD_BUTTON_RIGHT)
+            if(kpadData.classic.btns_h & WPAD_CLASSIC_BUTTON_RIGHT)
             {
                 if(data.x < (width / 2)) data.x += 10;
             }
-            if(kpadData.btns_h & WPAD_BUTTON_UP)
+            if(kpadData.classic.btns_h & WPAD_CLASSIC_BUTTON_UP)
             {
                 if(data.y < (height / 2)) data.y += 10;
             }
-            if(kpadData.btns_h & WPAD_BUTTON_DOWN)
+            if(kpadData.classic.btns_h & WPAD_CLASSIC_BUTTON_DOWN)
             {
                 if(data.y > -(height / 2)) data.y -= 10;
             }
@@ -145,6 +148,11 @@ public:
             data.buttons_r = remapClassicButtons(kpadData.classic.btns_r);
             data.buttons_h = remapClassicButtons(kpadData.classic.btns_h);
             data.buttons_d = remapClassicButtons(kpadData.classic.btns_d);
+			
+			data.lstick.x = kpadData.classic.lstick_x;
+			data.lstick.y = kpadData.classic.lstick_y;
+			data.rstick.x = kpadData.classic.rstick_x;
+			data.rstick.y = kpadData.classic.rstick_y;
         }
         
         return true;
