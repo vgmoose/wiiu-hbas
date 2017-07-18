@@ -28,6 +28,7 @@ public:
         : GuiController(channel)
     {
         memset(&kpadData, 0, sizeof(kpadData));
+		showPointer = true;
     }
 
     //!Destructor
@@ -147,12 +148,20 @@ public:
             data.buttons_r = remapWiiMoteButtons(kpadData.btns_r);
             data.buttons_h = remapWiiMoteButtons(kpadData.btns_h);
             data.buttons_d = remapWiiMoteButtons(kpadData.btns_d);
+			
+			data.lstick.x = kpadData.nunchuck.stick_x;
+			data.lstick.y = kpadData.nunchuck.stick_y;
         }
         else
         {
             data.buttons_r = remapClassicButtons(kpadData.classic.btns_r);
             data.buttons_h = remapClassicButtons(kpadData.classic.btns_h);
             data.buttons_d = remapClassicButtons(kpadData.classic.btns_d);
+			
+			data.lstick.x = kpadData.classic.lstick_x;
+			data.lstick.y = kpadData.classic.lstick_y;
+			data.rstick.x = kpadData.classic.rstick_x;
+			data.rstick.y = kpadData.classic.rstick_y;
         }
 
         data.validPointer = (kpadData.pos_valid == 1 || kpadData.pos_valid == 2) && (kpadData.pos_x >= -1.0f && kpadData.pos_x <= 1.0f) && (kpadData.pos_y >= -1.0f && kpadData.pos_y <= 1.0f);

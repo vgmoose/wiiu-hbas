@@ -50,6 +50,8 @@ public:
             chanIdx = 4;
             break;
         }
+		isDPadMode = false;
+		showPointer = false;
     }
 
     //!Destructor
@@ -75,6 +77,8 @@ public:
     int chanIdx;
     PadData data;
     PadData lastData;
+	bool isDPadMode;
+	bool showPointer;
 
 };
 

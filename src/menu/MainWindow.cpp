@@ -56,9 +56,9 @@ MainWindow::MainWindow(int w, int h)
 		
 //	srand(OSGetTime());
 
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 5; i++)
     {
-        std::string filename = strfmt("player%i_point.png", i+1);
+        std::string filename = strfmt("player%i_point.png", i);
         pointerImgData[i] = Resources::GetImageData(filename.c_str());
         pointerImg[i] = new GuiImage(pointerImgData[i]);
         pointerImg[i]->setScale(1.5f);
@@ -123,7 +123,7 @@ MainWindow::~MainWindow()
 //        delete drcElements[0];
 //        removeE(drcElements[0]);
 //    }
-//    for(int i = 0; i < 4; i++)
+//    for(int i = 0; i < 5; i++)
 //    {
 //        delete pointerImg[i];
 //        Resources::RemoveImageData(pointerImgData[i]);
@@ -162,15 +162,20 @@ void MainWindow::update(GuiController *controller)
     //! dont read behind the initial elements in case one was added
     //u32 tvSize = tvElements.size();
     
-        if(controller->chanIdx >= 1 && controller->chanIdx <= 4 && controller->data.validPointer)
+        if(controller->showPointer && controller->data.validPointer)
     {
-        int wpadIdx = controller->chanIdx - 1;
+        int wpadIdx = controller->chanIdx;
         f32 posX = controller->data.x;
         f32 posY = controller->data.y;
         pointerImg[wpadIdx]->setPosition(posX, posY);
         pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
         pointerValid[wpadIdx] = true;
     }
+	
+	if(!controller->showPointer)
+	{
+		pointerValid[controller->chanIdx] = false;
+	}
 	
 	// minus button toggles joysticks
 	if (controller->data.buttons_r & VPAD_BUTTON_MINUS)
@@ -225,9 +230,11 @@ void MainWindow::update(GuiController *controller)
 	if (joysticksDisabled)
 		ydif = 0;
         
-	// Handle D-pad movements as well
+	// Handle D-pad (and 1/2 on Wii Remotes) movement as well
 	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;
 	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_UP)? -20: ydif;
+    ydif = (ydif >  1 || controller->data.buttons_h &	GuiTrigger::BUTTON_2)?    20 : ydif;
+    ydif = (ydif < -1 || controller->data.buttons_h &  GuiTrigger::BUTTON_1)? -20: ydif;
     
 //    // do auto scrolling on first load to the top
 //    if (!showingSplashScreen && doIntroScroll)
@@ -318,7 +325,14 @@ void MainWindow::drawDrc(CVideo *video)
         drcElements[i]->draw(video);
     }
 
-    for(int i = 0; i < 4; i++)
+	if(pointerValid[0])
+	{
+		pointerImg[0]->setAlpha(1.0f);
+		pointerImg[0]->draw(video);
+		pointerImg[0]->setAlpha(1.0f);
+	}
+
+    for(int i = 1; i < 5; i++)
     {
         if(pointerValid[i])
         {
@@ -336,7 +350,14 @@ void MainWindow::drawTv(CVideo *video)
         tvElements[i]->draw(video);
     }
 
-    for(int i = 0; i < 4; i++)
+	if(pointerValid[0])
+	{
+		pointerImg[0]->setAlpha(0.5f);
+		pointerImg[0]->draw(video);
+		pointerImg[0]->setAlpha(1.0f);
+	}
+
+	for(int i = 1; i < 5; i++)
     {
         if(pointerValid[i])
         {
