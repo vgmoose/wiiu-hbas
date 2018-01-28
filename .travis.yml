@@ -1,0 +1,38 @@
+language: c
+sudo: false
+
+os:
+  - linux
+
+env:
+  global:
+    - DEVKITPRO=$HOME/devkitPro
+    - DEVKITPPC=${DEVKITPRO}/devkitPPC
+
+cache:
+  directories:
+    - ${DEVKITPRO}
+
+addons:
+  apt:
+    packages:
+    - p7zip-full
+    - zip
+
+before_install:
+  - mkdir -p "${DEVKITPRO}"
+  - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
+  - wget https://github.com/Maschell/dynamic_libs/archive/lib.tar.gz -O dynamic_libs.tar.gz
+  - wget https://github.com/Maschell/libgui/archive/master.tar.gz -O libgui.tar.gz
+
+install:
+  - tar -xjf devkitPPC-linux.tar.bz2 -C ${DEVKITPRO}/
+  - tar -xzvf dynamic_libs.tar.gz
+  - tar -xzvf libgui.tar.gz
+  - 7z x -y ./dynamic_libs-lib/libs/portlibs.zip -o${DEVKITPRO}
+  - 7z x -y ./libgui-master/libs/portlibs.zip -o${DEVKITPRO}
+  - (cd dynamic_libs-lib && make -j8 && make install)
+  - (cd libgui-master && make -j8 && make install)
+
+script:
+- make -j8
