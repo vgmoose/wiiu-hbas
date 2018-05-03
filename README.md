@@ -1,8 +1,6 @@
 **The 1.5 version of HBAS [is released!](http://github.com/vgmoose/hbas/releases)** See [the post here](https://gbatemp.net/threads/release-homebrew-app-store-for-wiiu.433275) for more info.
 
-<!---
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
--->
 
 Known Homebrew app store repos:
 - [WiiUBru - wiiubru.com/appstore](http://wiiubru.com/appstore) (default)

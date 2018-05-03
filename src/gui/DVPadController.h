@@ -46,7 +46,7 @@ public:
     {
         lastData = data;
         
-        int vpadError = -1;
+        s32 vpadError = -1;
         VPADRead(0, &vpad, 1, &vpadError);
         
         if(vpadError == 0)

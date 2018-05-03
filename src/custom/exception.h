@@ -30,7 +30,7 @@ unsigned char exception_handler(OSContext* contextIn) {
 	
 	//Temporary hacky fix, please ignore me.
 
-	unsigned int coreinit_handle;
+	u32 coreinit_handle;
 	OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 	void (*DisassemblePPCRange)(void *start, void *end, void *printf_func, int *find_symbol_func, int flags);
 	OSDynLoad_FindExport(coreinit_handle, 0, "DisassemblePPCRange", &DisassemblePPCRange);  

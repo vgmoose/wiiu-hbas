@@ -32,7 +32,7 @@ int HomebrewLoader::loadToMemory()
     if(!file.isOpen())
     {
         progressWindow.setTitle(StringTools::strfmt("Failed to open file %s", StringTools::FullpathToFilename(filepath.c_str())));
-        sleep(1);
+        os_usleep(1);
         return FILE_OPEN_FAILURE;
     }
 
@@ -45,7 +45,7 @@ int HomebrewLoader::loadToMemory()
     if(!buffer)
     {
         progressWindow.setTitle("Not enough memory");
-        sleep(1);
+        os_usleep(1);
         return NOT_ENOUGH_MEMORY;
     }
 
@@ -75,7 +75,7 @@ int HomebrewLoader::loadToMemory()
         free(buffer);
         log_printf("File loading not finished for file %s, finished %i of %i bytes\n", filepath.c_str(), bytesRead, fileSize);
         progressWindow.setTitle("File read failure");
-        sleep(1);
+        os_usleep(1);
         return FILE_READ_ERROR;
     }
 
@@ -88,7 +88,7 @@ int HomebrewLoader::loadToMemory()
     if(ret < 0)
     {
         progressWindow.setTitle("Not enough memory");
-        sleep(1);
+        os_usleep(1);
         return NOT_ENOUGH_MEMORY;
     }
 
