@@ -2,6 +2,8 @@
 
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
 
+[![Build Status](https://travis-ci.org/vgmoose/get.svg?branch=master)](https://travis-ci.org/vgmoose/get)
+
 Known Homebrew app store repos:
 - [WiiUBru - wiiubru.com/appstore](http://wiiubru.com/appstore) (default)
 - [Utools - coc4tm.github.io/Utools/web](http://coc4tm.github.io/Utools/web)
