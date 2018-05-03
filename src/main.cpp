@@ -1,21 +1,21 @@
 //#include <string>
 #include "Application.h"
-#include "dynamic_libs/os_functions.h"
-#include "dynamic_libs/fs_functions.h"
-#include "dynamic_libs/gx2_functions.h"
-#include "dynamic_libs/sys_functions.h"
-#include "dynamic_libs/vpad_functions.h"
-#include "dynamic_libs/padscore_functions.h"
-#include "dynamic_libs/socket_functions.h"
-#include "dynamic_libs/ax_functions.h"
-#include "fs/fs_utils.h"
-#include "fs/sd_fat_devoptab.h"
-#include "system/memory.h"
-#include "utils/logger.h"
-#include "utils/utils.h"
+#include <dynamic_libs/os_functions.h>
+#include <dynamic_libs/fs_functions.h>
+#include <dynamic_libs/gx2_functions.h>
+#include <dynamic_libs/sys_functions.h>
+#include <dynamic_libs/vpad_functions.h>
+#include <dynamic_libs/padscore_functions.h>
+#include <dynamic_libs/socket_functions.h>
+#include <dynamic_libs/ax_functions.h>
+#include <fs/FSUtils.h>
+#include <fs/sd_fat_devoptab.h>
+#include <system/memory.h>
+#include <utils/logger.h>
+#include <utils/utils.h>
 #include "common/common.h"
-#include "dynamic_libs/curl_functions.h"
-#include "quark/exception.h"
+#include <dynamic_libs/curl_functions.h>
+#include "custom/exception.h"
 
 /* Entry point */
 extern "C" int Menu_Main(void)
@@ -27,7 +27,7 @@ extern "C" int Menu_Main(void)
     InitOSFunctionPointers();
     InitSocketFunctionPointers();
 
-    log_init("192.168.1.96");
+    log_init();
     log_print("Starting launcher\n");
 
     InitFSFunctionPointers();
@@ -66,7 +66,7 @@ extern "C" int Menu_Main(void)
     unmount_sd_fat("sd");
     log_printf("Release memory\n");
     memoryRelease();
-    log_deinit();
+//    log_deinit();
 
     return 0;
 }

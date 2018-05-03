@@ -11,8 +11,8 @@
 #ifndef DWPAD_CONTROLLER_H_
 #define DWPAD_CONTROLLER_H_
 
-#include "GuiController.h"
-#include "dynamic_libs/padscore_functions.h"
+#include <gui/GuiController.h>
+#include <dynamic_libs/padscore_functions.h>
 
 class DWPadController : public GuiController
 {
@@ -24,8 +24,8 @@ public:
         memset(&kpadData, 0, sizeof(KPADData));
         
         data.validPointer = true;
-        isDPadMode = true;
-        showPointer = true;
+//        isDPadMode = true;
+//        showPointer = true;
     }
     
     //!Destructor
@@ -123,8 +123,8 @@ public:
             data.buttons_h = remapWiiMoteButtons(kpadData.btns_h);
             data.buttons_d = remapWiiMoteButtons(kpadData.btns_d);
 			
-			data.lstick.x = kpadData.nunchuck.stick_x;
-			data.lstick.y = kpadData.nunchuck.stick_y;
+//			data.lstick.x = kpadData.nunchuck.stick_x;
+//			data.lstick.y = kpadData.nunchuck.stick_y;
         }
         else
         {
@@ -149,10 +149,10 @@ public:
             data.buttons_h = remapClassicButtons(kpadData.classic.btns_h);
             data.buttons_d = remapClassicButtons(kpadData.classic.btns_d);
 			
-			data.lstick.x = kpadData.classic.lstick_x;
-			data.lstick.y = kpadData.classic.lstick_y;
-			data.rstick.x = kpadData.classic.rstick_x;
-			data.rstick.y = kpadData.classic.rstick_y;
+//			data.lstick.x = kpadData.classic.lstick_x;
+//			data.lstick.y = kpadData.classic.lstick_y;
+//			data.rstick.x = kpadData.classic.rstick_x;
+//			data.rstick.y = kpadData.classic.rstick_y;
         }
         
         return true;

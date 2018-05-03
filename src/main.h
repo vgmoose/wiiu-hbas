@@ -2,7 +2,7 @@
 #define _MAIN_H_
 
 #include "common/types.h"
-#include "dynamic_libs/os_functions.h"
+#include <dynamic_libs/os_functions.h>
 
 /* Main */
 #ifdef __cplusplus

@@ -6,7 +6,7 @@
 #include <gctypes.h>
 
 #include "ProgressWindow.h"
-#include "system/CThread.h"
+#include <system/CThread.h>
 #include "gui/sigslot.h"
 
 class HomebrewLoader : public GuiFrame, public CThread

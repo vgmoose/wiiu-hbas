@@ -17,14 +17,13 @@
 #include "HomebrewLaunchWindow.h"
 #include "HomebrewLoader.h"
 #include "common/common.h"
-#include "fs/DirList.h"
-#include "fs/fs_utils.h"
-#include "utils/HomebrewXML.h"
+#include <fs/DirList.h>
+#include <fs/FSUtils.h>
+#include "HomebrewXML.h"
 #include "Application.h"
-#include "dynamic_libs/sys_functions.h"
+#include <dynamic_libs/sys_functions.h>
 #include "network/FileDownloader.h"
-#include "utils/Zip.h"
-#include "utils/HomebrewManager.h"
+#include "HomebrewManager.h"
 #include <algorithm>
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
@@ -246,7 +245,7 @@ void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)
 void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
 {
     //! remove element from draw list and push to delete queue
-    removeE(element);
+    this->remove(element);
     AsyncDeleter::pushForDelete(element);
 
     backBtn.clearState(GuiElement::STATE_DISABLED);
@@ -290,7 +289,7 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 	delete InstallHomebrew;
 	
 	
-    homebrewWindowTarget->removeE(progress); // Remove the progress bar
+    homebrewWindowTarget->remove(progress); // Remove the progress bar
     homebrewWindowTarget->OnLaunchBoxCloseClick(homebrewWindowTarget->launchWindowTarget); // Really hacky way to dismiss this window
 
     //! refresh main directory

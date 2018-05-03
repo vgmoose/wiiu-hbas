@@ -1,9 +1,10 @@
 #include <string.h>
 #include "common/common.h"
-#include "dynamic_libs/os_functions.h"
-#include "system/memory_area_table.h"
-#include "utils/utils.h"
-#include "utils/logger.h"
+#include <dynamic_libs/os_functions.h>
+#include "custom/memory_area_table.h"
+#include <utils/utils.h>
+#include <utils/logger.h>
+#include <kernel/syscalls.h>
 
 static s_mem_area *mem_map = 0;
 static u32 mapPosition = 0;

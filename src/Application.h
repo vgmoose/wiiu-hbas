@@ -19,7 +19,7 @@
 
 #include "menu/MainWindow.h"
 #include "video/CVideo.h"
-#include "system/CThread.h"
+#include <system/CThread.h>
 
 extern char* repoUrl;
 

@@ -17,10 +17,10 @@
 #include "HomebrewWindow.h"
 #include "common/common.h"
 #include "Application.h"
-#include "fs/DirList.h"
-#include "fs/fs_utils.h"
-#include "system/AsyncDeleter.h"
-#include "utils/HomebrewXML.h"
+#include <fs/DirList.h>
+#include <fs/FSUtils.h>
+#include <system/AsyncDeleter.h>
+#include "HomebrewXML.h"
 #include "HomebrewLaunchWindow.h"
 #include "network/FileDownloader.h"
 #include "network/ConnectionTest.h"
@@ -266,7 +266,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         u32 iconDataSize = 0;
         
         log_printf("Continuing with it...");
-        LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
+        FSUtils::LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
         
         log_printf("Loaded icon");
 
@@ -377,7 +377,7 @@ void HomebrewWindow::refreshHomebrewApps()
     {
         // create the icon cache folder
         cache = "sd:/wiiu/apps/appstore/cache/";
-        CreateSubfolder(cache.c_str());
+        FSUtils::CreateSubfolder(cache.c_str());
     }
     
     int count = 0;
@@ -388,7 +388,7 @@ void HomebrewWindow::refreshHomebrewApps()
     {
         log_printf("refreshHomebrewApps: Downloading remote %s", targetUrl.c_str());
         gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
-//        removeE(progressWindow);
+//        this->remove(progressWindow);
         log_printf("refreshHomebrewApps: Updated directory");
         
         std::istringstream f2(fileContents);
@@ -517,7 +517,7 @@ void HomebrewWindow::refreshHomebrewApps()
             
             // if invalidating cache, skip loading to memory (leaving iconData null)
             if (!invalidateCache)
-                LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+                FSUtils::LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
             
             // check if the desired icon already exists in the cache, if not download it
             if (iconData == NULL)
@@ -527,7 +527,7 @@ void HomebrewWindow::refreshHomebrewApps()
             {
                 u8 * iconData = NULL;
                 u32 iconDataSize = 0;
-                LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
+                FSUtils::LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
 
                 GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
 
@@ -537,7 +537,7 @@ void HomebrewWindow::refreshHomebrewApps()
         
     }
     
-    removeE(progressWindow);
+    this->remove(progressWindow);
 
     initialLoadInProgress = false;
     globalUpdatePosition = true;
@@ -702,7 +702,7 @@ void HomebrewWindow::clearScreen()
     for (u32 x=0; x<curTabButtons.size(); x++)
     {
 //        log_printf("filter: about to remove button %d", x);
-        removeE(curTabButtons[x]->button);  
+        this->remove(curTabButtons[x]->button);  
     }
     curTabButtons.clear();
 }
@@ -718,11 +718,11 @@ void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *co
             listingMode = x;
                         
         // remove them
-        removeE(all_cats[x]);
+        this->remove(all_cats[x]);
     }
     
-    removeE(header);
-    removeE(header2);
+    this->remove(header);
+    this->remove(header2);
     
     append(&backTabBtn);
 
@@ -797,10 +797,10 @@ void HomebrewWindow::OnHBLTabButtonClick(GuiButton *button, const GuiController 
     clearScreen();
     filter();
     
-    removeE(&backTabBtn);
+    this->remove(&backTabBtn);
 
     if (internet_connection)
-        removeE(&randomTabBtn);
+        this->remove(&randomTabBtn);
     
     displayCategories();
     globalUpdatePosition = true;
@@ -812,7 +812,7 @@ void HomebrewWindow::OnRPXTabButtonClick(GuiButton *button, const GuiController 
     {
         if (launchBox)
             // dismiss any active window
-            removeE(launchBox);
+            this->remove(launchBox);
     }
     
     // click a random button within the displayed apps
@@ -835,7 +835,7 @@ void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
     randomTabBtn.clearState(GuiElement::STATE_DISABLED);
     
     //! remove element from draw list and push to delete queue
-    removeE(element);
+    this->remove(element);
     AsyncDeleter::pushForDelete(element);
 
     for(u32 i = 0; i < homebrewButtons.size(); i++)

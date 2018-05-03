@@ -3,8 +3,8 @@
 #include <string.h>
 #include "Resources.h"
 #include "filelist.h"
-#include "system/AsyncDeleter.h"
-#include "fs/fs_utils.h"
+#include <system/AsyncDeleter.h>
+#include <fs/FSUtils.h>
 #include "gui/GuiImageAsync.h"
 #include "gui/GuiSound.h"
 
@@ -47,7 +47,7 @@ bool Resources::LoadFiles(const char * path)
         u8 * buffer = NULL;
         u32 filesize = 0;
 
-        LoadFileToMem(fullpath.c_str(), &buffer, &filesize);
+        FSUtils::LoadFileToMem(fullpath.c_str(), &buffer, &filesize);
 
         RecourceList[i].CustomFile = buffer;
         RecourceList[i].CustomFileSize = (u32) filesize;

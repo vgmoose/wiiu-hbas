@@ -1,3 +1,5 @@
+DO_LOGGING := 1
+
 #---------------------------------------------------------------------------------
 # Clear the implicit built in rules
 #---------------------------------------------------------------------------------
@@ -33,7 +35,6 @@ BUILD		:=	build
 BUILD_DBG	:=	$(TARGET)_dbg
 SOURCES		:=	src \
 				src/common \
-				src/dynamic_libs \
 				src/fs \
 				src/game \
 				src/gui \
@@ -49,7 +50,7 @@ SOURCES		:=	src \
 				src/utils \
 				src/video \
 				src/video/shaders \
-				src/quark
+				src/custom
 DATA		:=	data \
 				data/images \
 				data/fonts \
@@ -73,7 +74,7 @@ MAKEFLAGS += --no-print-directory
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lgcc -lgd -lpng -lz -lfreetype -lmad -lzip
+LIBS	:= -lgui -lutils -ldynamiclibs -lfreetype -lgd -lpng -ljpeg -lz  -lmad -lvorbisidec
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -126,7 +127,9 @@ export OFILES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD) -I$(LIBOGC_INC) \
-					-I$(PORTLIBS)/include -I$(PORTLIBS)/include/freetype2
+					-I$(PORTLIBS)/include -I$(PORTLIBS)/include/freetype2 \
+					-I$(PORTLIBS)/include/zip \
+					-I$(PORTLIBS)/include/libutils -I$(PORTLIBS)/include/libgui
 
 #---------------------------------------------------------------------------------
 # build a list of library paths

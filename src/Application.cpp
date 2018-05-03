@@ -16,15 +16,15 @@
  ****************************************************************************/
 #include "Application.h"
 #include "common/common.h"
-#include "dynamic_libs/os_functions.h"
-#include "gui/FreeTypeGX.h"
-#include "gui/VPadController.h"
-#include "gui/WPadController.h"
-#include "gui/DVPadController.h"
-#include "gui/DWPadController.h"
+#include <dynamic_libs/os_functions.h>
+#include <gui/FreeTypeGX.h>
+#include <gui/VPadController.h>
+#include <gui/WPadController.h>
+#include <gui/DVPadController.h>
+#include <gui/DWPadController.h>
 #include "resources/Resources.h"
 #include "sounds/SoundHandler.hpp"
-#include "utils/logger.h"
+#include <utils/logger.h>
 
 Application *Application::applicationInstance = NULL;
 bool Application::exitApplication = false;
@@ -170,62 +170,64 @@ void Application::executeThread(void)
             mainWindow->update(controller[i]);
             
             //If the + button on the GamePad is pressed, switch to DPAD mode and vice versa.
-            if((i == 0) && (controller[i]->data.buttons_d & GuiTrigger::BUTTON_PLUS))
-            {
-                if(controller[i]->isDPadMode)
-                {
-                    delete controller[i];
-                    controller[i] = new VPadController(GuiTrigger::CHANNEL_1);
-                }
-                else
-                {
-                    delete controller[i];
-                    controller[i] = new DVPadController(GuiTrigger::CHANNEL_1);
-                }
-            }
-            
-            //If the + button on any other controller is pressed, switch to DPAD mode and vice versa.
-            else if(controller[i]->data.buttons_d & GuiTrigger::BUTTON_PLUS)
-            {
-                if(controller[i]->isDPadMode)
-                {
-                    delete controller[i];
-                    switch(i)
-                    {
-                        case 1:
-                            controller[i] = new WPadController(GuiTrigger::CHANNEL_2);
-                            break;
-                        case 2:
-                            controller[i] = new WPadController(GuiTrigger::CHANNEL_3);
-                            break;
-                        case 3:
-                            controller[i] = new WPadController(GuiTrigger::CHANNEL_4);
-                            break;
-                        case 4:
-                            controller[i] = new WPadController(GuiTrigger::CHANNEL_5);
-                            break;
-                    }
-                }
-                else
-                {
-                    delete controller[i];
-                    switch(i)
-                    {
-                        case 1:
-                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_2);
-                            break;
-                        case 2:
-                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_3);
-                            break;
-                        case 3:
-                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_4);
-                            break;
-                        case 4:
-                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_5);
-                            break;
-                    }
-                }
-            }
+
+// TODO: enable dpad mode again
+//            if((i == 0) && (controller[i]->data.buttons_d & GuiTrigger::BUTTON_PLUS))
+//            {
+//                if(controller[i]->isDPadMode)
+//                {
+//                    delete controller[i];
+//                    controller[i] = new VPadController(GuiTrigger::CHANNEL_1);
+//                }
+//                else
+//                {
+//                    delete controller[i];
+//                    controller[i] = new DVPadController(GuiTrigger::CHANNEL_1);
+//                }
+//            }
+//            
+//            //If the + button on any other controller is pressed, switch to DPAD mode and vice versa.
+//            else if(controller[i]->data.buttons_d & GuiTrigger::BUTTON_PLUS)
+//            {
+//                if(controller[i]->isDPadMode)
+//                {
+//                    delete controller[i];
+//                    switch(i)
+//                    {
+//                        case 1:
+//                            controller[i] = new WPadController(GuiTrigger::CHANNEL_2);
+//                            break;
+//                        case 2:
+//                            controller[i] = new WPadController(GuiTrigger::CHANNEL_3);
+//                            break;
+//                        case 3:
+//                            controller[i] = new WPadController(GuiTrigger::CHANNEL_4);
+//                            break;
+//                        case 4:
+//                            controller[i] = new WPadController(GuiTrigger::CHANNEL_5);
+//                            break;
+//                    }
+//                }
+//                else
+//                {
+//                    delete controller[i];
+//                    switch(i)
+//                    {
+//                        case 1:
+//                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_2);
+//                            break;
+//                        case 2:
+//                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_3);
+//                            break;
+//                        case 3:
+//                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_4);
+//                            break;
+//                        case 4:
+//                            controller[i] = new DWPadController(GuiTrigger::CHANNEL_5);
+//                            break;
+//                    }
+//                }
+//            }
         }
 
         //! start rendering DRC

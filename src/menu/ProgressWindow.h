@@ -17,7 +17,7 @@
 #ifndef _PROGRESS_WINDOW_H_
 #define _PROGRESS_WINDOW_H_
 
-#include "gui/Gui.h"
+#include <gui/Gui.h>
 
 class ProgressWindow : public GuiFrame, public sigslot::has_slots<>
 {

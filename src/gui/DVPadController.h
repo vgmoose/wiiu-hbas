@@ -9,8 +9,8 @@
 #ifndef DPAD_CONTROLLER_H_
 #define DPAD_CONTROLLER_H_
 
-#include "GuiController.h"
-#include "dynamic_libs/vpad_functions.h"
+#include <gui/GuiController.h>
+#include <dynamic_libs/vpad_functions.h>
 
 class DVPadController : public GuiController
 {
@@ -24,8 +24,8 @@ public:
         memset(&lastData, 0, sizeof(PadData));
         
         data.validPointer = true;
-        isDPadMode = true;
-        showPointer = true;
+//        isDPadMode = true;
+//        showPointer = true;
     }
     
     //!Destructor
@@ -76,8 +76,8 @@ public:
             data.buttons_r = fixButtons(vpad.btns_r);
             data.buttons_h = fixButtons(vpad.btns_h);
             data.buttons_d = fixButtons(vpad.btns_d);
-            data.lstick = vpad.lstick;
-            data.rstick = vpad.rstick;
+//            data.lstick = vpad.lstick;
+//            data.rstick = vpad.rstick;
             
             return true;
         }

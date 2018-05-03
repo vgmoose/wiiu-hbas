@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "MainWindow.h"
-#include "dynamic_libs/os_functions.h"
-#include "dynamic_libs/socket_functions.h"
+#include <dynamic_libs/os_functions.h>
+#include <dynamic_libs/socket_functions.h>
 #include "Application.h"
-#include "utils/StringTools.h"
-#include "utils/logger.h"
+#include <utils/StringTools.h>
+#include <utils/logger.h>
 
-#include "dynamic_libs/vpad_functions.h"
+#include <dynamic_libs/vpad_functions.h>
 
 int movedALittleBit = 0;
 int scrolledSoFar = 0;
@@ -58,7 +58,7 @@ MainWindow::MainWindow(int w, int h)
 
     for(int i = 0; i < 5; i++)
     {
-        std::string filename = strfmt("player%i_point.png", i);
+        std::string filename = StringTools::strfmt("player%i_point.png", i);
         pointerImgData[i] = Resources::GetImageData(filename.c_str());
         pointerImg[i] = new GuiImage(pointerImgData[i]);
         pointerImg[i]->setScale(1.5f);
@@ -89,7 +89,7 @@ void asyncRefreshHomebrewApps(CThread* thread, void* args)
 	GuiText* loadingMsg = new GuiText("One Moment Please...", 40, glm::vec4(1, 1, 1, 1));
 	homebrewWindow->append(loadingMsg);
 	homebrewWindow->loadLocalApps(0);
-	homebrewWindow->removeE(loadingMsg);
+	homebrewWindow->remove(loadingMsg);
 	homebrewWindow->displayCategories();
 	
 //    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
@@ -116,7 +116,7 @@ MainWindow::~MainWindow()
 //    while(!tvElements.empty())
 //    {
 //        delete tvElements[0];
-//        removeE(tvElements[0]);
+//        this->remove(tvElements[0]);
 //    }
 //    while(!drcElements.empty())
 //    {
@@ -162,20 +162,21 @@ void MainWindow::update(GuiController *controller)
     //! dont read behind the initial elements in case one was added
     //u32 tvSize = tvElements.size();
     
-        if(controller->showPointer && controller->data.validPointer)
-    {
-        int wpadIdx = controller->chanIdx;
-        f32 posX = controller->data.x;
-        f32 posY = controller->data.y;
-        pointerImg[wpadIdx]->setPosition(posX, posY);
-        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
-        pointerValid[wpadIdx] = true;
-    }
-	
-	if(!controller->showPointer)
-	{
+// TODO: put back with dpad changes
+//        if(controller->showPointer && controller->data.validPointer)
+//    {
+//        int wpadIdx = controller->chanIdx;
+//        f32 posX = controller->data.x;
+//        f32 posY = controller->data.y;
+//        pointerImg[wpadIdx]->setPosition(posX, posY);
+//        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
+//        pointerValid[wpadIdx] = true;
+//    }
+//	
+//	if(!controller->showPointer)
+	//{
 		pointerValid[controller->chanIdx] = false;
-	}
+	//}
 	
 	// minus button toggles joysticks
 	if (controller->data.buttons_r & VPAD_BUTTON_MINUS)
@@ -221,11 +222,12 @@ void MainWindow::update(GuiController *controller)
     // below code from Space Game https://github.com/vgmoose/space/blob/hbl_elf/src/space.c
     		
 	// Handle analog stick movements
-	Vec2D left =  controller->data.lstick;
-	Vec2D right = controller->data.rstick;
+// TODO: re-add joystick controls back
+//	Vec2D left =  controller->data.lstick;
+//	Vec2D right = controller->data.rstick;
 
 	// get the differences
-	float ydif = -20*left.y + -20*right.y;
+	float ydif = 0; // -20*left.y + -20*right.y;
 	
 	if (joysticksDisabled)
 		ydif = 0;
@@ -236,9 +238,9 @@ void MainWindow::update(GuiController *controller)
     ydif = (ydif >  1 || controller->data.buttons_h &	GuiTrigger::BUTTON_2)?    20 : ydif;
     ydif = (ydif < -1 || controller->data.buttons_h &  GuiTrigger::BUTTON_1)? -20: ydif;
     
-//    // do auto scrolling on first load to the top
-//    if (!showingSplashScreen && doIntroScroll)
-//        ydif -= 20;
+//x    // do auto scrolling on first load to the top
+//x    if (!showingSplashScreen && doIntroScroll)
+//x        ydif -= 20;
     
     if (ydif != 0) {
         movedALittleBit = 10;
