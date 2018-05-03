@@ -1,5 +1,6 @@
 /****************************************************************************
- * Copyright (C) 2015 Dimok
+ * Copyright (C) 2015-2018 VGMoose, rw-r-r_0644, Creepermario, Brienj
+ * Copyright (C) 2015 Dimok, Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

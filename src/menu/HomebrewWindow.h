@@ -21,6 +21,9 @@
 #include "gui/GuiFrame.h"
 #include "menu/ProgressWindow.h"
 
+#include <dynamic_libs/socket_functions.h>
+#include "../libs/get/src/Get.hpp"
+
 #define LOCAL 0
 #define UPDATE 1
 #define INSTALLED 2
@@ -33,7 +36,16 @@ extern ProgressWindow * progressWindow;
 
 typedef struct
 {
-    std::string execPath;
+    // for legacy apps uninstallation
+    std::string execPath = NULL;
+    int status;
+    std::string shortname;
+    std::string binary = NULL;
+    std::string category; // string version
+    std::string version;
+    std::string dirPath = NULL;
+
+    // properties to be displayed/drawn
     GuiImage *image;
     GuiButton *button;
     GuiText *nameLabel;
@@ -42,13 +54,9 @@ typedef struct
     GuiText *descriptionLabel;
     GuiImageData *iconImgData;
     GuiImage *iconImg;
-    std::string shortname;
-    int status;
-    std::string dirPath;
-    std::string binary;
-    std::string version;
-    std::string category;
-    int typee;
+    
+    // the actual package this button represents
+    Package* package = NULL;
 } homebrewButton;
 
 extern void updateProgress(void *arg, u32 done, u32 total);
@@ -67,6 +75,7 @@ public:
     std::vector<homebrewButton*> homebrewButtons;
     GuiFrame * launchBox;
     
+    Get* get = NULL;
     
     GuiSound *buttonClickSound;
     GuiImageData * installedButtonImgData;

@@ -28,9 +28,9 @@
 #include <sstream>
 
 
+
 #define DEFAULT_WIILOAD_PORT        4299
 
-#define MAX_BUTTONS_ON_PAGE     4
 char * repoUrl = "http://wiiubru.com/appstore";
 //char * repoUrl = "192.168.1.104:8000";
 //char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
@@ -317,7 +317,6 @@ void HomebrewWindow::loadLocalApps(int mode)
         // file path
         homebrewButtons[idx]->execPath = dirList->GetFilepath(i);
         homebrewButtons[idx]->iconImgData = NULL;        
-        homebrewButtons[idx]->typee = HBL;
         homebrewButtons[idx]->dirPath = homebrewPath;
 
 //        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
@@ -364,6 +363,7 @@ This method fetches remote apps only and that's all nothing more
 void HomebrewWindow::refreshHomebrewApps()
 {
     log_printf("refreshHomebrewApps: starting homebrew app refresh");
+    
     // get the 4 different types of app backgrounds
     
     // clear arrays
@@ -380,70 +380,28 @@ void HomebrewWindow::refreshHomebrewApps()
         FSUtils::CreateSubfolder(cache.c_str());
     }
     
-    int count = 0;
-                        
     // download app list from the repo
-    std::string targetUrl = std::string(repoUrl)+"/directory12.yaml";
-    if (!gotDirectorySuccess)
-    {
-        log_printf("refreshHomebrewApps: Downloading remote %s", targetUrl.c_str());
-        gotDirectorySuccess = FileDownloader::getFile(targetUrl, fileContents, &updateProgress);
-//        this->remove(progressWindow);
-        log_printf("refreshHomebrewApps: Updated directory");
-        
-        std::istringstream f2(fileContents);
+    // check if the Get object already exists, and make it if it doesn't
+    if (this->get == NULL)
+        this->get = new Get(".get", repoUrl);
     
-        // get the total number of apps (lines divided by 7)
-        while (gotDirectorySuccess)
-        {
-            count ++;
-            std::string dummy;
-            if (!std::getline(f2, dummy)) break;
-        }
-
-        count /= 7;
-    }
-    
-    std::istringstream f(fileContents);
+    int count = this->get->packages.size();
     
     // totalLocalApps will represent how many apps aren't on the server
     totalLocalApps = homebrewButtons.size();
     
-    u32 iterCount = 0;
     globalUpdatePosition = true;
 
-    while (gotDirectorySuccess)
+    for (int iterCount=0; iterCount<count; iterCount++)
     {
         char numstr[30];
         sprintf(numstr, "Updating App info... (%d/%d)", iterCount, count);
         
         progressWindow->setTitle(numstr);
         updateProgress(0, iterCount, count);
-
-        log_printf("starting yaml parsing");
-        std::string shortname;
-
-        // very poor yaml parsing, to be replaced with json in the future
-        if (!std::getline(f, shortname)) break;
-        shortname = shortname.substr(5);
-        std::string name;    
-        std::getline(f, name);
-        name = name.substr(2);
-        std::string author;    
-        std::getline(f, author);
-        author = author.substr(2);
-        std::string desc;    
-        std::getline(f, desc);
-        desc = desc.substr(2);
-        std::string binary;    
-        std::getline(f, binary);
-        binary = binary.substr(2);
-        std::string version;
-        std::getline(f, version);
-        version = version.substr(2);
-        std::string typee;
-        std::getline(f, typee);
-        typee = typee.substr(2);
+        
+        // the info for the current package is stored within the package variable
+        Package* package = this->get->packages[iterCount];
         
         log_printf("done yaml parsing");
 
@@ -454,37 +412,21 @@ void HomebrewWindow::refreshHomebrewApps()
         
         homebrewButtons[idx] = new homebrewButton();
         // file path
-        homebrewButtons[idx]->execPath = "";
-        log_printf("set exec path");
 
+        // store the package pointer inside the homebrew button element
+        homebrewButtons[idx]->package = package;
         
-        std::string homebrewPath = homebrewButtons[idx]->execPath;
-        size_t slashPos = homebrewPath.rfind('/');
-        if(slashPos != std::string::npos)
-            homebrewPath.erase(slashPos);
-
-        homebrewButtons[idx]->dirPath = homebrewPath;
-
-        // since we got this app from the net, mark it as a GET
-        homebrewButtons[idx]->status = GET;
-        homebrewButtons[idx]->shortname = shortname;
-        homebrewButtons[idx]->binary = binary;
-        homebrewButtons[idx]->version = version;
+        // store other proeprteis (legacy, reference)
+        homebrewButtons[idx]->status = package->status;
+        homebrewButtons[idx]->shortname = package->pkg_name;
+        homebrewButtons[idx]->category = package->category;
+        homebrewButtons[idx]->version = package->version;
         log_printf("set a bunch of attributes");
-        
-        // default to HBL type, set to RPX type if typee string matches
-        homebrewButtons[idx]->category = typee;
 
-        const char *cpName = name.c_str();
-//        const char *cpDescription = desc.c_str();
-
-        if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
-           cpName += strlen("sd:/wiiu/apps/");
-
-        homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->versionLabel = new GuiText(version.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->coderLabel = new GuiText(author.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->descriptionLabel = new GuiText(desc.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->nameLabel = new GuiText(package->title.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->versionLabel = new GuiText(package->version.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->coderLabel = new GuiText(package->author.c_str(), 28, glm::vec4(0, 0, 0, 1));
+        homebrewButtons[idx]->descriptionLabel = new GuiText(package->short_desc.c_str(), 28, glm::vec4(0, 0, 0, 1));
         log_printf("created some more attributes");
         
         homebrewButtons[idx]->iconImgData = Resources::GetImageData("missing.png");
@@ -493,9 +435,7 @@ void HomebrewWindow::refreshHomebrewApps()
         // add this to the remote button array
         remoteAppButtons.push_back(homebrewButtons[idx]);
         
-        
         log_printf("added %s to the remoteApps vector", shortname.c_str());
-        iterCount ++;
         
         // download the icon for this remote app if we aren't ignoring icons
         if (!noIconMode)

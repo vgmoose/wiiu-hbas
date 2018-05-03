@@ -16,6 +16,10 @@ export LIBOGC_INC	:=	$(DEVKITPRO)/libogc/include
 export LIBOGC_LIB	:=	$(DEVKITPRO)/libogc/lib/wii
 export PORTLIBS		:=	$(DEVKITPRO)/portlibs/ppc
 
+export GET		:= ./libs/get/src
+export RAPIDJSON	:= ./libs/get/src/libs/rapidjson/include
+export MINIZIP          := ./libs/get/src/libs/minizip
+
 PREFIX	:=	powerpc-eabi-
 
 export AS	:=	$(PREFIX)as
@@ -40,20 +44,21 @@ SOURCES		:=	src \
 				src/network \
 				src/menu \
 				src/resources \
+				$(GET) $(MINIZIP)
 
 DATA		:=	data \
 				data/images \
 				data/fonts \
 				data/sounds
 
-INCLUDES	:=  src
+INCLUDES	:=  src $(RAPIDJSON) $(MINIZIP)
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-CFLAGS	:=  -std=gnu11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
-		    -O3 -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE)
-CXXFLAGS := -std=gnu++11 -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
+CFLAGS	:=  -std=gnu11 -DWIIU -DNOCRYPT -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
+		    -O3 -Wall -Wextra -Wno-unused-parameter -Wno-strict-aliasing $(INCLUDE) 
+CXXFLAGS := -std=gnu++11 -DWIIU -DNOCRYPT -mrvl -mcpu=750 -meabi -mhard-float -ffast-math \
 		    -O3 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE -Wno-strict-aliasing $(INCLUDE)
 			
 ifeq ($(DO_LOGGING), 1)
@@ -70,7 +75,7 @@ MAKEFLAGS += --no-print-directory
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lgui -lutils -ldynamiclibs -lfreetype -lgd -lpng -ljpeg -lz  -lmad -lvorbisidec -lzip
+LIBS	:= -lgui -lutils -ldynamiclibs -lfreetype -lgd -lpng -ljpeg -lz -lmad -lvorbisidec -lzip
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
