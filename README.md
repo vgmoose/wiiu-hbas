@@ -2,7 +2,7 @@
 
 ![icon](https://raw.githubusercontent.com/vgmoose/hbas/master/meta/icon.png)
 
-[![Build Status](https://travis-ci.org/vgmoose/get.svg?branch=master)](https://travis-ci.org/vgmoose/get)
+[![Build Status](https://travis-ci.org/vgmoose/hbas.svg?branch=master)](https://travis-ci.org/vgmoose/hbas)
 
 Known Homebrew app store repos:
 - [WiiUBru - wiiubru.com/appstore](http://wiiubru.com/appstore) (default)

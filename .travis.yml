@@ -33,8 +33,8 @@ install:
   - tar -xzvf libutils.tar.gz
   - tar -xzvf libgui.tar.gz
   - 7z x -y ./dynamic_libs-lib/libs/portlibs.zip -o${DEVKITPRO}
-  - 7z x -y ./libutils-master/libs/portlibs.zip -o${DEVKITPRO}
   - 7z x -y ./libgui-master/libs/portlibs.zip -o${DEVKITPRO}
+  - 7z x -y ./libs/portlibs.zip -o${DEVKITPRO}
   - (cd dynamic_libs-lib && make -j8 && make install)
   - (cd libutils-master && make -j8 && make install)
   - (cd libgui-master && make -j8 && make install)
