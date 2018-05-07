@@ -1,4 +1,4 @@
-#include <gctypes.h>
+#include <dynamic_libs/os_types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

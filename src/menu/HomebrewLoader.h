@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include <gctypes.h>
+#include <dynamic_libs/os_types.h>
 
 #include "ProgressWindow.h"
 #include <system/CThread.h>

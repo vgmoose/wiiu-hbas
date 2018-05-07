@@ -16,7 +16,7 @@
  ****************************************************************************/
 #include <malloc.h>
 #include <string.h>
-#include <gctypes.h>
+#include <dynamic_libs/os_types.h>
 #include "common/common.h"
 #include <utils/utils.h>
 #include "memory_area_table.h"

@@ -9,7 +9,7 @@
 #ifndef _FILELIST_H_
 #define _FILELIST_H_
 
-#include <gctypes.h>
+#include <dynamic_libs/os_types.h>
 
 typedef struct _RecourceFile
 {

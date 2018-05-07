@@ -1,4 +1,4 @@
-#include <gctypes.h>
+#include <dynamic_libs/os_types.h>
 #include <malloc.h>
 #include <string.h>
 #include "Resources.h"
