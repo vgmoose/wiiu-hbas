@@ -15,6 +15,15 @@ At this time, only one repository at a time is supported. See below on how to us
 ### Usage
 Copy the release to /wiiu/apps on the SD card, and launch it from the homebrew launcher. You can then launch this app to install and manage downloaded software for the HBL onto your SD card from any HBAS server. 
 
+### Building
+To build this app, the following dependencies should be installed:
+- [devkitPPC](https://devkitpro.org/wiki/Getting_Started/devkitPPC)
+- [libutils](https://github.com/Maschell/libutils)
+- [libgui](https://github.com/Maschell/libgui)
+- [dynamic_libs](https://github.com/Maschell/dynamic_libs)
+
+and then cd into the main repo folder and run `make`. See the [.travis.yml](https://github.com/vgmoose/hbas/blob/master/.travis.yml) for more details.
+
 ### Customizing the server
 You can put a text file in the /wiiu/apps/appstore/ folder called "repository.txt". If this file is detected then HBAS will use the contents of this file as the specified server. It will expect a [yaml file](https://github.com/vgmoose/hbas/blob/gh-pages/directory.yaml) at a GET request to /directory.yaml . If this file is not in the app bundle, it will default to [hbas.vgmoose.com](http://hbas.vgmoose.com/directory.yaml).
 
@@ -30,9 +39,10 @@ Code
 - dimok - lots of code, and the main framework used here is copied from [Homebrew Launcher](https://gbatemp.net/threads/homebrew-launcher-for-wiiu.416905/)
 - pwsincd - writing and optimizing web template code
 - brienj - extremely helpful debugging
-- rw-r-r_0644 - fix some framerate issues and  downloading enhancements
+- rw-r-r_0644 - fix some framerate issues and downloading enhancements
 - quarktheawesome - the lovely exception handler
 - zarklord1 - wii u zip folder extraction library
+- maschell - libgui and libutils refactoring
 - marionumber1 - for begrudgingly being a 5.5 enabler
 
 Resources
