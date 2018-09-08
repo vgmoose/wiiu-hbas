@@ -30,7 +30,6 @@ before_install:
   - wget https://github.com/Maschell/libgui/archive/master.tar.gz -O libgui.tar.gz
 
 install:
-  - tar -xjf devkitPPC-linux.tar.bz2 -C ${DEVKITPRO}/
   - tar -xzvf dynamic_libs.tar.gz
   - tar -xzvf libutils.tar.gz
   - tar -xzvf libgui.tar.gz
