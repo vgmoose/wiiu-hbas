@@ -1,4 +1,4 @@
-language: c
+language: cpp
 sudo: false
 
 os:
@@ -8,6 +8,7 @@ env:
   global:
     - DEVKITPRO=$HOME/devkitPro
     - DEVKITPPC=${DEVKITPRO}/devkitPPC
+    - PORTLIBREPOS=$HOME/portlibrepos
 
 cache:
   directories:
@@ -21,8 +22,9 @@ addons:
 
 before_install:
   - mkdir -p "${DEVKITPRO}"
-  - wget http://download.sourceforge.net/devkitpro/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
-  - wget https://downloads.devkitpro.org/devkitPPC_r29-1-x86_64-linux.tar.bz2 -O devkitPPC-linux.tar.bz2
+  - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb -O /tmp/devkitpro-pacman.deb
+  - sudo dpkg -i /tmp/devkitpro-pacman.deb
+  - yes | sudo dkp-pacman -Syu devkitPPC --needed
   - wget https://github.com/Maschell/dynamic_libs/archive/lib.tar.gz -O dynamic_libs.tar.gz
   - wget https://github.com/Maschell/libutils/archive/master.tar.gz -O libutils.tar.gz
   - wget https://github.com/Maschell/libgui/archive/master.tar.gz -O libgui.tar.gz
