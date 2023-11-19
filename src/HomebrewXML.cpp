@@ -1,8 +1,7 @@
-#include <dynamic_libs/os_types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "custom/tinyxml.h"
+#include "../libs/get/src/libs/tinyxml/tinyxml.h"
 
 #include "HomebrewXML.h"
 
@@ -165,7 +164,7 @@ void HomebrewXML::SetArgument(const char* argument)
 
 	// Check if argument already exists and edit it
 	bool found = false;
-	for(u8 i=0; i < Arguments.size(); i++)
+	for(uint32_t i=0; i < Arguments.size(); i++)
 	{
 		size_t pos = Arguments[i].find(argName);
 		if(pos != std::string::npos)

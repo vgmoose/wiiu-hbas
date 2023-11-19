@@ -19,18 +19,15 @@
 
 #include <vector>
 #include <queue>
-#include "gui/Gui.h"
 #include "HomebrewWindow.h"
-
-class CVideo;
 
 extern HomebrewWindow * homebrewWindow;
 extern int movedALittleBit;
 extern int scrolledSoFar;
 
 extern void scrollMenu(float scrol);
-extern void asyncRefreshHomebrewAppIcons(CThread* thread, void* args);
-extern void asyncRefreshHomebrewApps(CThread* thread, void* args);
+extern void asyncRefreshHomebrewAppIcons(void* thread, void* args);
+extern void asyncRefreshHomebrewApps(void* thread, void* args);
 extern void globalRefreshHomebrewApps();
 
 
@@ -45,15 +42,15 @@ public:
     
     bool showingSplashScreen;
     bool disableSplashScreenNextUpdate;
-    GuiImageData * backgroundImg2Data;
+    GuiTextureData * backgroundImg2Data;
     GuiImage backgroundImg2;
 	bool joysticksDisabled = false;
 
         
-    GuiImageData * splashScreenImgData;
+    GuiTextureData * splashScreenImgData;
     GuiImage splashScreen;
     
-    CThread * initialLoadThread;
+    // CThread * initialLoadThread;
 
     void appendTv(GuiElement *e)
     {
@@ -78,7 +75,7 @@ public:
         appendDrc(e);
     }
 
-    void insertTv(u32 pos, GuiElement *e)
+    void insertTv(uint32_t pos, GuiElement *e)
     {
         if(!e)
             return;
@@ -86,7 +83,7 @@ public:
         removeTv(e);
         tvElements.insert(tvElements.begin() + pos, e);
     }
-    void insertDrc(u32 pos, GuiElement *e)
+    void insertDrc(uint32_t pos, GuiElement *e)
     {
         if(!e)
             return;
@@ -95,7 +92,7 @@ public:
         drcElements.insert(drcElements.begin() + pos, e);
     }
 
-    void insert(u32 pos, GuiElement *e)
+    void insert(uint32_t pos, GuiElement *e)
     {
         insertTv(pos, e);
         insertDrc(pos, e);
@@ -103,7 +100,7 @@ public:
 
     void removeTv(GuiElement *e)
     {
-        for(u32 i = 0; i < tvElements.size(); ++i)
+        for(uint32_t i = 0; i < tvElements.size(); ++i)
         {
             if(e == tvElements[i])
             {
@@ -114,7 +111,7 @@ public:
     }
     void removeDrc(GuiElement *e)
     {
-        for(u32 i = 0; i < drcElements.size(); ++i)
+        for(uint32_t i = 0; i < drcElements.size(); ++i)
         {
             if(e == drcElements[i])
             {
@@ -135,8 +132,8 @@ public:
         drcElements.clear();
     }
 
-    void drawDrc(CVideo *video);
-    void drawTv(CVideo *video);
+    void drawDrc(Renderer *video);
+    void drawTv(Renderer *video);
     void update(GuiController *controller);
     void updateEffects();
     float lastTouchX2 = 0;
@@ -145,7 +142,7 @@ private:
     std::vector<GuiElement *> tvElements;
 
 
-    GuiImageData *pointerImgData[5];
+    GuiTextureData *pointerImgData[5];
     GuiImage *pointerImg[5];
     bool pointerValid[5];
 };

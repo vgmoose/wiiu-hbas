@@ -9,112 +9,110 @@
 #ifndef _FILELIST_H_
 #define _FILELIST_H_
 
-#include <dynamic_libs/os_types.h>
-
 typedef struct _RecourceFile
 {
 	const char *filename;
-	const u8   *DefaultFile;
-	const u32  &DefaultFileSize;
-	u8		   *CustomFile;
-	u32		    CustomFileSize;
+	const uint32_t   *DefaultFile;
+	const uint32_t  &DefaultFileSize;
+	uint32_t		   *CustomFile;
+	uint32_t		    CustomFileSize;
 } RecourceFile;
 
-extern const u8 all_gray_png[];
-extern const u32 all_gray_png_size;
+extern const uint32_t all_gray_png[];
+extern const uint32_t all_gray_png_size;
 
-extern const u8 back_tab_png[];
-extern const u32 back_tab_png_size;
+extern const uint32_t back_tab_png[];
+extern const uint32_t back_tab_png_size;
 
-extern const u8 bg_png[];
-extern const u32 bg_png_size;
+extern const uint32_t bg_png[];
+extern const uint32_t bg_png_size;
 
-extern const u8 button_click_mp3[];
-extern const u32 button_click_mp3_size;
+extern const uint32_t button_click_mp3[];
+extern const uint32_t button_click_mp3_size;
 
-extern const u8 CLOSE_png[];
-extern const u32 CLOSE_png_size;
+extern const uint32_t CLOSE_png[];
+extern const uint32_t CLOSE_png_size;
 
-extern const u8 concepts_png[];
-extern const u32 concepts_png_size;
+extern const uint32_t concepts_png[];
+extern const uint32_t concepts_png_size;
 
-extern const u8 DELETE_BUTTON_png[];
-extern const u32 DELETE_BUTTON_png_size;
+extern const uint32_t DELETE_BUTTON_png[];
+extern const uint32_t DELETE_BUTTON_png_size;
 
-extern const u8 emulators_png[];
-extern const u32 emulators_png_size;
+extern const uint32_t emulators_png[];
+extern const uint32_t emulators_png_size;
 
-extern const u8 font_ttf[];
-extern const u32 font_ttf_size;
+extern const uint32_t font_ttf[];
+extern const uint32_t font_ttf_size;
 
-extern const u8 games_png[];
-extern const u32 games_png_size;
+extern const uint32_t games_png[];
+extern const uint32_t games_png_size;
 
-extern const u8 GET_png[];
-extern const u32 GET_png_size;
+extern const uint32_t GET_png[];
+extern const uint32_t GET_png_size;
 
-extern const u8 GET_BUTTON_png[];
-extern const u32 GET_BUTTON_png_size;
+extern const uint32_t GET_BUTTON_png[];
+extern const uint32_t GET_BUTTON_png_size;
 
-extern const u8 INSTALLED_png[];
-extern const u32 INSTALLED_png_size;
+extern const uint32_t INSTALLED_png[];
+extern const uint32_t INSTALLED_png_size;
 
-extern const u8 launchMenuBox_png[];
-extern const u32 launchMenuBox_png_size;
+extern const uint32_t launchMenuBox_png[];
+extern const uint32_t launchMenuBox_png_size;
 
-extern const u8 loaders_png[];
-extern const u32 loaders_png_size;
+extern const uint32_t loaders_png[];
+extern const uint32_t loaders_png_size;
 
-extern const u8 LOCAL_png[];
-extern const u32 LOCAL_png_size;
+extern const uint32_t LOCAL_png[];
+extern const uint32_t LOCAL_png_size;
 
-extern const u8 missing_png[];
-extern const u32 missing_png_size;
+extern const uint32_t missing_png[];
+extern const uint32_t missing_png_size;
 
-extern const u8 OPEN_BUTTON_png[];
-extern const u32 OPEN_BUTTON_png_size;
+extern const uint32_t OPEN_BUTTON_png[];
+extern const uint32_t OPEN_BUTTON_png_size;
 
-extern const u8 player0_point_png[];
-extern const u32 player0_point_png_size;
+extern const uint32_t player0_point_png[];
+extern const uint32_t player0_point_png_size;
 
-extern const u8 player1_point_png[];
-extern const u32 player1_point_png_size;
+extern const uint32_t player1_point_png[];
+extern const uint32_t player1_point_png_size;
 
-extern const u8 player2_point_png[];
-extern const u32 player2_point_png_size;
+extern const uint32_t player2_point_png[];
+extern const uint32_t player2_point_png_size;
 
-extern const u8 player3_point_png[];
-extern const u32 player3_point_png_size;
+extern const uint32_t player3_point_png[];
+extern const uint32_t player3_point_png_size;
 
-extern const u8 player4_point_png[];
-extern const u32 player4_point_png_size;
+extern const uint32_t player4_point_png[];
+extern const uint32_t player4_point_png_size;
 
-extern const u8 progressWindow_png[];
-extern const u32 progressWindow_png_size;
+extern const uint32_t progressWindow_png[];
+extern const uint32_t progressWindow_png_size;
 
-extern const u8 random_tab_png[];
-extern const u32 random_tab_png_size;
+extern const uint32_t random_tab_png[];
+extern const uint32_t random_tab_png_size;
 
-extern const u8 REINSTALL_BUTTON_png[];
-extern const u32 REINSTALL_BUTTON_png_size;
+extern const uint32_t REINSTALL_BUTTON_png[];
+extern const uint32_t REINSTALL_BUTTON_png_size;
 
-extern const u8 slimers_mp3[];
-extern const u32 slimers_mp3_size;
+extern const uint32_t slimers_mp3[];
+extern const uint32_t slimers_mp3_size;
 
-extern const u8 splash_png[];
-extern const u32 splash_png_size;
+extern const uint32_t splash_png[];
+extern const uint32_t splash_png_size;
 
-extern const u8 title_png[];
-extern const u32 title_png_size;
+extern const uint32_t title_png[];
+extern const uint32_t title_png_size;
 
-extern const u8 tools_png[];
-extern const u32 tools_png_size;
+extern const uint32_t tools_png[];
+extern const uint32_t tools_png_size;
 
-extern const u8 UPDATE_png[];
-extern const u32 UPDATE_png_size;
+extern const uint32_t UPDATE_png[];
+extern const uint32_t UPDATE_png_size;
 
-extern const u8 UPDATE_BUTTON_png[];
-extern const u32 UPDATE_BUTTON_png_size;
+extern const uint32_t UPDATE_BUTTON_png[];
+extern const uint32_t UPDATE_BUTTON_png_size;
 
 static RecourceFile RecourceList[] =
 {

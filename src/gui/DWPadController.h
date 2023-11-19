@@ -12,7 +12,6 @@
 #define DWPAD_CONTROLLER_H_
 
 #include <gui/GuiController.h>
-#include <dynamic_libs/padscore_functions.h>
 
 class DWPadController : public GuiController
 {
@@ -32,9 +31,9 @@ public:
     virtual ~DWPadController() {}
     
     //Remove the DPAD buttons (by ignoring their bits) so that they aren't used by the Gui processes.
-    u32 remapWiiMoteButtons(u32 buttons)
+    uint32_t remapWiiMoteButtons(uint32_t buttons)
     {
-        u32 temp = 0;
+        uint32_t temp = 0;
         
         if(buttons & WPAD_BUTTON_MINUS)
             temp |= GuiTrigger::BUTTON_MINUS;
@@ -59,9 +58,9 @@ public:
     }
     
     //Remove the DPAD buttons (by ignoring their bits) so that they aren't used by the Gui processes.
-    u32 remapClassicButtons(u32 buttons)
+    uint32_t remapClassicButtons(uint32_t buttons)
     {
-        u32 temp = 0;
+        uint32_t temp = 0;
         
         if(buttons & WPAD_CLASSIC_BUTTON_MINUS)
             temp |= GuiTrigger::BUTTON_MINUS;
@@ -92,7 +91,7 @@ public:
     bool update(int width, int height)
     {
         lastData = data;
-        u32 controller_type;
+        uint32_t controller_type;
         
         //! check if the controller is connected
         if(WPADProbe(chanIdx-1, &controller_type) != 0)

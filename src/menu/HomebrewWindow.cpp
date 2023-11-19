@@ -17,17 +17,19 @@
 #include "HomebrewWindow.h"
 #include "common/common.h"
 #include "Application.h"
-#include <fs/DirList.h>
-#include <fs/FSUtils.h>
-#include <system/AsyncDeleter.h>
+#include "fs/DirList.h"
+#include "fs/FSUtils.h"
+// #include <system/AsyncDeleter.h>
 #include "HomebrewXML.h"
 #include "HomebrewLaunchWindow.h"
-#include "network/FileDownloader.h"
 #include "network/ConnectionTest.h"
+#include "../resources/Resources.h"
 #include <thread>
 #include <sstream>
 
-
+#define sdlBlack (SDL_Color) { 0, 0, 0, 255 }
+#define sdlWhite (SDL_Color) { 255, 255, 255, 255 }
+#define sdlRed (SDL_Color) { 255, 0, 0, 255 }
 
 #define DEFAULT_WIILOAD_PORT        4299
 
@@ -40,7 +42,7 @@ static HomebrewWindow* thisHomebrewWindow;
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
-    log_printf("going into this big function");
+    printf("going into this big function");
     const float cfImageScale = 0.8f;
     
     if (button->iconImgData)
@@ -54,45 +56,45 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
     if (button->nameLabel)
     {
         button->nameLabel->setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        button->nameLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+        button->nameLabel->setMaxWidth(350);//, GuiText::SCROLL_HORIZONTAL);
         button->nameLabel->setPosition(0, 70);
     }
     
     if (button->coderLabel)
     {
         button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        button->coderLabel->setMaxWidth(160, GuiText::SCROLL_HORIZONTAL);
+        button->coderLabel->setMaxWidth(160);//, GuiText::SCROLL_HORIZONTAL);
         button->coderLabel->setPosition(300, 20);
-        log_printf("did coder things");
+        printf("did coder things");
     }
     
     if (button->versionLabel)
     {
         button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
-        button->versionLabel->setMaxWidth(160, GuiText::SCROLL_HORIZONTAL);
+        button->versionLabel->setMaxWidth(160);//, GuiText::SCROLL_HORIZONTAL);
         button->versionLabel->setPosition(300, -15);
-        log_printf("did version things");
+        printf("did version things");
     }
     
     if (button->descriptionLabel)
     {
         button->descriptionLabel->setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
-        button->descriptionLabel->setMaxWidth(350, GuiText::SCROLL_HORIZONTAL);
+        button->descriptionLabel->setMaxWidth(350);//, GuiTex t::SCROLL_HORIZONTAL);
         button->descriptionLabel->setPosition(0, -60);
-        log_printf("did description things");
+        printf("did description things");
     }
 
     if (button->image)
     {
         // set the right image for the status
         button->image->setScale(0.9);
-        log_printf("did image scale things");
+        printf("did image scale things");
     }
 
     if (button->button)
     {
         button->button->setImage(button->image);
-        log_printf("did another image things");
+        printf("did another image things");
         button->button->setLabel(button->nameLabel, 0);
         button->button->setLabel(button->descriptionLabel, 1);
         button->button->setLabel(button->coderLabel, 2);
@@ -101,7 +103,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
         button->button->setTrigger(&touchTrigger);
         button->button->setTrigger(&wpadTouchTrigger);
         button->button->setEffectGrow();
-        log_printf("did button things");
+        printf("did button things");
     }
 //    button->button->setPosition(0, 0);
     //        button->button->setSoundClick(buttonClickSound);
@@ -112,9 +114,9 @@ ProgressWindow* getProgressWindow()
     return progressWindow;
 }
 
-void updateProgress(void *arg, u32 done, u32 total)
+void updateProgress(void *arg, uint32_t done, uint32_t total)
 {
-    progressWindow->setProgress(100.0f* (((f32)done)/((f32)total)));
+    progressWindow->setProgress(100.0f* (((float)done)/((float)total)));
 }
 
 /**
@@ -134,7 +136,7 @@ void HomebrewWindow::filter()
     homebrewButtons.clear();
     
 //    std::string output = "CURRENT: ";
-//    for (u32 x=0; x<curTabButtons.size(); x++)
+//    for (uint32_t x=0; x<curTabButtons.size(); x++)
 //    {
 //        output += "["+std::string(curTabButtons[x]->shortname)+"] ";
 //    }
@@ -142,7 +144,7 @@ void HomebrewWindow::filter()
 //    std::random_shuffle(curTabButtons.begin(),curTabButtons.end());
     
 
-    for (u32 x=0; x<curTabButtons.size(); x++)
+    for (uint32_t x=0; x<curTabButtons.size(); x++)
     {
         // if it's 0, it's all apps
         if (listingMode > 0)
@@ -160,11 +162,11 @@ void HomebrewWindow::filter()
                 continue;
         }
 
-        log_printf("%p", curTabButtons[x]->button);
+        printf("%p", curTabButtons[x]->button);
         append(curTabButtons[x]->button);
         homebrewButtons.push_back(curTabButtons[x]);
 
-//        log_printf("filter: added it");
+//        printf("filter: added it");
         globalUpdatePosition = true;
     }
     
@@ -174,31 +176,31 @@ void HomebrewWindow::filter()
 
 void HomebrewWindow::addAll(std::vector<homebrewButton*> buttons, int status)
 {
-    log_printf("Starting addall for status %d", status);
-    GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
+    printf("Starting addall for status %d", status);
+    GuiTextureData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
 
     // only add the specific status of button to the current tab
     for (unsigned int x=0; x<buttons.size(); x++)
     {
-//        log_printf("Checking %d, named %s", x, buttons[x].shortname.c_str());
+//        printf("Checking %d, named %s", x, buttons[x].shortname.c_str());
         if (buttons[x]->status == status)
         {
-            log_printf("going in...");
+            printf("going in...");
             curTabButtons.push_back(buttons[x]);
-            log_printf("added to current tab");
+            printf("added to current tab");
             
             buttons[x]->image = new GuiImage(appButtonImages[status]);
-            log_printf("created new GuiImage");
+            printf("created new GuiImage");
             
             buttons[x]->button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-            log_printf("initialized button");
+            printf("initialized button");
 
             buttons[x]->button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
-            log_printf("attached click event");
+            printf("attached click event");
 
                                     
             positionHomebrewButton(buttons[x], x);
-            log_printf("positioned button");
+            printf("positioned button");
 
         }
     }
@@ -214,15 +216,15 @@ void HomebrewWindow::loadLocalApps(int mode)
     localAppButtons.clear();
     homebrewButtons.clear();
     
-    log_printf("loadLocalApps: begin");
+    printf("loadLocalApps: begin");
     // get the 4 different types of app backgrounds
-//    GuiImageData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
+//    GuiTextureData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
     
-    // log_printf("loadLocalApps: begin2");
+    // printf("loadLocalApps: begin2");
     // get a list of directories
     DirList* dirList = new DirList("sd:/wiiu/apps", ".elf,.rpx", DirList::Files | DirList::CheckSubfolders);
     
-    log_printf("loadLocalApps: directory is loaded, it has %d files", dirList->GetFilecount());
+    printf("loadLocalApps: directory is loaded, it has %d files", dirList->GetFilecount());
     
     // sort the dir list
     dirList->SortList();
@@ -234,7 +236,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         
     }
     
-    log_printf("loadLocalApps: directory is sorted");
+    printf("loadLocalApps: directory is sorted");
 
     // load up local apps
     for(int i = 0; i < dirList->GetFilecount(); i++)
@@ -245,30 +247,30 @@ void HomebrewWindow::loadLocalApps(int mode)
 
         std::string homebrewPath = dirList->GetFilepath(i);
 
-        log_printf("Initial value: %s", homebrewPath.c_str());
+        printf("Initial value: %s", homebrewPath.c_str());
         size_t slashPos = homebrewPath.rfind('/');
         if(slashPos != std::string::npos)
             homebrewPath.erase(slashPos);
 
         if(homebrewPath == "sd:/wiiu/apps") {
             // This cause (a lot of) problems
-            log_printf("Skipping app with bad path to prevent errors");
+            printf("Skipping app with bad path to prevent errors");
             continue;
         }
         
-        log_printf("Loaded up %s, going to check for a meta", homebrewPath.c_str());
+        printf("Loaded up %s, going to check for a meta", homebrewPath.c_str());
         HomebrewXML metaXml;
         bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
 //        if (!xmlReadSuccess)
 //            continue;
         std::string iconPath = "/icon.png";
-        u8 * iconData = NULL;
-        u32 iconDataSize = 0;
+        uint8_t * iconData = NULL;
+        uint32_t iconDataSize = 0;
         
-        log_printf("Continuing with it...");
+        printf("Continuing with it...");
         FSUtils::LoadFileToMem((homebrewPath + iconPath).c_str(), &iconData, &iconDataSize);
         
-        log_printf("Loaded icon");
+        printf("Loaded icon");
 
         int found = 0;
         if (!xmlReadSuccess) continue;
@@ -286,13 +288,13 @@ void HomebrewWindow::loadLocalApps(int mode)
                 else 
                     remoteAppButtons[x]->status = INSTALLED;
 
-                log_printf("decided it's %d", remoteAppButtons[x]->status);
+                printf("decided it's %d", remoteAppButtons[x]->status);
                 remoteAppButtons[x]->execPath = dirList->GetFilepath(i);
                 remoteAppButtons[x]->dirPath = homebrewPath;
 
                 if(iconData != NULL)
                 {
-                    remoteAppButtons[x]->iconImgData = new GuiImageData(iconData, iconDataSize);
+                    remoteAppButtons[x]->iconImgData = new GuiTextureData(iconData, iconDataSize);
                     free(iconData);
                     iconData = NULL;
                 }
@@ -306,7 +308,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         
         scrollOffY = -120;
                 
-        log_printf("Making a localfile for this one");
+        printf("Making a localfile for this one");
         
         // make the homebrew list bigger if we're gonna process this
         int idx = homebrewButtons.size();
@@ -323,11 +325,11 @@ void HomebrewWindow::loadLocalApps(int mode)
         homebrewButtons[idx]->shortname = curAppString;
         homebrewButtons[idx]->status = LOCAL;
 //        
-        log_printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
+        printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
 //
         if(iconData != NULL)
         {
-            homebrewButtons[idx]->iconImgData = new GuiImageData(iconData, iconDataSize);
+            homebrewButtons[idx]->iconImgData = new GuiTextureData(iconData, iconDataSize);
             free(iconData);
             iconData = NULL;
         }
@@ -337,15 +339,15 @@ void HomebrewWindow::loadLocalApps(int mode)
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
             cpName += strlen("sd:/wiiu/apps/");
         
-        homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, glm::vec4(0, 0, 0, 1));
-        log_printf("refreshHomebrewApps: added local button %d", idx);
+        homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, sdlBlack);
+        homebrewButtons[idx]->versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, sdlBlack);
+        homebrewButtons[idx]->coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, sdlBlack);
+        homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, sdlBlack);
+        printf("refreshHomebrewApps: added local button %d", idx);
         homebrewButtons[idx]->version = xmlReadSuccess? metaXml.GetVersion() : "999";
         
         localAppButtons.push_back(homebrewButtons[idx]);
-        log_printf("totally done with and added that");
+        printf("totally done with and added that");
     }
     
     // add everything to the current tab (this defines the order)
@@ -362,7 +364,7 @@ This method fetches remote apps only and that's all nothing more
 **/
 void HomebrewWindow::refreshHomebrewApps()
 {
-    log_printf("refreshHomebrewApps: starting homebrew app refresh");
+    printf("refreshHomebrewApps: starting homebrew app refresh");
     
     // get the 4 different types of app backgrounds
     
@@ -403,12 +405,12 @@ void HomebrewWindow::refreshHomebrewApps()
         // the info for the current package is stored within the package variable
         Package* package = this->get->packages[iterCount];
         
-        log_printf("done yaml parsing");
+        printf("done yaml parsing");
 
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
 
-        log_printf("resized homebrewButtons vector");
+        printf("resized homebrewButtons vector");
         
         homebrewButtons[idx] = new homebrewButton();
         // file path
@@ -421,21 +423,21 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx]->shortname = package->pkg_name;
         homebrewButtons[idx]->category = package->category;
         homebrewButtons[idx]->version = package->version;
-        log_printf("set a bunch of attributes");
+        printf("set a bunch of attributes");
 
-        homebrewButtons[idx]->nameLabel = new GuiText(package->title.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->versionLabel = new GuiText(package->version.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->coderLabel = new GuiText(package->author.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        homebrewButtons[idx]->descriptionLabel = new GuiText(package->short_desc.c_str(), 28, glm::vec4(0, 0, 0, 1));
-        log_printf("created some more attributes");
+        homebrewButtons[idx]->nameLabel = new GuiText(package->title.c_str(), 28, sdlBlack);
+        homebrewButtons[idx]->versionLabel = new GuiText(package->version.c_str(), 28, sdlBlack);
+        homebrewButtons[idx]->coderLabel = new GuiText(package->author.c_str(), 28, sdlBlack);
+        homebrewButtons[idx]->descriptionLabel = new GuiText(package->short_desc.c_str(), 28, sdlBlack);
+        printf("created some more attributes");
         
-        homebrewButtons[idx]->iconImgData = Resources::GetImageData("missing.png");
+        homebrewButtons[idx]->iconImgData = Resources::GetImageData(ASSET_ROOT "missing.png");
 
         
         // add this to the remote button array
         remoteAppButtons.push_back(homebrewButtons[idx]);
         
-        log_printf("added %s to the remoteApps vector", shortname.c_str());
+        // printf("added %s to the remoteApps vector", shortname.c_str());
         
         // download the icon for this remote app if we aren't ignoring icons
         if (!noIconMode)
@@ -452,24 +454,24 @@ void HomebrewWindow::refreshHomebrewApps()
             bool imageDownloadSuccessful = false;
                                     
             // try to load an existing icon
-            u8 * iconData = NULL;
-            u32 iconDataSize = 0;
+            uint8_t * iconData = NULL;
+            uint32_t iconDataSize = 0;
             
             // if invalidating cache, skip loading to memory (leaving iconData null)
             if (!invalidateCache)
                 FSUtils::LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
             
             // check if the desired icon already exists in the cache, if not download it
-            if (iconData == NULL)
-                imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
+            // if (iconData == NULL)
+            //     imageDownloadSuccessful = FileDownloader::getFile(targetIconUrl, dest);
 
             if (imageDownloadSuccessful || iconData != NULL)
             {
-                u8 * iconData = NULL;
-                u32 iconDataSize = 0;
+                uint8_t * iconData = NULL;
+                uint32_t iconDataSize = 0;
                 FSUtils::LoadFileToMem(dest.c_str(), &iconData, &iconDataSize);
 
-                GuiImageData* iconImgData = new GuiImageData(iconData, iconDataSize);
+                GuiTextureData* iconImgData = new GuiTextureData(iconData, iconDataSize);
 
                 remoteAppButtons[x]->iconImgData = iconImgData;
             }
@@ -481,13 +483,13 @@ void HomebrewWindow::refreshHomebrewApps()
 
     initialLoadInProgress = false;
     globalUpdatePosition = true;
-    log_printf("refreshHomebrewApps: done");
+    printf("refreshHomebrewApps: done");
     
 }
 
 bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 {
-    for (u32 x=0; x<localAppButtons.size(); x++)
+    for (uint32_t x=0; x<localAppButtons.size(); x++)
     {
         if (localAppButtons[x]->shortname == shortname)
         {
@@ -501,18 +503,18 @@ bool HomebrewWindow::checkLocalAppExists(std::string shortname)
 HomebrewWindow::HomebrewWindow(int w, int h)
     : GuiFrame(w, h)
     , buttonClickSound(Resources::GetSound("button_click.mp3"))
-    , installedButtonImgData(Resources::GetImageData("INSTALLED.png"))
-    , getButtonImgData(Resources::GetImageData("GET.png"))
-    , updateButtonImgData(Resources::GetImageData("UPDATE.png"))
-    , localButtonImgData(Resources::GetImageData("LOCAL.png"))
-    , hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, glm::vec4(1.0f))
-    , hblTabImgData(Resources::GetImageData("back_tab.png"))
-    , rpxTabImgData(Resources::GetImageData("random_tab.png"))
+    , installedButtonImgData(Resources::GetImageData(ASSET_ROOT "INSTALLED.png"))
+    , getButtonImgData(Resources::GetImageData(ASSET_ROOT "GET.png"))
+    , updateButtonImgData(Resources::GetImageData(ASSET_ROOT "UPDATE.png"))
+    , localButtonImgData(Resources::GetImageData(ASSET_ROOT "LOCAL.png"))
+    , hblVersionText("Credit: pwsincd and dimok, Music: (T-T)b     ", 32, sdlWhite)
+    , hblTabImgData(Resources::GetImageData(ASSET_ROOT "back_tab.png"))
+    , rpxTabImgData(Resources::GetImageData(ASSET_ROOT "random_tab.png"))
     , hblTabImg(hblTabImgData)
     , rpxTabImg(rpxTabImgData)
     , backTabBtn(hblTabImg.getWidth(), hblTabImg.getHeight())
     , randomTabBtn(rpxTabImg.getWidth(), rpxTabImg.getHeight())
-    , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
+    , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::TOUCHED)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
 {
 //    tcpReceiver.serverReceiveStart.connect(this, &HomebrewWindow::OnTcpReceiveStart);
@@ -548,7 +550,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
         }
     }
         
-    log_printf(repoUrl);
+    printf(repoUrl);
     
     ConnectionTest * repoConnection = new ConnectionTest(std::string(repoUrl));
     internet_connection = repoConnection->Test();
@@ -557,9 +559,9 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     std::string qualifiedName = " " + std::string(repoUrl);
 
     if (internet_connection)
-        hblRepoText = new GuiText(qualifiedName.c_str(), 32, glm::vec4(1.0f));
+        hblRepoText = new GuiText(qualifiedName.c_str(), 32, sdlWhite);
     else
-        hblRepoText = new GuiText(" (!) OFFLINE", 32, glm::vec4(1, 1, 0, 1));
+        hblRepoText = new GuiText(" (!) OFFLINE", 32, sdlRed);
         
     hblVersionText.setAlignment(ALIGN_BOTTOM | ALIGN_RIGHT);
     hblRepoText->setAlignment(ALIGN_BOTTOM | ALIGN_LEFT);
@@ -569,10 +571,10 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     append(&hblVersionText);
     append(hblRepoText);
         
-//    header = new GuiText("Homebrew App Store", 64, glm::vec4(1, 1, 1, 1));
-    header = new GuiImage(Resources::GetImageData("title.png"));
+//    header = new GuiText("Homebrew App Store", 64, sdlWhite);
+    header = new GuiImage(Resources::GetImageData(ASSET_ROOT "title.png"));
     header->setAlignment(ALIGN_TOP);
-    header2 = new GuiText("Select a Category", 30, glm::vec4(1, 1, 1, 1));
+    header2 = new GuiText("Select a Category", 30, sdlWhite);
     
         
     // for now, do this like this
@@ -611,7 +613,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
 
 HomebrewWindow::~HomebrewWindow()
 {
-    for(u32 i = 0; i < homebrewButtons.size(); ++i)
+    for(uint32_t i = 0; i < homebrewButtons.size(); ++i)
     {
         if (homebrewButtons[i]->image != 0)
             delete homebrewButtons[i]->image;
@@ -627,21 +629,21 @@ HomebrewWindow::~HomebrewWindow()
             delete homebrewButtons[i]->iconImg;
     }
 
-    Resources::RemoveSound(buttonClickSound);
-    Resources::RemoveImageData(installedButtonImgData);
-    Resources::RemoveImageData(getButtonImgData);
-    Resources::RemoveImageData(updateButtonImgData);
-    Resources::RemoveImageData(localButtonImgData);
-    Resources::RemoveImageData(hblTabImgData);
-    Resources::RemoveImageData(rpxTabImgData);
+    // Resources::RemoveSound(buttonClickSound);
+    // Resources::RemoveImageData(installedButtonImgData);
+    // Resources::RemoveImageData(getButtonImgData);
+    // Resources::RemoveImageData(updateButtonImgData);
+    // Resources::RemoveImageData(localButtonImgData);
+    // Resources::RemoveImageData(hblTabImgData);
+    // Resources::RemoveImageData(rpxTabImgData);
 }
 
 void HomebrewWindow::clearScreen()
 {
     // remove any existing buttons
-    for (u32 x=0; x<curTabButtons.size(); x++)
+    for (uint32_t x=0; x<curTabButtons.size(); x++)
     {
-//        log_printf("filter: about to remove button %d", x);
+//        printf("filter: about to remove button %d", x);
         this->remove(curTabButtons[x]->button);  
     }
     curTabButtons.clear();
@@ -677,13 +679,14 @@ void HomebrewWindow::OnCategorySwitch(GuiButton *button, const GuiController *co
 void HomebrewWindow::appendCategoryButton(char* name, int x, int y)
 {        
     int idx = all_cats.size();
-    log_printf("CUR BUTTON: %d", idx);
+    printf("CUR BUTTON: %d", idx);
     all_cats.resize(idx+1);
     
-    GuiImage* img = new GuiImage(Resources::GetImageData(name));
+    std::string nameStr = std::string(ASSET_ROOT) + std::string(name);
+    GuiImage* img = new GuiImage(Resources::GetImageData(nameStr.c_str()));
         
     all_cats[idx] = new GuiButton(img->getWidth(), img->getHeight());
-    all_cats[idx]->setImage(new GuiImage(Resources::GetImageData(name)));
+    all_cats[idx]->setImage(new GuiImage(Resources::GetImageData(nameStr.c_str())));
     all_cats[idx]->setPosition(x, y);
     
     all_cats[idx]->setSoundClick(buttonClickSound);
@@ -764,30 +767,30 @@ void HomebrewWindow::OnOpenEffectFinish(GuiElement *element)
 {
     //! once the menu is open reset its state and allow it to be "clicked/hold"
     element->effectFinished.disconnect(this);
-    element->clearState(GuiElement::STATE_DISABLED);
+    element->clearState(GuiElement::STATE_DISABLED, -1);
 }
 
 void HomebrewWindow::OnCloseEffectFinish(GuiElement *element)
 {
     screenLocked = false;
     
-    backTabBtn.clearState(GuiElement::STATE_DISABLED);
-    randomTabBtn.clearState(GuiElement::STATE_DISABLED);
+    backTabBtn.clearState(GuiElement::STATE_DISABLED, -1);
+    randomTabBtn.clearState(GuiElement::STATE_DISABLED, -1);
     
     //! remove element from draw list and push to delete queue
     this->remove(element);
-    AsyncDeleter::pushForDelete(element);
+    // AsyncDeleter::pushForDelete(element);
 
-    for(u32 i = 0; i < homebrewButtons.size(); i++)
+    for(uint32_t i = 0; i < homebrewButtons.size(); i++)
     {
         if (homebrewButtons[i]->button != 0)
-            homebrewButtons[i]->button->clearState(GuiElement::STATE_DISABLED);
+            homebrewButtons[i]->button->clearState(GuiElement::STATE_DISABLED, -1);
     }
 }
 
 void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 {
-    element->setState(GuiElement::STATE_DISABLED);
+    element->setState(GuiElement::STATE_DISABLED, -1);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewWindow::OnCloseEffectFinish);
     launchBox = NULL;
@@ -795,7 +798,7 @@ void HomebrewWindow::OnLaunchBoxCloseClick(GuiElement *element)
 
 void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    log_printf("clicked a homebrew button");
+    printf("clicked a homebrew button");
     if (getHasScrolled() || initialLoadInProgress) {
         return;
     }        
@@ -805,18 +808,18 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
     bool disableButtons = false;
 //    return;
 
-    for(u32 i = 0; i < homebrewButtons.size(); i++)
+    for(uint32_t i = 0; i < homebrewButtons.size(); i++)
     {
         if(button == homebrewButtons[i]->button)
         {
             launchBox = new HomebrewLaunchWindow(*homebrewButtons[i], this);
             HomebrewLaunchWindow* launchBox2 = (HomebrewLaunchWindow*)launchBox;
             launchBox2->setEffect(EFFECT_FADE, 10, 255);
-            launchBox2->setState(GuiElement::STATE_DISABLED);
+            launchBox2->setState(GuiElement::STATE_DISABLED, -1);
             launchBox2->setPosition(0.0f, 30.0f);
             launchBox2->effectFinished.connect(this, &HomebrewWindow::OnOpenEffectFinish);
             launchBox2->backButtonClicked.connect(this, &HomebrewWindow::OnLaunchBoxCloseClick);
-            log_printf("creating launchbox");
+            printf("creating launchbox");
             append(launchBox);
             disableButtons = true;
             screenLocked = true;
@@ -827,16 +830,16 @@ void HomebrewWindow::OnHomebrewButtonClick(GuiButton *button, const GuiControlle
 
     if(disableButtons)
     {
-        for(u32 i = 0; i < homebrewButtons.size(); i++)
+        for(uint32_t i = 0; i < homebrewButtons.size(); i++)
         {
             if (homebrewButtons[i]->button != 0)
-                homebrewButtons[i]->button->setState(GuiElement::STATE_DISABLED);
+                homebrewButtons[i]->button->setState(GuiElement::STATE_DISABLED, -1);
         }
     }
 }
 
 
-void HomebrewWindow::draw(CVideo *pVideo)
+void HomebrewWindow::draw(Renderer *pVideo)
 {
     bool bUpdatePositions = false || globalUpdatePosition;
     
@@ -865,20 +868,20 @@ void HomebrewWindow::draw(CVideo *pVideo)
     if(bUpdatePositions)
     {
         
-        log_printf("draw: updating positions...");
+        printf("draw: updating positions...");
 //        bUpdatePositions = false;
         globalUpdatePosition = false;
         
         int imageHeight = 210;
 
-        for(u32 i = 0; i < homebrewButtons.size(); i++)
+        for(uint32_t i = 0; i < homebrewButtons.size(); i++)
         {
-//            log_printf("draw: adding a button at pos %d", i);
+//            printf("draw: adding a button at pos %d", i);
             float fXOffset = ((i % 2)? 265 : -265);
             float fYOffset = scrollOffY + (imageHeight + 20.0f) * 1.5f - (imageHeight + 15) * ((i%2)? (int)((i-1)/2) : (int)(i/2));    
             if (homebrewButtons[i]->button != 0)
                 homebrewButtons[i]->button->setPosition(currentLeftPosition + fXOffset, fYOffset);
-//            log_printf("draw: added that button %d", i);
+//            printf("draw: added that button %d", i);
         }
         
 //        if (listingMode == 1)
@@ -893,7 +896,7 @@ void HomebrewWindow::draw(CVideo *pVideo)
 //        }
         lastScrollOffY = scrollOffY;
         
-        log_printf("draw: done drawing");
+        printf("draw: done drawing");
     }
     
     
@@ -901,7 +904,7 @@ void HomebrewWindow::draw(CVideo *pVideo)
     GuiFrame::draw(pVideo);
     
     if (bUpdatePositions)
-        log_printf("draw: done with literally everything now");
+        printf("draw: done with literally everything now");
 
 }
 

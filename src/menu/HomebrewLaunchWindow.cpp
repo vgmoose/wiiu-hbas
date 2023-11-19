@@ -14,34 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#include <gui/system/SDLSystem.h>
+#include <gui/input/SDLController.h>
+#include <gui/input/SDLControllerMouse.h>
+#include <gui/input/SDLControllerWiiUProContoller.h>
+
 #include "HomebrewLaunchWindow.h"
-#include "HomebrewLoader.h"
 #include "common/common.h"
-#include <fs/DirList.h>
-#include <fs/FSUtils.h>
+#include "fs/DirList.h"
+#include "fs/FSUtils.h"
 #include "HomebrewXML.h"
 #include "Application.h"
-#include <dynamic_libs/sys_functions.h>
-#include "network/FileDownloader.h"
-#include "HomebrewManager.h"
+#include "../resources/Resources.h"
 #include <algorithm>
+
+#define sdlWhite (SDL_Color) { 255, 255, 255, 255 }
 
 HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, HomebrewWindow * window)
     : GuiFrame(0, 0)
-    , buttonClickSound(Resources::GetSound("button_click.mp3"))
-    , backgroundImgData(Resources::GetImageData("launchMenuBox.png"))
+    , buttonClickSound(Resources::GetSound(ASSET_ROOT "button_click.mp3"))
+    , backgroundImgData(Resources::GetImageData(ASSET_ROOT "launchMenuBox.png"))
     , backgroundImg(backgroundImgData)
-    , getButtonImgData(Resources::GetImageData("GET_BUTTON.png"))
-    , updateButtonImgData(Resources::GetImageData("UPDATE_BUTTON.png"))
-    , deleteButtonImgData(Resources::GetImageData("DELETE_BUTTON.png"))
-    , reinstallButtonImgData(Resources::GetImageData("REINSTALL_BUTTON.png"))
-    , openButtonImgData(Resources::GetImageData("OPEN_BUTTON.png"))
-    , closeButtonImgData(Resources::GetImageData("CLOSE.png"))
+    , getButtonImgData(Resources::GetImageData(ASSET_ROOT "GET_BUTTON.png"))
+    , updateButtonImgData(Resources::GetImageData(ASSET_ROOT "UPDATE_BUTTON.png"))
+    , deleteButtonImgData(Resources::GetImageData(ASSET_ROOT "DELETE_BUTTON.png"))
+    , reinstallButtonImgData(Resources::GetImageData(ASSET_ROOT "REINSTALL_BUTTON.png"))
+    , openButtonImgData(Resources::GetImageData(ASSET_ROOT "OPEN_BUTTON.png"))
+    , closeButtonImgData(Resources::GetImageData(ASSET_ROOT "CLOSE.png"))
     , iconImage(thisButton.iconImgData)
-    , titleText((char*)NULL, 42, glm::vec4(0,0,0, 1))
-    , versionValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
-    , authorValueText((char*)NULL, 32, glm::vec4(0,0,0, 1))
-    , descriptionText((char*)NULL, 28, glm::vec4(0,0,0, 1))
+    , titleText("Title", 42, sdlWhite)
+    , versionValueText("?", 32, sdlWhite)
+    , authorValueText("Author", 32, sdlWhite)
+    , descriptionText("Description", 28, sdlWhite)
     , loadImg(getButtonImgData)
     , delImg(deleteButtonImgData)
     , updateImg(updateButtonImgData)
@@ -54,7 +58,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     , reinstallBtn(reinstallImg.getWidth(), reinstallImg.getHeight())
     , openBtn(openImg.getWidth(), openImg.getHeight())
     , backBtn(backImg.getWidth(), backImg.getHeight())
-    , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::VPAD_TOUCH)
+    , touchTrigger(GuiTrigger::CHANNEL_1, GuiTrigger::TOUCHED)
     , wpadTouchTrigger(GuiTrigger::CHANNEL_2 | GuiTrigger::CHANNEL_3 | GuiTrigger::CHANNEL_4 | GuiTrigger::CHANNEL_5, GuiTrigger::BUTTON_A)
     , selectedButton(&thisButton)
     , homebrewWindow(window)
@@ -78,10 +82,10 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     // if GET or UDPATE, fetch xml from server
     if (selectedButton->status == GET || selectedButton->status == UPDATE)
     {
-        std::string xmlFetchData;
-        FileDownloader::getFile(std::string(repoUrl)+"/"+tabPath+"/"+selectedButton->shortname+"/meta.xml", xmlFetchData);
-        xmlReadSuccess = metaXml.LoadHomebrewXMLFromString(xmlFetchData.c_str());
-        log_printf("Tried to download %s", (std::string(repoUrl)+"/"+tabPath+"/"+selectedButton->shortname+"/meta.xml").c_str());
+        // std::string xmlFetchData;
+        // FileDownloader::getFile(std::string(repoUrl)+"/"+tabPath+"/"+selectedButton->shortname+"/meta.xml", xmlFetchData);
+        // xmlReadSuccess = metaXml.LoadHomebrewXMLFromString(xmlFetchData.c_str());
+        // printf("Tried to download %s", (std::string(repoUrl)+"/"+tabPath+"/"+selectedButton->shortname+"/meta.xml").c_str());
     }
 
     int xOffset = 500;
@@ -94,7 +98,7 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
     titleText.setText(cpName);
     titleText.setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
     titleText.setPosition(0, yOffset + 10);
-    titleText.setMaxWidth(width - 100, GuiText::DOTTED);
+    titleText.setMaxWidth(width - 100);//, GuiText::DOTTED);
     append(&titleText);
 
     float scaleFactor = 1.4f;
@@ -107,29 +111,29 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
     yOffset -= 50;
 
-    versionValueText.setTextf("%s", xmlReadSuccess ? metaXml.GetVersion() : launchPath.c_str());
+    versionValueText.setText(xmlReadSuccess ? metaXml.GetVersion() : launchPath.c_str());
     versionValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     versionValueText.setPosition(width - xOffset - 35, yOffset);
-    versionValueText.setMaxWidth(xOffset - 50, GuiText::DOTTED);
+    versionValueText.setMaxWidth(xOffset - 50);//, GuiText::DOTTED);
     append(&versionValueText);
     yOffset -= 30;
 
-    authorValueText.setTextf("%s", metaXml.GetCoder());
+    authorValueText.setText(metaXml.GetCoder());
     authorValueText.setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
     authorValueText.setPosition(width - xOffset - 35, yOffset);
-    authorValueText.setMaxWidth(xOffset - 50, GuiText::DOTTED);
+    authorValueText.setMaxWidth(xOffset - 50);//, GuiText::DOTTED);
     append(&authorValueText);
     yOffset -= 50;
 
     descriptionText.setText(metaXml.GetLongDescription());
     descriptionText.setAlignment(ALIGN_LEFT | ALIGN_TOP);
     descriptionText.setPosition(100, -370);
-    descriptionText.setMaxWidth(width - 200, GuiText::WRAP);
+    descriptionText.setMaxWidth(width - 200);//, GuiText::WRAP);
     append(&descriptionText);
         
     int actionButtonYOff = -30;
         
-    log_printf("Creating the button with click events");
+    printf("Creating the button with click events");
 
     if (thisButton.status == GET)
     {
@@ -225,39 +229,41 @@ HomebrewLaunchWindow::HomebrewLaunchWindow(homebrewButton & thisButton, Homebrew
 
 HomebrewLaunchWindow::~HomebrewLaunchWindow()
 {
-    Resources::RemoveSound(buttonClickSound);
-    Resources::RemoveImageData(backgroundImgData);
-    Resources::RemoveImageData(getButtonImgData);
-    Resources::RemoveImageData(updateButtonImgData);
-    Resources::RemoveImageData(deleteButtonImgData);
-    Resources::RemoveImageData(reinstallButtonImgData);
-    Resources::RemoveImageData(openButtonImgData);
-    Resources::RemoveImageData(closeButtonImgData);
+    // Resources::RemoveSound(buttonClickSound);
+    // Resources::RemoveImageData(backgroundImgData);
+    // Resources::RemoveImageData(getButtonImgData);
+    // Resources::RemoveImageData(updateButtonImgData);
+    // Resources::RemoveImageData(deleteButtonImgData);
+    // Resources::RemoveImageData(reinstallButtonImgData);
+    // Resources::RemoveImageData(openButtonImgData);
+    // Resources::RemoveImageData(closeButtonImgData);
 }
 
 void HomebrewLaunchWindow::OnOpenEffectFinish(GuiElement *element)
 {
     //! once the menu is open reset its state and allow it to be "clicked/hold"
     element->effectFinished.disconnect(this);
-    element->clearState(GuiElement::STATE_DISABLED);
+    element->clearState(GuiElement::STATE_DISABLED, -1);
 }
 
 void HomebrewLaunchWindow::OnCloseEffectFinish(GuiElement *element)
 {
     //! remove element from draw list and push to delete queue
     this->remove(element);
-    AsyncDeleter::pushForDelete(element);
+    // AsyncDeleter::pushForDelete(element);
 
-    backBtn.clearState(GuiElement::STATE_DISABLED);
-    loadBtn.clearState(GuiElement::STATE_DISABLED);
+    backBtn.clearState(GuiElement::STATE_DISABLED, -1);
+    loadBtn.clearState(GuiElement::STATE_DISABLED, -1);
 }
 
 void HomebrewLaunchWindow::OnDeleteButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
 	//! Delete 
-	HomebrewManager * DeleteHomebrew = new HomebrewManager(selectedButton->shortname);
-	DeleteHomebrew->Delete();
-	delete DeleteHomebrew;
+    // TODO: delete via libget
+
+	// HomebrewManager * DeleteHomebrew = new HomebrewManager(selectedButton->shortname);
+	// DeleteHomebrew->Delete();
+	// delete DeleteHomebrew;
     
     OnBackButtonClick(button, controller, trigger); // Close the window
 
@@ -274,9 +280,9 @@ The main issue with tis function is it needs some variables passed in order
 to fetch them. Currently this is done by attaching variables to the singleton
 instance of HomebrewWindow, which was set up at start.
 **/
-static void asyncDownloadTargetedFiles(CThread* thread, void* args)
+static void asyncDownloadTargetedFiles(void* thread, void* args)
 {
-    log_printf("asyncDownloadTargetedFiles: start");
+    printf("asyncDownloadTargetedFiles: start");
     ProgressWindow * progress = getProgressWindow(); 
 	
     //! Get the homebrew window, which holds variables we need access to
@@ -284,9 +290,10 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
     std::string appShortName = homebrewWindowTarget->appShortName;
 	
 	//! Install
-	HomebrewManager * InstallHomebrew = new HomebrewManager(appShortName, progress);
-	InstallHomebrew->Install();
-	delete InstallHomebrew;
+    // TODO: install via libget
+	// HomebrewManager * InstallHomebrew = new HomebrewManager(appShortName, progress);
+	// InstallHomebrew->Install();
+	// delete InstallHomebrew;
 	
 	
     homebrewWindowTarget->remove(progress); // Remove the progress bar
@@ -294,12 +301,12 @@ static void asyncDownloadTargetedFiles(CThread* thread, void* args)
 
     //! refresh main directory
     globalRefreshHomebrewApps();
-    log_printf("asyncDownloadTargetedFiles: stop");
+    printf("asyncDownloadTargetedFiles: stop");
 }
 
 void HomebrewLaunchWindow::OnFileLoadFinish(GuiElement *element, const std::string & filepath, int result)
 {
-    element->setState(GuiElement::STATE_DISABLED);
+    element->setState(GuiElement::STATE_DISABLED, -1);
     element->setEffect(EFFECT_FADE, -10, 0);
     element->effectFinished.connect(this, &HomebrewLaunchWindow::OnCloseEffectFinish);
 
@@ -315,21 +322,21 @@ spawns another thread to handle the downloading in the background.
 **/
 void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    log_printf("OnLoadButtonClick: Load button clicked");
+    printf("OnLoadButtonClick: Load button clicked");
     // disable the buttons
-    delBtn.setState(GuiElement::STATE_DISABLED);
-    loadBtn.setState(GuiElement::STATE_DISABLED);
-    backBtn.setState(GuiElement::STATE_DISABLED);
-    updateBtn.setState(GuiElement::STATE_DISABLED);
-    reinstallBtn.setState(GuiElement::STATE_DISABLED);
-    openBtn.setState(GuiElement::STATE_DISABLED);
+    delBtn.setState(GuiElement::STATE_DISABLED, -1);
+    loadBtn.setState(GuiElement::STATE_DISABLED, -1);
+    backBtn.setState(GuiElement::STATE_DISABLED, -1);
+    updateBtn.setState(GuiElement::STATE_DISABLED, -1);
+    reinstallBtn.setState(GuiElement::STATE_DISABLED, -1);
+    openBtn.setState(GuiElement::STATE_DISABLED, -1);
     // get progress window and homebrew window, add progress to view
     ProgressWindow * progress = getProgressWindow(); 
     HomebrewWindow * homebrewWindowTarget = getHomebrewWindow();
     homebrewWindowTarget->append(progress);
 	
-    homebrewWindow->backTabBtn.setState(GuiElement::STATE_DISABLED);
-    homebrewWindow->randomTabBtn.setState(GuiElement::STATE_DISABLED);
+    homebrewWindow->backTabBtn.setState(GuiElement::STATE_DISABLED, -1);
+    homebrewWindow->randomTabBtn.setState(GuiElement::STATE_DISABLED, -1);
 
     // store information about the desired file to homebrewWindowTarget, so that
     // the thread can access it
@@ -341,28 +348,28 @@ void HomebrewLaunchWindow::OnLoadButtonClick(GuiButton *button, const GuiControl
 //    homebrewWindowTarget->triggerTarget = trigger;
     homebrewWindowTarget->launchWindowTarget = this;
     
-    log_printf("OnLoadButtonClick: starting downloading thread");
+    printf("OnLoadButtonClick: starting downloading thread");
     // Create a new thread to do the downloading it, so the prgress bar can be updated
-    CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore0 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+    // CThread * pThread = CThread::create(asyncDownloadTargetedFiles, NULL, CThread::eAttributeAffCore0 | CThread::eAttributePinnedAff, 10);
+    // pThread->resumeThread();
     
 }
 
 void HomebrewLaunchWindow::OnOpenButtonClick(GuiButton *button, const GuiController *controller, GuiTrigger *trigger)
 {
-    log_printf("OnLoadButtonClick: Load button clicked");
+    printf("OnLoadButtonClick: Load button clicked");
     // disable the buttons
-    delBtn.setState(GuiElement::STATE_DISABLED);
-    loadBtn.setState(GuiElement::STATE_DISABLED);
-    backBtn.setState(GuiElement::STATE_DISABLED);
-    updateBtn.setState(GuiElement::STATE_DISABLED);
-    reinstallBtn.setState(GuiElement::STATE_DISABLED);
-    openBtn.setState(GuiElement::STATE_DISABLED);
+    delBtn.setState(GuiElement::STATE_DISABLED, -1);
+    loadBtn.setState(GuiElement::STATE_DISABLED, -1);
+    backBtn.setState(GuiElement::STATE_DISABLED, -1);
+    updateBtn.setState(GuiElement::STATE_DISABLED, -1);
+    reinstallBtn.setState(GuiElement::STATE_DISABLED, -1);
+    openBtn.setState(GuiElement::STATE_DISABLED, -1);
 
-    HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(selectedButton->execPath);
-    loader->setEffect(EFFECT_FADE, 15, 255);
-    loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
-    append(loader);
+    // HomebrewLoader * loader = HomebrewLoader::loadToMemoryAsync(selectedButton->execPath);
+    // loader->setEffect(EFFECT_FADE, 15, 255);
+    // loader->asyncLoadFinished.connect(this, &HomebrewLaunchWindow::OnFileLoadFinish);
+    // append(loader);
 }
 
 

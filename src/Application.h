@@ -18,13 +18,13 @@
 #ifndef _APPLICATION_H
 #define _APPLICATION_H
 
+#include <gui/GuiButton.h>
+#include <gui/input/SDLController.h>
 #include "menu/MainWindow.h"
-#include "video/CVideo.h"
-#include <system/CThread.h>
 
 extern char* repoUrl;
 
-class Application : public CThread
+class Application
 {
 public:
     static Application * instance() {
@@ -39,9 +39,6 @@ public:
         }
     }
 
-    CVideo *getVideo(void) const {
-        return video;
-    }
     MainWindow *getMainWindow(void) const {
         return mainWindow;
     }
@@ -68,9 +65,9 @@ private:
     void executeThread(void);
 
     GuiSound *bgMusic;
-    CVideo *video;
+    Renderer *video;
     MainWindow *mainWindow;
-    GuiController *controller[5];
+    SDLController *controller[5];
     int exitCode;
 };
 

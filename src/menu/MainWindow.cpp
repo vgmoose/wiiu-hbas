@@ -15,13 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 #include "MainWindow.h"
-#include <dynamic_libs/os_functions.h>
-#include <dynamic_libs/socket_functions.h>
 #include "Application.h"
-#include <utils/StringTools.h>
-#include <utils/logger.h>
-
-#include <dynamic_libs/vpad_functions.h>
+#include "../resources/Resources.h"
+#include "utils/StringTools.h"
 
 int movedALittleBit = 0;
 int scrolledSoFar = 0;
@@ -30,25 +26,28 @@ bool doIntroScroll;
 
 HomebrewWindow * homebrewWindow;
 
+#define sdlWhite (SDL_Color) { 1, 1, 1, 255 }
+
+
 MainWindow::MainWindow(int w, int h)
     : width(w)
     , height(h)
-    , bgImageColor(w, h, (GX2Color){ 0, 0, 0, 0 })
-    , backgroundImg2Data(Resources::GetImageData("bg.png"))
+    , bgImageColor((SDL_Color){ 0, 0, 0, 0 }, w, h)
+    , backgroundImg2Data(Resources::GetImageData(ASSET_ROOT "bg.png"))
     , backgroundImg2(backgroundImg2Data)
-    , splashScreenImgData(Resources::GetImageData("splash.png"))
+    , splashScreenImgData(Resources::GetImageData(ASSET_ROOT "splash.png"))
     , splashScreen(splashScreenImgData)
 {
-//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 0);
-//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 1);
-//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 2);
-//    bgImageColor.setImageColor((GX2Color){ 40, 40, 40, 255 }, 3);
+//    bgImageColor.setImageColor((SDL_Color){ 40, 40, 40, 255 }, 0);
+//    bgImageColor.setImageColor((SDL_Color){ 40, 40, 40, 255 }, 1);
+//    bgImageColor.setImageColor((SDL_Color){ 40, 40, 40, 255 }, 2);
+//    bgImageColor.setImageColor((SDL_Color){ 40, 40, 40, 255 }, 3);
 //    append(&bgImageColor);
         
     append(&backgroundImg2);
         
     disableSplashScreenNextUpdate = false;
-//    splashScreenImgData = new GuiImageData(Resources::GetImageData("splash.png");
+//    splashScreenImgData = new GuiTextureData(Resources::GetImageData(ASSET_ROOT "splash.png");
 //    splashScreen = new GuiImage(splashScreenImgData);
 		                        
     append(&splashScreen);
@@ -58,7 +57,7 @@ MainWindow::MainWindow(int w, int h)
 
     for(int i = 0; i < 5; i++)
     {
-        std::string filename = StringTools::strfmt("player%i_point.png", i);
+        std::string filename = StringTools::strfmt(ASSET_ROOT "player%i_point.png", i);
         pointerImgData[i] = Resources::GetImageData(filename.c_str());
         pointerImg[i] = new GuiImage(pointerImgData[i]);
         pointerImg[i]->setScale(1.5f);
@@ -67,26 +66,26 @@ MainWindow::MainWindow(int w, int h)
         
     homebrewWindow = new HomebrewWindow(w, h);
         
-    log_printf("MainWindow done loading");
-    CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
-    pThread->resumeThread();
+    printf("MainWindow done loading");
+    // CThread * pThread = CThread::create(asyncRefreshHomebrewApps, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
+    // pThread->resumeThread();
 }
 
-void asyncRefreshHomebrewAppIcons(CThread* thread, void* args)
+void asyncRefreshHomebrewAppIcons(void* thread, void* args)
 {
-    log_printf("NEW THREAD START: Icon async refresh");
+    printf("NEW THREAD START: Icon async refresh");
 //    homebrewWindow->populateIconCache();
-    log_printf("EXISTING THREAD END: Icon async refresh");
+    printf("EXISTING THREAD END: Icon async refresh");
 }
 
-void asyncRefreshHomebrewApps(CThread* thread, void* args)
+void asyncRefreshHomebrewApps(void* thread, void* args)
 {
-    log_printf("NEW THREAD START: Async refresh homebrew apps");
+    printf("NEW THREAD START: Async refresh homebrew apps");
     homebrewWindow->refreshHomebrewApps();
 	
 	// display another loading message
 	// toDO: temporary until loadLocalApps is sped up
-	GuiText* loadingMsg = new GuiText("One Moment Please...", 40, glm::vec4(1, 1, 1, 1));
+	GuiText* loadingMsg = new GuiText("One Moment Please...", 40, sdlWhite);
 	homebrewWindow->append(loadingMsg);
 	homebrewWindow->loadLocalApps(0);
 	homebrewWindow->remove(loadingMsg);
@@ -94,7 +93,7 @@ void asyncRefreshHomebrewApps(CThread* thread, void* args)
 	
 //    CThread * pThread = CThread::create(asyncRefreshHomebrewAppIcons, NULL, CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 10);
 //    pThread->resumeThread();
-    log_printf("EXISTING THREAD END: Async refresh homebrew apps");
+    printf("EXISTING THREAD END: Async refresh homebrew apps");
 }
 
 void globalRefreshHomebrewApps()
@@ -126,25 +125,25 @@ MainWindow::~MainWindow()
 //    for(int i = 0; i < 5; i++)
 //    {
 //        delete pointerImg[i];
-//        Resources::RemoveImageData(pointerImgData[i]);
+//        // Resources::RemoveImageData(pointerImgData[i]);
 //    }
 }
 
 void MainWindow::updateEffects()
 {
     //! dont read behind the initial elements in case one was added
-    u32 tvSize = tvElements.size();
-    u32 drcSize = drcElements.size();
+    uint32_t tvSize = tvElements.size();
+    uint32_t drcSize = drcElements.size();
 
-    for(u32 i = 0; (i < drcSize) && (i < drcElements.size()); ++i)
+    for(uint32_t i = 0; (i < drcSize) && (i < drcElements.size()); ++i)
     {
         drcElements[i]->updateEffects();
     }
 
     //! only update TV elements that are not updated yet because they are on DRC
-    for(u32 i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
+    for(uint32_t i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
     {
-        u32 n;
+        uint32_t n;
         for(n = 0; (n < drcSize) && (n < drcElements.size()); n++)
         {
             if(tvElements[i] == drcElements[n])
@@ -160,14 +159,14 @@ void MainWindow::updateEffects()
 void MainWindow::update(GuiController *controller)
 {
     //! dont read behind the initial elements in case one was added
-    //u32 tvSize = tvElements.size();
+    //uint32_t tvSize = tvElements.size();
     
 // TODO: put back with dpad changes
 //        if(controller->showPointer && controller->data.validPointer)
 //    {
 //        int wpadIdx = controller->chanIdx;
-//        f32 posX = controller->data.x;
-//        f32 posY = controller->data.y;
+//        float posX = controller->data.x;
+//        float posY = controller->data.y;
 //        pointerImg[wpadIdx]->setPosition(posX, posY);
 //        pointerImg[wpadIdx]->setAngle(controller->data.pointerAngle);
 //        pointerValid[wpadIdx] = true;
@@ -179,11 +178,11 @@ void MainWindow::update(GuiController *controller)
 	//}
 	
 	// minus button toggles joysticks
-	if (controller->data.buttons_r & VPAD_BUTTON_MINUS)
+	if (controller->data.buttons_r & GuiTrigger::BUTTON_MINUS)
 		joysticksDisabled = !joysticksDisabled;
 	
 //	// get a random app
-//	if (controller->data.buttons_r & VPAD_BUTTON_PLUS)
+//	if (controller->data.buttons_r & GuiTrigger::BUTTON_PLUS)
 //	{
 //		srand(OSGetTime());
 //		int r = rand() % homebrewWindow->curTabButtons.size();
@@ -192,18 +191,18 @@ void MainWindow::update(GuiController *controller)
 //    
 	
 	// L button forces a cache refresh
-	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_L)
+	if (showingSplashScreen && controller->data.buttons_h & GuiTrigger::BUTTON_L)
 		homebrewWindow->invalidateCache = disableSplashScreenNextUpdate = true;
 
 	// R button completely ignores icons
-	if (showingSplashScreen && controller->data.buttons_h & VPAD_BUTTON_R)
+	if (showingSplashScreen && controller->data.buttons_h & GuiTrigger::BUTTON_R)
 		homebrewWindow->noIconMode = disableSplashScreenNextUpdate = true;
     
     if (showingSplashScreen && controller->data.touched)
         disableSplashScreenNextUpdate = true;
     
     else if ((disableSplashScreenNextUpdate ||
-        (controller->data.buttons_h & VPAD_BUTTON_A)) &&
+        (controller->data.buttons_h & GuiTrigger::BUTTON_A)) &&
         showingSplashScreen)
     {
         removeE(&splashScreen);
@@ -213,7 +212,7 @@ void MainWindow::update(GuiController *controller)
         // perform a synchronous refresh
 //        globalRefreshHomebrewApps();
         
-        log_printf("update made");
+        printf("update made");
         
 
         return;
@@ -233,8 +232,8 @@ void MainWindow::update(GuiController *controller)
 		ydif = 0;
         
 	// Handle D-pad (and 1/2 on Wii Remotes) movement as well
-	ydif = (ydif >  1 || controller->data.buttons_h &	VPAD_BUTTON_DOWN)?    20 : ydif;
-	ydif = (ydif < -1 || controller->data.buttons_h &  VPAD_BUTTON_UP)? -20: ydif;
+	ydif = (ydif >  1 || controller->data.buttons_h &	GuiTrigger::BUTTON_DOWN)?    20 : ydif;
+	ydif = (ydif < -1 || controller->data.buttons_h &  GuiTrigger::BUTTON_UP)? -20: ydif;
     ydif = (ydif >  1 || controller->data.buttons_h &	GuiTrigger::BUTTON_2)?    20 : ydif;
     ydif = (ydif < -1 || controller->data.buttons_h &  GuiTrigger::BUTTON_1)? -20: ydif;
     
@@ -267,27 +266,27 @@ void MainWindow::update(GuiController *controller)
 
     if(controller->chan & GuiTrigger::CHANNEL_1)
     {
-        u32 drcSize = drcElements.size();
+        uint32_t drcSize = drcElements.size();
 
-        for(u32 i = 0; (i < drcSize) && (i < drcElements.size()); ++i)
+        for(uint32_t i = 0; (i < drcSize) && (i < drcElements.size()); ++i)
         {
             drcElements[i]->update(controller);
         }
     }
     else
     {
-        u32 tvSize = tvElements.size();
+        uint32_t tvSize = tvElements.size();
 
-        for(u32 i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
+        for(uint32_t i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
         {
             tvElements[i]->update(controller);
         }
     }
 
 //    //! only update TV elements that are not updated yet because they are on DRC
-//    for(u32 i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
+//    for(uint32_t i = 0; (i < tvSize) && (i < tvElements.size()); ++i)
 //    {
-//        u32 n;
+//        uint32_t n;
 //        for(n = 0; (n < drcSize) && (n < drcElements.size()); n++)
 //        {
 //            if(tvElements[i] == drcElements[n])
@@ -320,9 +319,9 @@ void scrollMenu(float scrol)
     homebrewWindow->scrollOffY += scrol;
 }
 
-void MainWindow::drawDrc(CVideo *video)
+void MainWindow::drawDrc(Renderer *video)
 {
-    for(u32 i = 0; i < drcElements.size(); ++i)
+    for(uint32_t i = 0; i < drcElements.size(); ++i)
     {
         drcElements[i]->draw(video);
     }
@@ -345,9 +344,9 @@ void MainWindow::drawDrc(CVideo *video)
     }
 }
 
-void MainWindow::drawTv(CVideo *video)
+void MainWindow::drawTv(Renderer *video)
 {
-    for(u32 i = 0; i < tvElements.size(); ++i)
+    for(uint32_t i = 0; i < tvElements.size(); ++i)
     {
         tvElements[i]->draw(video);
     }

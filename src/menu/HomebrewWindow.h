@@ -17,11 +17,17 @@
 #ifndef _HOMEBREW_WINDOW_H_
 #define _HOMEBREW_WINDOW_H_
 
-#include "gui/Gui.h"
-#include "gui/GuiFrame.h"
+#include <gui/GuiFrame.h>
+#include <gui/GuiButton.h>
+#include <gui/GuiText.h>
+#include <gui/GuiImage.h>
+#include <gui/GuiTrigger.h>
+#include <gui/GuiSound.h>
+#include <gui/GuiTextureData.h>
+#include <gui/GuiController.h>
+
 #include "menu/ProgressWindow.h"
 
-#include <dynamic_libs/socket_functions.h>
 #include "../libs/get/src/Get.hpp"
 
 #define LOCAL 0
@@ -52,14 +58,14 @@ typedef struct
     GuiText *versionLabel;
     GuiText *coderLabel;
     GuiText *descriptionLabel;
-    GuiImageData *iconImgData;
+    GuiTextureData *iconImgData;
     GuiImage *iconImg;
     
     // the actual package this button represents
     Package* package = NULL;
 } homebrewButton;
 
-extern void updateProgress(void *arg, u32 done, u32 total);
+extern void updateProgress(void *arg, uint32_t done, uint32_t total);
 extern ProgressWindow* getProgressWindow();
 
 class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
@@ -67,8 +73,8 @@ class HomebrewWindow : public GuiFrame, public sigslot::has_slots<>
 public:
     HomebrewWindow(int w, int h);
     virtual ~HomebrewWindow();
-    static void do_download(CThread *thread, void *arg);
-    void draw(CVideo *pVideo);
+    static void do_download(void *thread, void *arg);
+    void draw(Renderer *pVideo);
     float scrollOffY = 0;
     float lastScrollOffY = 0;
     // all homebrew buttons
@@ -78,16 +84,16 @@ public:
     Get* get = NULL;
     
     GuiSound *buttonClickSound;
-    GuiImageData * installedButtonImgData;
-    GuiImageData * getButtonImgData;
-    GuiImageData * updateButtonImgData;
-    GuiImageData * localButtonImgData;
+    GuiTextureData * installedButtonImgData;
+    GuiTextureData * getButtonImgData;
+    GuiTextureData * updateButtonImgData;
+    GuiTextureData * localButtonImgData;
     
     GuiText hblVersionText;
     GuiText * hblRepoText;
         
-    GuiImageData *hblTabImgData;
-    GuiImageData *rpxTabImgData;
+    GuiTextureData *hblTabImgData;
+    GuiTextureData *rpxTabImgData;
     GuiImage hblTabImg;
     GuiImage rpxTabImg;
 
@@ -102,7 +108,7 @@ public:
     
     std::vector<GuiButton*> all_cats;
     
-    bool noIconMode = false;
+    bool noIconMode = true;
     bool invalidateCache = false;
     bool isFiltering = false;
     
@@ -155,8 +161,8 @@ private:
 
 
     void OnCloseTcpReceiverFinish(GuiElement *element);
-    void OnTcpReceiveStart(GuiElement *element, u32 ip);
-    void OnTcpReceiveFinish(GuiElement *element, u32 ip, int result);
+    void OnTcpReceiveStart(GuiElement *element, uint32_t ip);
+    void OnTcpReceiveFinish(GuiElement *element, uint32_t ip, int result);
     
 
 

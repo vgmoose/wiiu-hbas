@@ -10,7 +10,6 @@
 #define DPAD_CONTROLLER_H_
 
 #include <gui/GuiController.h>
-#include <dynamic_libs/vpad_functions.h>
 
 class DVPadController : public GuiController
 {
@@ -19,7 +18,7 @@ public:
     //!Constructor
     DVPadController(int channel) : GuiController(channel)
     {
-        memset(&vpad, 0, sizeof(VPADData));
+        memset(&vpad, 0, sizeof(PADData));
         memset(&data, 0, sizeof(PadData));
         memset(&lastData, 0, sizeof(PadData));
         
@@ -32,13 +31,13 @@ public:
     virtual ~DVPadController() {}
     
     //Remove the DPAD buttons (by clearing their bits) so that they aren't used by the Gui processes.
-    u32 fixButtons(u32 buttons)
+    uint32_t fixButtons(uint32_t buttons)
     {
-        buttons &= ~VPAD_BUTTON_LEFT;
-        buttons &= ~VPAD_BUTTON_RIGHT;
-        buttons &= ~VPAD_BUTTON_UP;
-        buttons &= ~VPAD_BUTTON_DOWN;
-        buttons &= ~VPAD_BUTTON_A;
+        buttons &= ~GuiTrigger::BUTTON_LEFT;
+        buttons &= ~GuiTrigger::BUTTON_RIGHT;
+        buttons &= ~GuiTrigger::BUTTON_UP;
+        buttons &= ~GuiTrigger::BUTTON_DOWN;
+        buttons &= ~GuiTrigger::BUTTON_A;
         return buttons;
     }
     
@@ -51,24 +50,24 @@ public:
         
         if(vpadError == 0)
         {
-            if(vpad.btns_h & VPAD_BUTTON_LEFT)
+            if(vpad.btns_h & GuiTrigger::BUTTON_LEFT)
             {
                 if(data.x > -(width / 2)) data.x -= 10;
             }
-            if(vpad.btns_h & VPAD_BUTTON_RIGHT)
+            if(vpad.btns_h & GuiTrigger::BUTTON_RIGHT)
             {
                 if(data.x < (width / 2)) data.x += 10;
             }
-            if(vpad.btns_h & VPAD_BUTTON_UP)
+            if(vpad.btns_h & GuiTrigger::BUTTON_UP)
             {
                 if(data.y < (height / 2)) data.y += 10;
             }
-            if(vpad.btns_h & VPAD_BUTTON_DOWN)
+            if(vpad.btns_h & GuiTrigger::BUTTON_DOWN)
             {
                 if(data.y > -(height / 2)) data.y -= 10;
             }
             
-            if(vpad.btns_h & VPAD_BUTTON_A)
+            if(vpad.btns_h & GuiTrigger::BUTTON_A)
                 data.touched = true;
             else
                 data.touched = false;

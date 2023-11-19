@@ -17,9 +17,16 @@
 #ifndef _HOMEBREW_LAUNCHER_WINDOW_H_
 #define _HOMEBREW_LAUNCHER_WINDOW_H_
 
-#include "gui/Gui.h"
-#include "gui/GuiFrame.h"
+#include <gui/GuiFrame.h>
+#include <gui/GuiText.h>
+#include <gui/GuiImage.h>
+#include <gui/GuiButton.h>
+#include <gui/GuiTrigger.h>
+#include <gui/GuiSound.h>
+#include <gui/GuiTextureData.h>
+
 #include "menu/HomebrewWindow.h"
+
 
 //typedef void (GuiFrame::*fn)(GuiElement*); 
 //static fn removeETarget;
@@ -48,22 +55,22 @@ private:
     void OnCloseEffectFinish(GuiElement *element);
 
     GuiSound *buttonClickSound;
-    GuiImageData * backgroundImgData;
+    GuiTextureData * backgroundImgData;
     GuiImage backgroundImg;
 
-    GuiImageData *delButtonImgData;
-    GuiImageData *getButtonImgData;
-    GuiImageData *updateButtonImgData;
-    GuiImageData *deleteButtonImgData;
-    GuiImageData *reinstallButtonImgData;
-    GuiImageData *openButtonImgData;
-    GuiImageData *closeButtonImgData;
+    GuiTextureData *delButtonImgData;
+    GuiTextureData *getButtonImgData;
+    GuiTextureData *updateButtonImgData;
+    GuiTextureData *deleteButtonImgData;
+    GuiTextureData *reinstallButtonImgData;
+    GuiTextureData *openButtonImgData;
+    GuiTextureData *closeButtonImgData;
     GuiImage iconImage;
 
     GuiText titleText;
-    GuiText versionText;
+    // GuiText versionText;
     GuiText versionValueText;
-    GuiText authorText;
+    // GuiText authorText;
     GuiText authorValueText;
     GuiText descriptionText;
 

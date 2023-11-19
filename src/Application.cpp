@@ -17,37 +17,34 @@
  ****************************************************************************/
 #include "Application.h"
 #include "common/common.h"
-#include <dynamic_libs/os_functions.h>
-#include <gui/FreeTypeGX.h>
-#include <gui/VPadController.h>
-#include <gui/WPadController.h>
-#include <gui/DVPadController.h>
-#include <gui/DWPadController.h>
 #include "resources/Resources.h"
-#include "sounds/SoundHandler.hpp"
-#include <utils/logger.h>
+#include <gui/system/SDLSystem.h>
+#include <gui/input/SDLControllerMouse.h>
+#include <gui/input/SDLControllerWiiUProContoller.h>
+
+// #include <guiounds/SoundHandler.hpp"
 
 Application *Application::applicationInstance = NULL;
 bool Application::exitApplication = false;
 
 Application::Application()
-	: CThread(CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 0, 0x20000)
-	, bgMusic(NULL)
-	, video(NULL)
+	// : CThread(CThread::eAttributeAffCore1 | CThread::eAttributePinnedAff, 0, 0x20000)
+	: bgMusic(NULL)
+	// , video(NULL)
     , mainWindow(NULL)
     , exitCode(EXIT_RELAUNCH_ON_LOAD)
 {
-    controller[0] = new VPadController(GuiTrigger::CHANNEL_1);
-    controller[1] = new WPadController(GuiTrigger::CHANNEL_2);
-    controller[2] = new WPadController(GuiTrigger::CHANNEL_3);
-    controller[3] = new WPadController(GuiTrigger::CHANNEL_4);
-    controller[4] = new WPadController(GuiTrigger::CHANNEL_5);
+    controller[0] = new SDLControllerMouse(GuiTrigger::CHANNEL_1);
+    controller[1] = new SDLControllerWiiUProContoller(GuiTrigger::CHANNEL_2);
+    controller[2] = new SDLControllerWiiUProContoller(GuiTrigger::CHANNEL_3);
+    controller[3] = new SDLControllerWiiUProContoller(GuiTrigger::CHANNEL_4);
+    controller[4] = new SDLControllerWiiUProContoller(GuiTrigger::CHANNEL_5);
         
     //! load resources
-    Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
+    // Resources::LoadFiles("sd:/wiiu/apps/appstore/resources");
 
     //! create bgMusic
-    bgMusic = new GuiSound(Resources::GetFile("slimers.mp3"), Resources::GetFileSize("slimers.mp3"));
+    bgMusic = new GuiSound(Resources::GetFile(ASSET_ROOT "background.mp3"), Resources::GetFileSize(ASSET_ROOT "background.mp3"));
     bgMusic->SetLoop(true);
     bgMusic->Play();
     bgMusic->SetVolume(50);
@@ -57,114 +54,145 @@ Application::Application()
 
 Application::~Application()
 {
-    log_printf("Destroy music\n");
+    printf("Destroy music\n");
 
     delete bgMusic;
 
-    log_printf("Destroy controller\n");
+    printf("Destroy controller\n");
 
     for(int i = 0; i < 5; i++)
         delete controller[i];
 
-    log_printf("Destroy async deleter\n");
-	AsyncDeleter::destroyInstance();
+    printf("Destroy async deleter\n");
+	// AsyncDeleter::destroyInstance();
 
-    log_printf("Clear resources\n");
-    Resources::Clear();
+    printf("Clear resources\n");
+    // Resources::Clear();
 
-    log_printf("Stop sound handler\n");
-	SoundHandler::DestroyInstance();
+    printf("Stop sound handler\n");
+	// SoundHandler::DestroyInstance();
 }
 
 int Application::exec()
 {
+    executeThread();
     //! start main GX2 thread
-    resumeThread();
-    //! now wait for thread to finish
-	shutdownThread();
+    // resumeThread();
+    // //! now wait for thread to finish
+	// shutdownThread();
 
 	return exitCode;
 }
 
 void Application::fadeOut()
 {
-    GuiImage fadeOut(video->getTvWidth(), video->getTvHeight(), (GX2Color){ 0, 0, 0, 255 });
+    // GuiImage fadeOut(video->getTvWidth(), video->getTvHeight(), (SDL_Color){ 0, 0, 0, 255 });
 
-	for(int i = 0; i < 255; i += 10)
-    {
-        if(i > 255)
-            i = 255;
+	// for(int i = 0; i < 255; i += 10)
+    // {
+    //     if(i > 255)
+    //         i = 255;
 
-        fadeOut.setAlpha(i / 255.0f);
+    //     fadeOut.setAlpha(i / 255.0f);
 
-        //! start rendering DRC
-	    video->prepareDrcRendering();
-	    mainWindow->drawDrc(video);
+    //     //! start rendering DRC
+	//     video->prepareDrcRendering();
+	//     mainWindow->drawDrc(video);
 
-        GX2SetDepthOnlyControl(GX2_DISABLE, GX2_DISABLE, GX2_COMPARE_ALWAYS);
-        fadeOut.draw(video);
-        GX2SetDepthOnlyControl(GX2_ENABLE, GX2_ENABLE, GX2_COMPARE_LEQUAL);
+    //     GX2SetDepthOnlyControl(GX2_DISABLE, GX2_DISABLE, GX2_COMPARE_ALWAYS);
+    //     fadeOut.draw(video);
+    //     GX2SetDepthOnlyControl(GX2_ENABLE, GX2_ENABLE, GX2_COMPARE_LEQUAL);
 
-	    video->drcDrawDone();
+	//     video->drcDrawDone();
 
-        //! start rendering TV
-	    video->prepareTvRendering();
+    //     //! start rendering TV
+	//     video->prepareTvRendering();
 
-	    mainWindow->drawTv(video);
+	//     mainWindow->drawTv(video);
 
-        GX2SetDepthOnlyControl(GX2_DISABLE, GX2_DISABLE, GX2_COMPARE_ALWAYS);
-        fadeOut.draw(video);
-        GX2SetDepthOnlyControl(GX2_ENABLE, GX2_ENABLE, GX2_COMPARE_LEQUAL);
+    //     GX2SetDepthOnlyControl(GX2_DISABLE, GX2_DISABLE, GX2_COMPARE_ALWAYS);
+    //     fadeOut.draw(video);
+    //     GX2SetDepthOnlyControl(GX2_ENABLE, GX2_ENABLE, GX2_COMPARE_LEQUAL);
 
-	    video->tvDrawDone();
+	//     video->tvDrawDone();
 
-	    //! as last point update the effects as it can drop elements
-	    mainWindow->updateEffects();
+	//     //! as last point update the effects as it can drop elements
+	//     mainWindow->updateEffects();
 
-	    video->waitForVSync();
-    }
+	//     video->waitForVSync();
+    // }
 
-    //! one last cleared black screen
-    video->prepareDrcRendering();
-    video->drcDrawDone();
-    video->prepareTvRendering();
-    video->tvDrawDone();
-    video->waitForVSync();
-    video->tvEnable(false);
-    video->drcEnable(false);
+    // //! one last cleared black screen
+    // video->prepareDrcRendering();
+    // video->drcDrawDone();
+    // video->prepareTvRendering();
+    // video->tvDrawDone();
+    // video->waitForVSync();
+    // video->tvEnable(false);
+    // video->drcEnable(false);
+}
+
+#define sdlBlack (SDL_Color) { 0, 0, 0, 255 }
+
+// TODO: actually measure TV on wiiu
+int getTvWidth() {
+    return 1280;
+}
+
+int getTvHeight() {
+    return 720;
 }
 
 void Application::executeThread(void)
 {
-    log_printf("Initialize video\n");
-    video = new CVideo(GX2_TV_SCAN_MODE_720P, GX2_DRC_SINGLE);
+    printf("Initialize video\n");
 
-    log_printf("Video size %i x %i\n", video->getTvWidth(), video->getTvHeight());
+    SDLSystem sdlSystem;
+    // initElements();
+
+    Renderer* mainRenderer = sdlSystem.getRenderer();
+    video = new Renderer(mainRenderer->getRenderer(), SDL_PIXELFORMAT_RGBA8888);
+
+    printf("Video size %i x %i\n", getTvWidth(), getTvHeight());
 
     //! setup default Font
-    log_printf("Initialize main font system\n");
-    FreeTypeGX *fontSystem = new FreeTypeGX(Resources::GetFile("font.ttf"), Resources::GetFileSize("font.ttf"), true);
+    printf("Initialize main font system\n");
+    GuiFont *fontSystem = new GuiFont(
+        Resources::GetFile(ASSET_ROOT "font.ttf"),
+        Resources::GetFileSize(ASSET_ROOT "font.ttf"),
+        mainRenderer
+    );
     GuiText::setPresetFont(fontSystem);
-    GuiText::setPresets(28, glm::vec4(0, 0, 0, 1), 0xFFFF, ALIGN_CENTER | ALIGN_MIDDLE); 
+    GuiText::setPresets(28, sdlBlack);//, 0xFFFF, ALIGN_CENTER | ALIGN_MIDDLE); 
 
-    log_printf("Initialize main window\n");
+    printf("Initialize main window\n");
 
-    mainWindow = new MainWindow(video->getTvWidth(), video->getTvHeight());
+    mainWindow = new MainWindow(getTvWidth(), getTvHeight());
 
-    log_printf("Entering main loop\n");
+    printf("Entering main loop\n");
 
     //! main GX2 loop (60 Hz cycle with max priority on core 1)
     while(!exitApplication)
     {
         //! Read out inputs
+        SDL_Event event;
+        SDL_PollEvent(&event);
+
+        // quit!!!
+        if(event.type == SDL_QUIT) {
+            exitApplication = true;
+            break;
+        }
+
+        //! Read out inputs
         for(int i = 0; i < 5; i++)
         {
             if(controller[i] == NULL) continue;
             
-            if(controller[i]->update(video->getTvWidth(), video->getTvHeight()) == false)
+            if(controller[i]->update(&event, getTvWidth(), getTvHeight()))
                 continue;
             
-            if(controller[i]->data.buttons_d & VPAD_BUTTON_HOME)
+            if(controller[i]->data.buttons_d & GuiTrigger::BUTTON_HOME)
                 exitApplication = true;
             
             //! update controller states
@@ -232,30 +260,30 @@ void Application::executeThread(void)
         }
 
         //! start rendering DRC
-	    video->prepareDrcRendering();
-	    mainWindow->drawDrc(video);
-	    video->drcDrawDone();
+	    // video->prepareDrcRendering();
+	    // mainWindow->drawDrc(video);
+	    // video->drcDrawDone();
 
-        //! start rendering TV
-	    video->prepareTvRendering();
+        // //! start rendering TV
+	    // video->prepareTvRendering();
 	    mainWindow->drawTv(video);
-	    video->tvDrawDone();
+	    // video->tvDrawDone();
 
         //! enable screen after first frame render
-	    if(video->getFrameCount() == 0) {
-            video->tvEnable(true);
-            video->drcEnable(true);
-	    }
+	    // if(video->getFrameCount() == 0) {
+        //     video->tvEnable(true);
+        //     video->drcEnable(true);
+	    // }
 
 	    //! as last point update the effects as it can drop elements
 	    mainWindow->updateEffects();
 
-	    video->waitForVSync();
+	    // video->waitForVSync();
 
         //! transfer elements to real delete list here after all processes are finished
         //! the elements are transfered to another list to delete the elements in a separate thread
         //! and avoid blocking the GUI thread
-        AsyncDeleter::triggerDeleteProcess();
+        // AsyncDeleter::triggerDeleteProcess();
 	}
 
 	fadeOut();
