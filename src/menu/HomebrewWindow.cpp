@@ -26,6 +26,7 @@
 #include "../resources/Resources.h"
 #include <thread>
 #include <sstream>
+#include "../libs/get/src/Utils.hpp"
 
 #define sdlBlack (SDL_Color) { 0, 0, 0, 255 }
 #define sdlWhite (SDL_Color) { 255, 255, 255, 255 }
@@ -33,16 +34,14 @@
 
 #define DEFAULT_WIILOAD_PORT        4299
 
-char * repoUrl = "http://wiiubru.com/appstore";
-//char * repoUrl = "192.168.1.104:8000";
-//char * repoUrl = "http://wiiubru.com/appstore/appstoretest";
+char * repoUrl = "https://wiiu.cdn.fortheusers.org";
 
 ProgressWindow* progressWindow;
 static HomebrewWindow* thisHomebrewWindow;
 
 void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
 {
-    printf("going into this big function");
+    printf("going into this big function\n");
     const float cfImageScale = 0.8f;
     
     if (button->iconImgData)
@@ -65,7 +64,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
         button->coderLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         button->coderLabel->setMaxWidth(160);//, GuiText::SCROLL_HORIZONTAL);
         button->coderLabel->setPosition(300, 20);
-        printf("did coder things");
+        printf("did coder things\n");
     }
     
     if (button->versionLabel)
@@ -73,7 +72,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
         button->versionLabel->setAlignment(ALIGN_LEFT | ALIGN_MIDDLE);
         button->versionLabel->setMaxWidth(160);//, GuiText::SCROLL_HORIZONTAL);
         button->versionLabel->setPosition(300, -15);
-        printf("did version things");
+        printf("did version things\n");
     }
     
     if (button->descriptionLabel)
@@ -81,20 +80,20 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
         button->descriptionLabel->setAlignment(ALIGN_CENTER | ALIGN_MIDDLE);
         button->descriptionLabel->setMaxWidth(350);//, GuiTex t::SCROLL_HORIZONTAL);
         button->descriptionLabel->setPosition(0, -60);
-        printf("did description things");
+        printf("did description things\n");
     }
 
     if (button->image)
     {
         // set the right image for the status
         button->image->setScale(0.9);
-        printf("did image scale things");
+        printf("did image scale things\n");
     }
 
     if (button->button)
     {
         button->button->setImage(button->image);
-        printf("did another image things");
+        printf("did another image things\n");
         button->button->setLabel(button->nameLabel, 0);
         button->button->setLabel(button->descriptionLabel, 1);
         button->button->setLabel(button->coderLabel, 2);
@@ -103,7 +102,7 @@ void HomebrewWindow::positionHomebrewButton(homebrewButton* button, int index)
         button->button->setTrigger(&touchTrigger);
         button->button->setTrigger(&wpadTouchTrigger);
         button->button->setEffectGrow();
-        printf("did button things");
+        printf("did button things\n");
     }
 //    button->button->setPosition(0, 0);
     //        button->button->setSoundClick(buttonClickSound);
@@ -176,7 +175,7 @@ void HomebrewWindow::filter()
 
 void HomebrewWindow::addAll(std::vector<homebrewButton*> buttons, int status)
 {
-    printf("Starting addall for status %d", status);
+    printf("Starting addall for status %d\n", status);
     GuiTextureData* appButtonImages[4] = { localButtonImgData, updateButtonImgData, installedButtonImgData, getButtonImgData };
 
     // only add the specific status of button to the current tab
@@ -185,22 +184,22 @@ void HomebrewWindow::addAll(std::vector<homebrewButton*> buttons, int status)
 //        printf("Checking %d, named %s", x, buttons[x].shortname.c_str());
         if (buttons[x]->status == status)
         {
-            printf("going in...");
+            printf("going in...\n");
             curTabButtons.push_back(buttons[x]);
-            printf("added to current tab");
+            printf("added to current tab\n");
             
             buttons[x]->image = new GuiImage(appButtonImages[status]);
-            printf("created new GuiImage");
+            printf("created new GuiImage\n");
             
             buttons[x]->button = new GuiButton(installedButtonImgData->getWidth(), installedButtonImgData->getHeight());
-            printf("initialized button");
+            printf("initialized button\n");
 
             buttons[x]->button->clicked.connect(this, &HomebrewWindow::OnHomebrewButtonClick);
-            printf("attached click event");
+            printf("attached click event\n");
 
                                     
             positionHomebrewButton(buttons[x], x);
-            printf("positioned button");
+            printf("positioned button\n");
 
         }
     }
@@ -236,7 +235,7 @@ void HomebrewWindow::loadLocalApps(int mode)
         
     }
     
-    printf("loadLocalApps: directory is sorted");
+    printf("loadLocalApps: directory is sorted\n");
 
     // load up local apps
     for(int i = 0; i < dirList->GetFilecount(); i++)
@@ -247,18 +246,18 @@ void HomebrewWindow::loadLocalApps(int mode)
 
         std::string homebrewPath = dirList->GetFilepath(i);
 
-        printf("Initial value: %s", homebrewPath.c_str());
+        printf("Initial value: %s\n", homebrewPath.c_str());
         size_t slashPos = homebrewPath.rfind('/');
         if(slashPos != std::string::npos)
             homebrewPath.erase(slashPos);
 
         if(homebrewPath == "sd:/wiiu/apps") {
             // This cause (a lot of) problems
-            printf("Skipping app with bad path to prevent errors");
+            printf("Skipping app with bad path to prevent errors\n");
             continue;
         }
         
-        printf("Loaded up %s, going to check for a meta", homebrewPath.c_str());
+        printf("Loaded up %s, going to check for a meta\n", homebrewPath.c_str());
         HomebrewXML metaXml;
         bool xmlReadSuccess = metaXml.LoadHomebrewXMLData((homebrewPath + "/meta.xml").c_str());
 //        if (!xmlReadSuccess)
@@ -314,18 +313,21 @@ void HomebrewWindow::loadLocalApps(int mode)
         int idx = homebrewButtons.size();
         homebrewButtons.resize(homebrewButtons.size() + 1);
         
+
         homebrewButtons[idx] = new homebrewButton();
+
                 
         // file path
         homebrewButtons[idx]->execPath = dirList->GetFilepath(i);
         homebrewButtons[idx]->iconImgData = NULL;        
         homebrewButtons[idx]->dirPath = homebrewPath;
 
+
 //        // assume that the first part of homebrewPath is "sd:/wiiu/apps/"
         homebrewButtons[idx]->shortname = curAppString;
         homebrewButtons[idx]->status = LOCAL;
 //        
-        printf("Looking in %s for an icon", (homebrewPath + iconPath).c_str());
+        printf("Looking in %s for an icon\n", (homebrewPath + iconPath).c_str());
 //
         if(iconData != NULL)
         {
@@ -333,21 +335,23 @@ void HomebrewWindow::loadLocalApps(int mode)
             free(iconData);
             iconData = NULL;
         }
+
       
         const char *cpName = xmlReadSuccess ? metaXml.GetName() : homebrewButtons[idx]->execPath.c_str();
 //        const char *cpDescription = xmlReadSuccess ? metaXml.GetShortDescription() : "";
         if(strncmp(cpName, "sd:/wiiu/apps/", strlen("sd:/wiiu/apps/")) == 0)
             cpName += strlen("sd:/wiiu/apps/");
         
+
         homebrewButtons[idx]->nameLabel = new GuiText(cpName, 28, sdlBlack);
         homebrewButtons[idx]->versionLabel = new GuiText(xmlReadSuccess? metaXml.GetVersion() : "", 28, sdlBlack);
         homebrewButtons[idx]->coderLabel = new GuiText(xmlReadSuccess? metaXml.GetCoder() : "Unknown", 28, sdlBlack);
         homebrewButtons[idx]->descriptionLabel = new GuiText(xmlReadSuccess? metaXml.GetShortDescription() : "", 28, sdlBlack);
-        printf("refreshHomebrewApps: added local button %d", idx);
+        printf("refreshHomebrewApps: added local button %d\n", idx);
         homebrewButtons[idx]->version = xmlReadSuccess? metaXml.GetVersion() : "999";
         
         localAppButtons.push_back(homebrewButtons[idx]);
-        printf("totally done with and added that");
+        printf("totally done with and added that\n");
     }
     
     // add everything to the current tab (this defines the order)
@@ -362,6 +366,8 @@ void HomebrewWindow::loadLocalApps(int mode)
 /**
 This method fetches remote apps only and that's all nothing more
 **/
+#define DEFAULT_GET_HOME "./.get/"
+
 void HomebrewWindow::refreshHomebrewApps()
 {
     printf("refreshHomebrewApps: starting homebrew app refresh");
@@ -375,44 +381,44 @@ void HomebrewWindow::refreshHomebrewApps()
     
     std::string cache;
     
-    if (!noIconMode)
-    {
-        // create the icon cache folder
-        cache = "sd:/wiiu/apps/appstore/cache/";
-        FSUtils::CreateSubfolder(cache.c_str());
-    }
+    // if (!noIconMode)
+    // {
+    //     // create the icon cache folder
+    //     cache = "sd:/wiiu/apps/appstore/cache/";
+    //     FSUtils::CreateSubfolder(cache.c_str());
+    // }
     
     // download app list from the repo
     // check if the Get object already exists, and make it if it doesn't
-    if (this->get == NULL)
-        this->get = new Get(".get", repoUrl);
-    
+    if (this->get == NULL) {
+        init_networking();
+        this->get = new Get(".get/", repoUrl);
+    }
+        
     int count = this->get->packages.size();
+    printf("Got: %d apps\n", count);
     
     // totalLocalApps will represent how many apps aren't on the server
     totalLocalApps = homebrewButtons.size();
+
+    homebrewButtons.resize(homebrewButtons.size() + count);
     
     globalUpdatePosition = true;
 
     for (int iterCount=0; iterCount<count; iterCount++)
     {
         char numstr[30];
-        sprintf(numstr, "Updating App info... (%d/%d)", iterCount, count);
+        sprintf(numstr, "Updating App info... (%d/%d)\n", iterCount, count);
         
         progressWindow->setTitle(numstr);
         updateProgress(0, iterCount, count);
         
         // the info for the current package is stored within the package variable
         Package* package = this->get->packages[iterCount];
-        
-        printf("done yaml parsing");
 
-        int idx = homebrewButtons.size();
-        homebrewButtons.resize(homebrewButtons.size() + 1);
+        int idx = homebrewButtons.size() - count + iterCount;
 
-        printf("resized homebrewButtons vector");
-        
-        homebrewButtons[idx] = new homebrewButton();
+        homebrewButtons[idx] = new homebrewButton;
         // file path
 
         // store the package pointer inside the homebrew button element
@@ -423,13 +429,11 @@ void HomebrewWindow::refreshHomebrewApps()
         homebrewButtons[idx]->shortname = package->pkg_name;
         homebrewButtons[idx]->category = package->category;
         homebrewButtons[idx]->version = package->version;
-        printf("set a bunch of attributes");
 
         homebrewButtons[idx]->nameLabel = new GuiText(package->title.c_str(), 28, sdlBlack);
         homebrewButtons[idx]->versionLabel = new GuiText(package->version.c_str(), 28, sdlBlack);
         homebrewButtons[idx]->coderLabel = new GuiText(package->author.c_str(), 28, sdlBlack);
         homebrewButtons[idx]->descriptionLabel = new GuiText(package->short_desc.c_str(), 28, sdlBlack);
-        printf("created some more attributes");
         
         homebrewButtons[idx]->iconImgData = Resources::GetImageData(ASSET_ROOT "missing.png");
 
@@ -483,7 +487,7 @@ void HomebrewWindow::refreshHomebrewApps()
 
     initialLoadInProgress = false;
     globalUpdatePosition = true;
-    printf("refreshHomebrewApps: done");
+    printf("refreshHomebrewApps: done\n");
     
 }
 
@@ -608,7 +612,7 @@ HomebrewWindow::HomebrewWindow(int w, int h)
     
     append(progressWindow);
         
-//    refreshHomebrewApps();
+   refreshHomebrewApps();
 }
 
 HomebrewWindow::~HomebrewWindow()

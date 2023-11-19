@@ -50,7 +50,7 @@ MainWindow::MainWindow(int w, int h)
 //    splashScreenImgData = new GuiTextureData(Resources::GetImageData(ASSET_ROOT "splash.png");
 //    splashScreen = new GuiImage(splashScreenImgData);
 		                        
-    append(&splashScreen);
+    // append(&splashScreen);
     showingSplashScreen = true;
 		
 //	srand(OSGetTime());
@@ -189,6 +189,12 @@ void MainWindow::update(GuiController *controller)
 //		homebrewWindow->OnHomebrewButtonClick(homebrewWindow->curTabButtons[r]->button, controller, 0);
 //	}
 //    
+
+    if (showingSplashScreen) {
+        append(homebrewWindow);
+        globalRefreshHomebrewApps();
+        showingSplashScreen = false;
+    }
 	
 	// L button forces a cache refresh
 	if (showingSplashScreen && controller->data.buttons_h & GuiTrigger::BUTTON_L)
@@ -207,12 +213,10 @@ void MainWindow::update(GuiController *controller)
     {
         removeE(&splashScreen);
         showingSplashScreen = false;
-        append(homebrewWindow);
 
         // perform a synchronous refresh
-//        globalRefreshHomebrewApps();
         
-        printf("update made");
+        printf("update made\n");
         
 
         return;

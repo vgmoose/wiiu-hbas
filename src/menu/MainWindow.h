@@ -40,7 +40,7 @@ public:
 
     GuiImage bgImageColor;
     
-    bool showingSplashScreen;
+    bool showingSplashScreen = true;
     bool disableSplashScreenNextUpdate;
     GuiTextureData * backgroundImg2Data;
     GuiImage backgroundImg2;

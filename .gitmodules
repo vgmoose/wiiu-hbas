@@ -1,6 +1,6 @@
 [submodule "libs/get"]
 	path = libs/get
 	url = https://github.com/vgmoose/get.git
-[submodule "libs/libgui"]
-	path = libs/libgui
-	url = https://github.com/wiiu-env/libgui.git
+[submodule "libs/libgui-sdl"]
+	path = libs/libgui-sdl
+	url = https://github.com/Maschell/libgui-sdl

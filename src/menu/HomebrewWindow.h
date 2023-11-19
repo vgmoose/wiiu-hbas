@@ -43,13 +43,13 @@ extern ProgressWindow * progressWindow;
 typedef struct
 {
     // for legacy apps uninstallation
-    std::string execPath = NULL;
+    std::string execPath;
     int status;
     std::string shortname;
-    std::string binary = NULL;
+    std::string binary;
     std::string category; // string version
     std::string version;
-    std::string dirPath = NULL;
+    std::string dirPath;
 
     // properties to be displayed/drawn
     GuiImage *image;
@@ -62,7 +62,7 @@ typedef struct
     GuiImage *iconImg;
     
     // the actual package this button represents
-    Package* package = NULL;
+    Package* package;
 } homebrewButton;
 
 extern void updateProgress(void *arg, uint32_t done, uint32_t total);

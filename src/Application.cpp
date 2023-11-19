@@ -189,8 +189,8 @@ void Application::executeThread(void)
         {
             if(controller[i] == NULL) continue;
             
-            if(controller[i]->update(&event, getTvWidth(), getTvHeight()))
-                continue;
+            // if(controller[i]->update(&event, getTvWidth(), getTvHeight()))
+            //     continue;
             
             if(controller[i]->data.buttons_d & GuiTrigger::BUTTON_HOME)
                 exitApplication = true;

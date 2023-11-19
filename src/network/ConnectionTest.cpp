@@ -25,33 +25,33 @@ ConnectionTest::ConnectionTest(const std::string & Url)
         mainUrl = Url;
         printf("ConnectionTest: Main url is %s", mainUrl.c_str());
     } else {
-        mainUrl = "http://www.google.com";
+        mainUrl = "https://www.google.com";
         printf("ConnectionTest: No url specified; using default %s", mainUrl.c_str());
     }
 }
 
 bool ConnectionTest::Test()
 {
-    // printf("ConnectionTest: Testing connection to %s...", mainUrl.c_str());
+    printf("ConnectionTest: Testing connection to %s...", mainUrl.c_str());
 
-    // CURL * curl = curl_easy_init();
-    // if(!curl)
-    //     return false;
+    CURL * curl = curl_easy_init();
+    if(!curl)
+        return false;
 
-    // curl_easy_setopt(curl, CURLOPT_URL, mainUrl.c_str());
-    // curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_URL, mainUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-    // curl_easy_perform(curl);
+    curl_easy_perform(curl);
 
-    // int resp = 404;
-    // curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp);
+    int resp = 404;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &resp);
 
-    // if(resp != 200) {
-    //     printf("ConnectionTest: response is %d; 200 expected -> connection unavailable", resp);
-    //     curl_easy_cleanup(curl);
-    //     return false;
-    // }
-    // printf("ConnectionTest: response is 200 -> connection available");
+    if(resp != 200) {
+        printf("ConnectionTest: response is %d; 200 expected -> connection unavailable", resp);
+        curl_easy_cleanup(curl);
+        return false;
+    }
+    printf("ConnectionTest: response is 200 -> connection available");
 
     // curl_easy_cleanup(curl);
     return true;

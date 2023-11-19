@@ -3,7 +3,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
-// #include <malloc.h>
+// // #include <malloc.h>
 
 // https://gist.github.com/ccbrown/9722406
 void dumpHex(const void* data, size_t size) {
